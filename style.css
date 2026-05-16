@@ -3136,9 +3136,10 @@ body::before {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  padding: clamp(40px,5.5vw,88px) clamp(32px,7vw,120px) clamp(28px,3.5vw,56px);
+  padding: clamp(28px,4vw,64px) clamp(32px,7vw,120px) clamp(20px,2.5vw,40px);
   gap: 32px;
   border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
 .pf-kicker {
@@ -3298,6 +3299,13 @@ body::before {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+}
+
+/* Override hero-bar to be static inside hero-pf */
+.hero-pf .hero-bar {
+  position: static;
+  flex-shrink: 0;
 }
 
 /* Mobile */
