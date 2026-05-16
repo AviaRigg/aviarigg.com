@@ -3290,8 +3290,12 @@ body::before {
   text-transform: uppercase;
 }
 
-/* hero-bar reused as-is from original, just positioned statically */
-.hero-pf .hero-bar { position: static; }
+/* Wrapper needed for mobile swipe hint */
+.pf-works-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 
 /* Mobile */
 @media (max-width: 768px) {
