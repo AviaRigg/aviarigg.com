@@ -3306,3 +3306,129 @@ body::before {
 @media (max-width: 480px) {
   .pf-works { grid-template-columns: 1fr; }
 }
+
+/* ══════════════════════════════════════════
+   WORK CARD GRAPHICS
+══════════════════════════════════════════ */
+.work-card-graphic {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(12px,1.5vw,24px) 0;
+  position: relative;
+}
+
+/* — Portfolio: bar chart — */
+.wcg-grid {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(4px,0.5vw,8px);
+  height: clamp(60px,7vw,120px);
+  width: 100%;
+  padding: 0 clamp(8px,1vw,16px);
+}
+.wcg-block {
+  flex: 1;
+  background: rgba(139,79,200,0.18);
+  border: 1px solid rgba(139,79,200,0.3);
+  height: 40%;
+  transition: height 0.3s ease;
+}
+.wcg-block--short { height: 25%; }
+.wcg-block--med   { height: 55%; }
+.wcg-block--tall  { height: 85%; background: rgba(176,110,245,0.25); border-color: rgba(176,110,245,0.5); }
+.work-card:hover .wcg-block        { background: rgba(139,79,200,0.28); }
+.work-card:hover .wcg-block--tall  { background: rgba(176,110,245,0.4); }
+
+/* — Shop: code block — */
+.wcg-code {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(8px,0.6vw,11px);
+  line-height: 1.9;
+  letter-spacing: 0.5px;
+  padding: 0 clamp(8px,1vw,16px);
+  width: 100%;
+}
+.wcg-code-line { color: var(--text-dim); white-space: nowrap; }
+.wcg-indent { padding-left: 1.2em; }
+.wcg-dim { opacity: 0.4; }
+.wcg-kw  { color: var(--accent2); }
+.wcg-fn  { color: var(--accent3); }
+.work-card:hover .wcg-code-line { color: var(--text); }
+
+/* — Commission: rig skeleton — */
+.wcg-rig {
+  position: relative;
+  width: clamp(40px,4vw,70px);
+  height: clamp(70px,8vw,130px);
+}
+.wcg-rig-spine {
+  position: absolute;
+  left: 50%; top: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--accent), transparent);
+  transform: translateX(-50%);
+}
+.wcg-rig-bone {
+  position: absolute;
+  height: 1px;
+  background: rgba(176,110,245,0.5);
+  left: 50%;
+}
+.wcg-rig-bone--l1 { width: 40%; top: 20%; transform: rotate(-20deg); transform-origin: left; }
+.wcg-rig-bone--l2 { width: 35%; top: 45%; transform: rotate(-15deg); transform-origin: left; }
+.wcg-rig-bone--r1 { width: 40%; top: 20%; transform: rotate(20deg) scaleX(-1); transform-origin: right; left: 10%; }
+.wcg-rig-bone--r2 { width: 35%; top: 45%; transform: rotate(15deg) scaleX(-1); transform-origin: right; left: 15%; }
+.wcg-rig-ctrl {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: clamp(6px,0.7vw,10px);
+  height: clamp(6px,0.7vw,10px);
+  border: 1px solid var(--accent2);
+  background: transparent;
+  transition: background 0.2s;
+}
+.wcg-rig-ctrl--top { top: 0; }
+.wcg-rig-ctrl--mid { top: 40%; }
+.wcg-rig-ctrl--bot { bottom: 0; }
+.work-card:hover .wcg-rig-ctrl { background: rgba(176,110,245,0.3); }
+
+/* — Contact: concentric rings — */
+.wcg-contact {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(80px,8vw,140px);
+  height: clamp(80px,8vw,140px);
+}
+.wcg-contact-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(139,79,200,0.2);
+}
+.wcg-contact-ring--1 { width: 100%; height: 100%; }
+.wcg-contact-ring--2 { width: 65%;  height: 65%;  border-color: rgba(139,79,200,0.35); }
+.wcg-contact-ring--3 { width: 35%;  height: 35%;  border-color: rgba(176,110,245,0.5); }
+.wcg-contact-dot {
+  width: clamp(6px,0.6vw,10px);
+  height: clamp(6px,0.6vw,10px);
+  border-radius: 50%;
+  background: var(--accent2);
+  position: relative;
+  z-index: 1;
+  animation: blink 2s ease-in-out infinite;
+}
+.wcg-contact-email {
+  position: absolute;
+  bottom: -clamp(16px,1.8vw,28px);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(7px,0.55vw,9px);
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.work-card:hover .wcg-contact-ring { border-color: rgba(176,110,245,0.4); }
+.work-card:hover .wcg-contact-ring--3 { border-color: rgba(176,110,245,0.7); }

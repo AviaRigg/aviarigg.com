@@ -95,48 +95,95 @@
     </div>
 
     <div class="pf-works">
+      <!-- Card 1: Portfolio -->
       <a class="work-card" href="/pages/portfolio">
         <div class="work-top">
           <div class="work-num">01</div>
-          <div class="work-cat">Film</div>
+          <div class="work-cat">Work</div>
+        </div>
+        <div class="work-card-graphic work-card-graphic--portfolio">
+          <div class="wcg-grid">
+            <div class="wcg-block wcg-block--tall"></div>
+            <div class="wcg-block"></div>
+            <div class="wcg-block wcg-block--med"></div>
+            <div class="wcg-block wcg-block--short"></div>
+            <div class="wcg-block wcg-block--med"></div>
+            <div class="wcg-block wcg-block--tall"></div>
+          </div>
         </div>
         <div class="work-bottom">
-          <div class="work-bar-wrap"><div class="work-bar" style="width:80%"></div></div>
-          <div class="work-title">Creature Rig</div>
-          <div class="work-sub">// Anatomical — Full body</div>
+          <div class="work-bar-wrap"><div class="work-bar" style="width:88%"></div></div>
+          <div class="work-title">Portfolio</div>
+          <div class="work-sub">// Character & Hard Surface Rigs</div>
         </div>
       </a>
-      <a class="work-card" href="/pages/portfolio">
+
+      <!-- Card 2: Shop -->
+      <a class="work-card" href="/pages/shop">
         <div class="work-top">
           <div class="work-num">02</div>
-          <div class="work-cat">Hard Surface</div>
+          <div class="work-cat">Store</div>
+        </div>
+        <div class="work-card-graphic work-card-graphic--shop">
+          <div class="wcg-code">
+            <div class="wcg-code-line"><span class="wcg-kw">def</span> <span class="wcg-fn">build_rig</span>(geo):</div>
+            <div class="wcg-code-line wcg-indent"><span class="wcg-kw">ctrl</span> = create_control()</div>
+            <div class="wcg-code-line wcg-indent"><span class="wcg-kw">skin</span> = bind_skin(geo)</div>
+            <div class="wcg-code-line wcg-indent wcg-dim"># automate pipeline</div>
+            <div class="wcg-code-line wcg-indent"><span class="wcg-kw">return</span> <span class="wcg-fn">ctrl</span></div>
+          </div>
         </div>
         <div class="work-bottom">
-          <div class="work-bar-wrap"><div class="work-bar" style="width:65%"></div></div>
-          <div class="work-title">Armor System</div>
-          <div class="work-sub">// Constraints — Mechanical</div>
+          <div class="work-bar-wrap"><div class="work-bar" style="width:60%"></div></div>
+          <div class="work-title">Shop</div>
+          <div class="work-sub">// Scripts & Rigs — Maya / Python</div>
         </div>
       </a>
-      <a class="work-card" href="/pages/library">
+
+      <!-- Card 3: Commissions -->
+      <a class="work-card" href="/pages/shop" onclick="sessionStorage.setItem('shopTab','commissions')">
         <div class="work-top">
           <div class="work-num">03</div>
-          <div class="work-cat">Tool</div>
+          <div class="work-cat">Custom</div>
+        </div>
+        <div class="work-card-graphic work-card-graphic--commission">
+          <div class="wcg-rig">
+            <div class="wcg-rig-spine"></div>
+            <div class="wcg-rig-bone wcg-rig-bone--l1"></div>
+            <div class="wcg-rig-bone wcg-rig-bone--l2"></div>
+            <div class="wcg-rig-bone wcg-rig-bone--r1"></div>
+            <div class="wcg-rig-bone wcg-rig-bone--r2"></div>
+            <div class="wcg-rig-ctrl wcg-rig-ctrl--top"></div>
+            <div class="wcg-rig-ctrl wcg-rig-ctrl--mid"></div>
+            <div class="wcg-rig-ctrl wcg-rig-ctrl--bot"></div>
+          </div>
         </div>
         <div class="work-bottom">
-          <div class="work-bar-wrap"><div class="work-bar" style="width:90%"></div></div>
-          <div class="work-title">Auto-Rig</div>
-          <div class="work-sub">// Maya 2022+ — Python 3</div>
+          <div class="work-bar-wrap"><div class="work-bar" style="width:75%"></div></div>
+          <div class="work-title">Commissions</div>
+          <div class="work-sub">// Custom Rigs — Currently Available</div>
         </div>
       </a>
-      <a class="work-card" href="/pages/library">
+
+      <!-- Card 4: Contact -->
+      <a class="work-card" href="/pages/contact">
         <div class="work-top">
           <div class="work-num">04</div>
-          <div class="work-cat">Scripts</div>
+          <div class="work-cat">Contact</div>
+        </div>
+        <div class="work-card-graphic work-card-graphic--contact">
+          <div class="wcg-contact">
+            <div class="wcg-contact-ring wcg-contact-ring--1"></div>
+            <div class="wcg-contact-ring wcg-contact-ring--2"></div>
+            <div class="wcg-contact-ring wcg-contact-ring--3"></div>
+            <div class="wcg-contact-dot"></div>
+            <div class="wcg-contact-email">contact@aviarigg.com</div>
+          </div>
         </div>
         <div class="work-bottom">
-          <div class="work-bar-wrap"><div class="work-bar" style="width:55%"></div></div>
-          <div class="work-title">Pipeline Library</div>
-          <div class="work-sub">// AviaRigg — Open source</div>
+          <div class="work-bar-wrap"><div class="work-bar" style="width:40%"></div></div>
+          <div class="work-title">Get in Touch</div>
+          <div class="work-sub">// Open to Work — Worldwide</div>
         </div>
       </a>
     </div>
