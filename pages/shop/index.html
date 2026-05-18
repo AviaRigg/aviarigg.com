@@ -847,7 +847,12 @@
 
     async function initAuth() {
       const { data: { session } } = await _sb.auth.getSession();
-      if (session) await handleSession(session.user);
+      if (session) {
+        await handleSession(session.user);
+      } else {
+        // No session — still load statuses (isAdmin=false, so hidden=invisible)
+        await loadProductStatuses();
+      }
       _sb.auth.onAuthStateChange(async (_event, session) => {
         if (session) await handleSession(session.user);
         else handleSignOut();
@@ -860,6 +865,8 @@
       currentProfile = profile;
       isAdmin = profile?.role === 'admin';
       updateAuthUI();
+      // Load statuses AFTER we know if user is admin
+      await loadProductStatuses();
     }
 
     function handleSignOut() {
@@ -868,6 +875,7 @@
       isAdmin = false;
       editMode = false;
       updateAuthUI();
+      loadProductStatuses();
     }
 
     function updateAuthUI() {
@@ -1690,7 +1698,7 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
 
 document.addEventListener('DOMContentLoaded', () => {
   updateScanHeights();
-  loadProductStatuses();
+  // loadProductStatuses is called after auth resolves in handleSession/handleSignOut
   if (window.location.hash === '#commissions') {
     switchTab('commissions', document.getElementById('tab-btn-commissions'));
   }
