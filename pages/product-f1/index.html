@@ -22,8 +22,99 @@
   <link rel="shortcut icon" href="/assets/icons/SiteIcon.png">
   <link rel="apple-touch-icon" href="/assets/icons/SiteIcon.png">
   <script src="/assets/js/status.js"></script>
+  <!-- Supabase + product availability check -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/product-check.js"></script>
+  <!-- Nav auth styles -->
+  <style>
+    #nav-auth-container { display: flex; align-items: center; }
+    .nav-auth-link {
+      font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent2, #b06ef5); background: transparent;
+      border: 1px solid rgba(139,79,200,0.4); padding: 7px 16px;
+      cursor: pointer; transition: all 0.2s; text-decoration: none;
+    }
+    .nav-auth-link:hover { border-color: var(--accent2, #b06ef5); }
+    .nav-user-wrap { position: relative; }
+    .nav-user-btn {
+      font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent2, #b06ef5); background: transparent;
+      border: 1px solid rgba(139,79,200,0.4); padding: 7px 14px;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+    }
+    .nav-user-btn:hover { border-color: var(--accent2, #b06ef5); background: rgba(139,79,200,0.08); }
+    .nav-user-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green, #00e87a); flex-shrink: 0; animation: blink 2.5s ease-in-out infinite; }
+    .nav-user-caret { font-size: 9px; opacity: 0.6; }
+    .nav-user-dropdown {
+      display: none; position: absolute; top: calc(100% + 8px); right: 0; min-width: 180px;
+      background: var(--surface, #13121a); border: 1px solid var(--border, rgba(255,255,255,0.08));
+      border-top: 2px solid var(--accent, #8b4fc8); z-index: 9999; flex-direction: column;
+    }
+    .nav-user-dropdown.open { display: flex; }
+    .nav-user-email {
+      font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 1px;
+      color: var(--text-dim, #6a6a8a); padding: 10px 14px 8px;
+      border-bottom: 1px solid var(--border, rgba(255,255,255,0.08));
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .nav-dropdown-item {
+      font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--text, #ccc); background: none; border: none; padding: 10px 14px;
+      cursor: pointer; text-align: left; text-decoration: none; display: block;
+      border-bottom: 1px solid var(--border, rgba(255,255,255,0.05)); transition: background 0.15s, color 0.15s;
+    }
+    .nav-dropdown-item:last-child { border-bottom: none; }
+    .nav-dropdown-item:hover { background: rgba(139,79,200,0.08); color: var(--text-bright, #eeeef8); }
+    .nav-dropdown-danger { color: #ff5050 !important; }
+    .nav-dropdown-danger:hover { background: rgba(255,80,80,0.08) !important; }
+  </style>
+  <!-- Nav auth script -->
+  <script>
+    const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
+    const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let currentUser = null, currentProfile = null, isAdmin = false;
+
+    async function initAuth() {
+      const { data: { session } } = await _sb.auth.getSession();
+      if (session) await handleSession(session.user);
+      _sb.auth.onAuthStateChange(async (_e, session) => {
+        if (session) await handleSession(session.user);
+        else { currentUser = null; currentProfile = null; isAdmin = false; updateNavAuth(); }
+      });
+    }
+    async function handleSession(user) {
+      currentUser = user;
+      const { data: profile } = await _sb.from('profiles').select('role, username').eq('id', user.id).single();
+      currentProfile = profile; isAdmin = profile?.role === 'admin';
+      updateNavAuth();
+    }
+    function updateNavAuth() {
+      const c = document.getElementById('nav-auth-container');
+      if (!c) return;
+      if (currentUser) {
+        const name = currentProfile?.username || currentUser.email.split('@')[0];
+        c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="toggleUserMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${currentUser.email}</div><a class="nav-dropdown-item" href="#">My Profile</a><button class="nav-dropdown-item" onclick="handleLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="handleDeleteAccount()">Delete Account</button></div></div>`;
+      } else {
+        c.innerHTML = '<a class="nav-auth-link" href="/pages/login">Log In</a>';
+      }
+    }
+    function toggleUserMenu(e) {
+      e.stopPropagation();
+      const dd = document.getElementById('nav-user-dropdown');
+      if (dd) dd.classList.toggle('open');
+    }
+    document.addEventListener('click', () => { const dd = document.getElementById('nav-user-dropdown'); if (dd) dd.classList.remove('open'); });
+    async function handleLogout() { await _sb.auth.signOut(); window.location.href = '/'; }
+    async function handleDeleteAccount() {
+      if (!confirm('Delete your account? This cannot be undone.')) return;
+      await _sb.from('profiles').delete().eq('id', currentUser.id);
+      await _sb.auth.signOut(); window.location.href = '/';
+    }
+    document.addEventListener('DOMContentLoaded', initAuth);
+  </script>
 </head>
-<body>
+<body data-product-id="f1-sf25">
 
 <nav class="topnav">
   <a class="nav-logo" href="/"><img src="/assets/icons/SiteIcon.png" alt="AviaRigg Logo" style="height:clamp(24px,2.2vw,36px);width:auto;display:inline-block;vertical-align:middle;margin-right:clamp(8px,0.8vw,14px);"><span style="display:inline-block;width:1px;height:clamp(18px,1.6vw,26px);background:rgba(139,79,200,0.4);vertical-align:middle;margin-right:clamp(8px,0.8vw,14px);"></span>Avia<span>Rigg</span></a>
@@ -35,6 +126,7 @@
     <a class="nav-link" href="/pages/about">About</a>
     <a class="nav-link" href="/pages/contact">Contact</a>
     <a class="nav-badge" href="/pages/contact">&#9679; Open to Work</a>
+    <div id="nav-auth-container"><a class="nav-auth-link" href="/pages/login">Log In</a></div>
   </div>
   <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu" onclick="toggleMobileNav()">
     <span></span><span></span><span></span>

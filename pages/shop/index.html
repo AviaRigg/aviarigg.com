@@ -1679,6 +1679,14 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
     cardEl.style.cursor = 'default';
     cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
     cardEl.removeAttribute('onclick');
+    // Disable buy buttons
+    cardEl.querySelectorAll('.shop-buy-btn, .comm-btn-primary, .comm-btn-outline[href*="payhip"]').forEach(btn => {
+      btn.setAttribute('data-real-href', btn.href || btn.getAttribute('onclick') || '');
+      btn.setAttribute('onclick', "event.preventDefault();event.stopPropagation();window.location.href='/pages/not-available?reason=draft'");
+      btn.href = '#';
+      btn.style.opacity = '0.4';
+      btn.style.cursor = 'not-allowed';
+    });
   } else if (newStatus === 'hidden') {
     cardEl.dataset.cat = originalCat;
     cardEl.classList.remove('dim');
@@ -1711,6 +1719,11 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
     cardEl.style.cursor = '';
     const savedOnclick = cardEl.getAttribute('data-onclick-disabled');
     if (savedOnclick) { cardEl.setAttribute('onclick', savedOnclick); cardEl.removeAttribute('data-onclick-disabled'); }
+    // Restore buy buttons
+    cardEl.querySelectorAll('.shop-buy-btn').forEach(btn => {
+      btn.style.opacity = '';
+      btn.style.cursor = '';
+    });
     // If this card was featured and is now live, check if hero needs empty state
     if (wasFeatured) {
       const stillFeatured = document.querySelector('[data-product-id][data-status="featured"]');

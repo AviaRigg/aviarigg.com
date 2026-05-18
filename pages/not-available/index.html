@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Not Available — AviaRigg</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
+<link rel="shortcut icon" href="/assets/icons/SiteIcon.png">
+<link rel="apple-touch-icon" href="/assets/icons/SiteIcon.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
+  const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Get reason from URL params
+  const params = new URLSearchParams(window.location.search);
+  const reason = params.get('reason') || 'unavailable'; // 'draft' | 'hidden' | 'unavailable'
+  const returnTo = params.get('from') || '/pages/shop';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Set message based on reason
+    const title = document.getElementById('error-title');
+    const sub = document.getElementById('error-sub');
+    const tag = document.getElementById('error-tag');
+
+    if (reason === 'draft') {
+      tag.textContent = '// Coming Soon';
+      title.textContent = 'Not Available Yet';
+      sub.textContent = "This product is still in progress and hasn't been released yet. Check back soon.";
+    } else if (reason === 'hidden') {
+      tag.textContent = '// Temporarily Unavailable';
+      title.textContent = 'Unavailable';
+      sub.textContent = 'This product has been temporarily removed. It may return in the future.';
+    } else {
+      tag.textContent = '// Not Found';
+      title.textContent = 'Product Not Found';
+      sub.textContent = "This product doesn't exist or may have been removed.";
+    }
+
+    // Nav auth
+    initAuth();
+  });
+
+  async function initAuth() {
+    const { data: { session } } = await _sb.auth.getSession();
+    if (session) {
+      const { data: profile } = await _sb.from('profiles').select('role, username').eq('id', session.user.id).single();
+      const name = profile?.username || session.user.email.split('@')[0];
+      const c = document.getElementById('nav-auth-container');
+      if (c) c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="toggleUserMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${session.user.email}</div><a class="nav-dropdown-item" href="#">My Profile</a><button class="nav-dropdown-item" onclick="_sb.auth.signOut().then(()=>window.location.href='/')">Log Out</button></div></div>`;
+    }
+  }
+
+  function toggleUserMenu(e) {
+    e.stopPropagation();
+    const dd = document.getElementById('nav-user-dropdown');
+    if (dd) dd.classList.toggle('open');
+  }
+  document.addEventListener('click', () => {
+    const dd = document.getElementById('nav-user-dropdown');
+    if (dd) dd.classList.remove('open');
+  });
+</script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .page { display: block !important; }
+  :root { --text: #ffffff; }
+
+  body {
+    min-height: 100vh; display: flex; flex-direction: column;
+    background: var(--bg, #0c0b10);
+  }
+
+  /* Grid background */
+  .err-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(139,79,200,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139,79,200,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* Scanline effect */
+  .err-scanlines {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+  }
+
+  /* Orb */
+  .err-orb {
+    position: fixed; z-index: 0; pointer-events: none;
+    width: 500px; height: 500px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,80,80,0.06) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+  }
+
+  .err-wrap {
+    position: relative; z-index: 1;
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 60px 20px;
+  }
+
+  .err-panel {
+    max-width: 560px; width: 100%; text-align: center;
+    animation: pgIn 0.4s ease;
+  }
+
+  @keyframes pgIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Big error code */
+  .err-code {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(80px, 12vw, 140px);
+    color: rgba(255,80,80,0.08);
+    line-height: 1;
+    letter-spacing: -4px;
+    margin-bottom: -20px;
+    user-select: none;
+  }
+
+  .err-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: #ff5050;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin-bottom: 20px;
+    animation: blink 2.5s ease-in-out infinite;
+  }
+  .err-tag::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: #ff5050; flex-shrink: 0;
+  }
+
+  .err-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(32px, 5vw, 52px); font-weight: 700;
+    color: var(--text-bright, #eeeef8);
+    letter-spacing: 1px; margin-bottom: 16px; line-height: 1.1;
+  }
+
+  .err-sub {
+    font-size: clamp(13px, 1vw, 15px); font-weight: 300;
+    color: var(--text-dim, #6a6a8a);
+    line-height: 1.7; margin-bottom: 40px; max-width: 400px; margin-left: auto; margin-right: auto;
+  }
+
+  /* Divider */
+  .err-divider {
+    width: 40px; height: 1px;
+    background: rgba(139,79,200,0.3);
+    margin: 0 auto 40px;
+  }
+
+  /* Action buttons */
+  .err-actions {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  }
+
+  .err-btn-primary {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: #fff; background: var(--accent, #8b4fc8);
+    border: 1px solid var(--accent, #8b4fc8);
+    padding: 12px 24px; text-decoration: none; cursor: pointer;
+    transition: background 0.2s; display: inline-block;
+  }
+  .err-btn-primary:hover { background: var(--accent2, #b06ef5); border-color: var(--accent2, #b06ef5); }
+
+  .err-btn-outline {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-dim, #6a6a8a);
+    background: transparent; border: 1px solid var(--border, rgba(255,255,255,0.08));
+    padding: 12px 24px; text-decoration: none; cursor: pointer;
+    transition: border-color 0.2s, color 0.2s; display: inline-block;
+  }
+  .err-btn-outline:hover { border-color: var(--accent2, #b06ef5); color: var(--accent2, #b06ef5); }
+
+  /* Nav auth styles */
+  #nav-auth-container { display: flex; align-items: center; }
+  .nav-auth-link {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent2, #b06ef5); background: transparent;
+    border: 1px solid rgba(139,79,200,0.4); padding: 7px 16px;
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
+  }
+  .nav-auth-link:hover { border-color: var(--accent2, #b06ef5); }
+  .nav-user-wrap { position: relative; }
+  .nav-user-btn {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent2, #b06ef5); background: transparent;
+    border: 1px solid rgba(139,79,200,0.4); padding: 7px 14px;
+    cursor: pointer; display: flex; align-items: center; gap: 8px;
+  }
+  .nav-user-btn:hover { border-color: var(--accent2, #b06ef5); background: rgba(139,79,200,0.08); }
+  .nav-user-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green, #00e87a); flex-shrink: 0; animation: blink 2.5s ease-in-out infinite; }
+  .nav-user-caret { font-size: 9px; opacity: 0.6; }
+  .nav-user-dropdown {
+    display: none; position: absolute; top: calc(100% + 8px); right: 0; min-width: 180px;
+    background: var(--surface, #13121a); border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-top: 2px solid var(--accent, #8b4fc8); z-index: 9999; flex-direction: column;
+  }
+  .nav-user-dropdown.open { display: flex; }
+  .nav-user-email {
+    font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 1px;
+    color: var(--text-dim, #6a6a8a); padding: 10px 14px 8px;
+    border-bottom: 1px solid var(--border, rgba(255,255,255,0.08));
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .nav-dropdown-item {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text, #ccc); background: none; border: none; padding: 10px 14px;
+    cursor: pointer; text-align: left; text-decoration: none; display: block;
+    border-bottom: 1px solid var(--border, rgba(255,255,255,0.05)); transition: background 0.15s, color 0.15s;
+  }
+  .nav-dropdown-item:last-child { border-bottom: none; }
+  .nav-dropdown-item:hover { background: rgba(139,79,200,0.08); color: var(--text-bright, #eeeef8); }
+</style>
+</head>
+<body>
+
+<div class="err-bg"></div>
+<div class="err-scanlines"></div>
+<div class="err-orb"></div>
+
+<nav class="topnav">
+  <a class="nav-logo" href="/"><img src="/assets/icons/SiteIcon.png" alt="AviaRigg Logo" style="height:clamp(24px,2.2vw,36px);width:auto;display:inline-block;vertical-align:middle;margin-right:clamp(8px,0.8vw,14px);"><span style="display:inline-block;width:1px;height:clamp(18px,1.6vw,26px);background:rgba(139,79,200,0.4);vertical-align:middle;margin-right:clamp(8px,0.8vw,14px);"></span>Avia<span>Rigg</span></a>
+  <div class="nav-links">
+    <a class="nav-link" href="/">Home</a>
+    <a class="nav-link" href="/pages/portfolio">Portfolio</a>
+    <a class="nav-link" href="/pages/library">Script Library</a>
+    <a class="nav-link active" href="/pages/shop">Shop</a>
+    <a class="nav-link" href="/pages/about">About</a>
+    <a class="nav-link" href="/pages/contact">Contact</a>
+    <div id="nav-auth-container"><a class="nav-auth-link" href="/pages/login">Log In</a></div>
+  </div>
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu" onclick="toggleMobileNav()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="nav-drawer" id="nav-drawer">
+  <a class="nav-link" href="/">Home</a>
+  <a class="nav-link" href="/pages/portfolio">Portfolio</a>
+  <a class="nav-link" href="/pages/shop">Shop</a>
+  <a class="nav-link" href="/pages/about">About</a>
+  <a class="nav-link" href="/pages/contact">Contact</a>
+</div>
+
+<div class="err-wrap">
+  <div class="err-panel">
+    <div class="err-code">404</div>
+    <div class="err-tag" id="error-tag">// Not Available</div>
+    <div class="err-title" id="error-title">Product Not Available</div>
+    <div class="err-sub" id="error-sub">This product is currently unavailable.</div>
+    <div class="err-divider"></div>
+    <div class="err-actions">
+      <a class="err-btn-primary" href="/pages/shop">← Back to Shop</a>
+      <a class="err-btn-outline" href="/">Go Home</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleMobileNav() {
+  const drawer = document.getElementById('nav-drawer');
+  const btn = document.getElementById('nav-hamburger');
+  const isOpen = drawer.classList.contains('open');
+  drawer.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+}
+</script>
+</body>
+</html>
