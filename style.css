@@ -3636,11 +3636,12 @@ body::before {
 #nav-auth-container-mobile {
   display: flex;
   flex-direction: column;
-  padding: 8px 0 4px;
+  padding: 16px 0 4px;
   border-top: 1px solid var(--border);
   margin-top: 4px;
 }
 #nav-auth-container-mobile .nav-auth-link {
-  display: block;
-  padding: 10px 0;
+  display: inline-flex;
+  width: fit-content;
+  padding: 7px 16px;
 }
