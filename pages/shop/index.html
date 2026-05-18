@@ -755,9 +755,10 @@
       border: 1px solid;
       pointer-events: auto !important;
     }
-    .status-live   { color: #00e87a; border-color: rgba(0,232,122,0.4); background: rgba(0,232,122,0.1); }
-    .status-draft  { color: #f5a623; border-color: rgba(245,166,35,0.4); background: rgba(245,166,35,0.1); }
-    .status-hidden { color: #ff5050; border-color: rgba(255,80,80,0.4);  background: rgba(255,80,80,0.1); }
+    .status-live     { color: #00e87a; border-color: rgba(0,232,122,0.4); background: rgba(0,232,122,0.1); }
+    .status-draft    { color: #f5a623; border-color: rgba(245,166,35,0.4); background: rgba(245,166,35,0.1); }
+    .status-hidden   { color: #ff5050; border-color: rgba(255,80,80,0.4);  background: rgba(255,80,80,0.1); }
+    .status-featured { color: #ffd700; border-color: rgba(255,215,0,0.4);  background: rgba(255,215,0,0.1); }
 
     body.edit-mode .admin-status-badge { display: block; }
     body.edit-mode .product-card { outline: 1px dashed rgba(139,79,200,0.3); }
@@ -1032,7 +1033,7 @@
       <!-- Product grid -->
       <div class="product-grid" id="product-grid">
 
-        <div class="product-card" data-product-id="f1-sf25-grid" data-status="live" data-cat="rig" onclick="window.location.href='/pages/product-f1'">
+        <div class="product-card" data-product-id="f1-sf25-grid" data-status="live" data-cat="rig" data-href="/pages/product-f1" data-img="/projects/f1_SF25/images/F1_Rendered.png" data-tag="// Hard Surface" data-category="Maya Rig" data-title="Formula 1 SF-25 Livery" data-desc="A fully rigged F1 car for Maya. Hamilton or Leclerc livery included — choose your side very carefully." data-price="€19.99" data-price-sub="EUR · Pay what you want" data-buy-url="https://payhip.com/b/4akCM" data-buy-label="Buy Now" onclick="window.location.href='/pages/product-f1'">
           <div class="pc-thumb">
             <span class="admin-status-badge status-live" onclick="event.stopPropagation();cycleProductStatus('f1-sf25-grid','live',this.closest('[data-product-id]'))">LIVE</span>
             <img class="pc-img" src="/projects/f1_SF25/images/F1_Rendered.png" alt="F1 SF-25 Rig">
@@ -1049,7 +1050,7 @@
           </div>
         </div>
 
-        <div class="product-card" data-product-id="controller-shape-menu" data-status="live" data-cat="tool" onclick="window.location.href='/pages/product-curvelib'">
+        <div class="product-card" data-product-id="controller-shape-menu" data-status="live" data-cat="tool" data-href="/pages/product-curvelib" data-img="/projects/AviaRigg_CurvLib/images/Main Window.png" data-tag="// Maya Tool" data-category="Python Tool · v2.1.0" data-title="Controller Shape Menu" data-desc="A Maya tool built by a rigger, for riggers — create, manage, and customize controllers without the headache." data-price="€4.99" data-price-sub="EUR · Pay what you want" data-buy-url="https://payhip.com/b/bZ1mE" data-buy-label="Buy Now" onclick="window.location.href='/pages/product-curvelib'">
           <div class="pc-thumb">
             <span class="admin-status-badge status-live" onclick="event.stopPropagation();cycleProductStatus('controller-shape-menu','live',this.closest('[data-product-id]'))">LIVE</span>
             <img class="pc-img" src="/projects/AviaRigg_CurvLib/images/Main Window.png" alt="Controller Shape Menu">
@@ -1426,6 +1427,56 @@ function toggleMobileNav() {
   btn.classList.toggle('open', !isOpen);
 }
 
+function swapHeroCard(cardEl) {
+  const hero = document.querySelector('.hero-card');
+  if (!hero) return;
+
+  const img     = cardEl.dataset.img     || '';
+  const tag     = cardEl.dataset.tag     || '';
+  const cat     = cardEl.dataset.category|| '';
+  const title   = cardEl.dataset.title   || '';
+  const desc    = cardEl.dataset.desc    || '';
+  const price   = cardEl.dataset.price   || '';
+  const priceSub= cardEl.dataset.priceSub|| 'EUR · Pay what you want';
+  const buyUrl  = cardEl.dataset.buyUrl  || '#';
+  const buyLabel= cardEl.dataset.buyLabel|| 'Buy Now';
+  const href    = cardEl.dataset.href    || '#';
+
+  // Update hero image
+  const heroImg = hero.querySelector('.hero-img');
+  if (heroImg) { heroImg.src = img; heroImg.alt = title; }
+
+  // Update hero tag
+  const heroTag = hero.querySelector('.hero-card-tag');
+  if (heroTag) heroTag.textContent = tag + ' · Featured';
+
+  // Update hero body
+  const heroCat   = hero.querySelector('.hero-cat');
+  const heroTitle = hero.querySelector('.hero-title');
+  const heroDesc  = hero.querySelector('.hero-desc');
+  const heroPrice = hero.querySelector('.hero-price');
+  const heroSub   = hero.querySelector('.hero-price-sub');
+  const heroBuy   = hero.querySelector('.shop-buy-btn');
+
+  if (heroCat)   heroCat.textContent = cat;
+  if (heroTitle) heroTitle.textContent = title;
+  if (heroDesc)  heroDesc.textContent = desc;
+  if (heroPrice) heroPrice.innerHTML = price;
+  if (heroSub)   heroSub.textContent = priceSub;
+  if (heroBuy) {
+    heroBuy.textContent = buyLabel + ' →';
+    heroBuy.href = buyUrl;
+    heroBuy.setAttribute('onclick', `event.preventDefault();event.stopPropagation();openCheckout('${buyUrl}')`);
+  }
+
+  // Update hero card link
+  hero.setAttribute('onclick', `window.location.href='${href}'`);
+
+  // Mark hero with this product's id
+  hero.dataset.productId = cardEl.dataset.productId;
+  hero.dataset.status = 'featured';
+}
+
 function switchTab(tab, el) {
   document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.shop-tab-panel').forEach(p => p.classList.remove('active'));
@@ -1444,7 +1495,7 @@ function filterProducts(cat, btn) {
 
 function cycleProductStatus(productId, currentStatus, cardEl) {
   if (!isAdmin || !editMode) return;
-  const cycle = { live: 'draft', draft: 'hidden', hidden: 'live' };
+  const cycle = { live: 'draft', draft: 'hidden', hidden: 'featured', featured: 'live' };
   const newStatus = cycle[currentStatus] || 'live';
 
   // Save to Supabase in background
@@ -1502,6 +1553,48 @@ function cycleProductStatus(productId, currentStatus, cardEl) {
     cardEl.style.cursor = 'default';
     cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
     cardEl.removeAttribute('onclick');
+  } else if (newStatus === 'featured') {
+    // Demote any existing featured card back to live first
+    document.querySelectorAll('[data-product-id][data-status="featured"]').forEach(other => {
+      if (other !== cardEl) {
+        other.dataset.status = 'live';
+        const otherBadge = other.querySelector('.admin-status-badge');
+        if (otherBadge) {
+          otherBadge.textContent = 'LIVE';
+          otherBadge.className = 'admin-status-badge status-live';
+          const otherId = other.dataset.productId;
+          otherBadge.setAttribute('onclick', `event.stopPropagation();cycleProductStatus('${otherId}','live',this.closest('[data-product-id]'))`);
+        }
+        // Restore its thumbnail
+        const otherImg = other.querySelector('.pc-img');
+        const otherPh = other.querySelector('.admin-placeholder');
+        if (otherImg) { if (otherImg.dataset.realSrc) otherImg.src = otherImg.dataset.realSrc; otherImg.style.display = ''; }
+        if (otherPh) otherPh.style.display = 'none';
+        other.classList.remove('dim');
+        other.style.opacity = '';
+        other.style.cursor = '';
+        const otherSaved = other.getAttribute('data-onclick-disabled');
+        if (otherSaved) { other.setAttribute('onclick', otherSaved); other.removeAttribute('data-onclick-disabled'); }
+      }
+    });
+    // Also demote the hero card featured item if it exists
+    const heroCard = document.querySelector('.hero-card[data-product-id]');
+    if (heroCard && heroCard.dataset.status === 'featured' && heroCard !== cardEl) {
+      heroCard.dataset.status = 'live';
+      const hBadge = heroCard.querySelector('.admin-status-badge');
+      if (hBadge) { hBadge.textContent = 'LIVE'; hBadge.className = 'admin-status-badge status-live'; }
+    }
+
+    cardEl.dataset.cat = originalCat;
+    cardEl.classList.remove('dim');
+    cardEl.style.opacity = '';
+    cardEl.style.cursor = '';
+    const savedOnclick2 = cardEl.getAttribute('data-onclick-disabled');
+    if (savedOnclick2) { cardEl.setAttribute('onclick', savedOnclick2); cardEl.removeAttribute('data-onclick-disabled'); }
+
+    // Swap hero card content with this card's data
+    swapHeroCard(cardEl);
+
   } else {
     cardEl.dataset.cat = originalCat;
     cardEl.classList.remove('dim');
