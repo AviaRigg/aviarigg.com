@@ -3639,3 +3639,15 @@ body::before {
 }
 .work-card:hover .wcg-contact-ring { border-color: rgba(176,110,245,0.4); }
 .work-card:hover .wcg-contact-ring--3 { border-color: rgba(176,110,245,0.7); }
+/* Mobile drawer — auth container */
+#nav-auth-container-mobile {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0 4px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+#nav-auth-container-mobile .nav-auth-link {
+  display: block;
+  padding: 10px 0;
+}
