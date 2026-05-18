@@ -1034,9 +1034,8 @@
       <div class="shop-inner">
 
       <!-- Hero featured card -->
-      <div class="hero-card" data-product-id="hero-featured" data-status="live" onclick="window.location.href='/pages/product-f1'">
+      <div class="hero-card" onclick="window.location.href='/pages/product-f1'">
         <div class="hero-card-img">
-          <span class="admin-status-badge status-live" onclick="event.stopPropagation();cycleProductStatus('hero-featured','live',this.closest('[data-product-id]'))">LIVE</span>
           <img class="hero-img" src="/projects/f1_SF25/images/F1_Rendered.png" alt="F1 SF-25 Rig">
           <div class="hero-img-overlay"></div>
           <div class="hero-card-tag">// Hard Surface · Featured</div>
@@ -1563,8 +1562,7 @@ function swapHeroCard(cardEl) {
   }
 
   hero.setAttribute('onclick', `window.location.href='${href}'`);
-  hero.dataset.productId = cardEl.dataset.productId;
-  hero.dataset.status = 'featured';
+  // Don't set data-product-id on hero — it's a display container only
 }
 
 function switchTab(tab, el) {
@@ -1607,14 +1605,28 @@ window.addEventListener('resize', updateScanHeights);
 async function loadProductStatuses() {
   const { data: products } = await _sb.from('shop_products').select('id, status');
   if (!products) return;
-  let hasFeatured = false;
+
+  let featuredId = null;
+
+  // First pass: apply all non-featured statuses
   products.forEach(({ id, status }) => {
+    if (id === 'hero-featured') return; // skip the hero row entirely
     const card = document.querySelector(`[data-product-id="${id}"]`);
     if (!card || status === 'live') return;
-    if (status === 'featured') hasFeatured = true;
+    if (status === 'featured') {
+      featuredId = id; // save for second pass
+      return;
+    }
     applyStatusToCard(id, status, card, false);
   });
-  if (!hasFeatured) showHeroEmpty();
+
+  // Second pass: apply featured last so swapHeroCard runs after DOM is settled
+  if (featuredId) {
+    const card = document.querySelector(`[data-product-id="${featuredId}"]`);
+    if (card) applyStatusToCard(featuredId, 'featured', card, false);
+  } else {
+    showHeroEmpty();
+  }
 }
 
 function applyStatusToCard(productId, newStatus, cardEl, save = true) {
