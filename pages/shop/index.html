@@ -785,6 +785,10 @@
     }
     .hero-card.no-featured:hover { background: var(--surface); }
     .hero-card.no-featured:hover .hero-img { transform: none; }
+    /* Featured placeholder text color */
+    .admin-placeholder { color: var(--text-dim, #6a6a8a); }
+    .status-featured + .pc-placeholder,
+    .admin-placeholder:has(+ *) { color: #ffd700; }
   </style>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
@@ -1460,16 +1464,23 @@ function toggleMobileNav() {
 function showHeroEmpty() {
   const hero = document.querySelector('.hero-card');
   if (!hero) return;
-  hero.classList.add('no-featured');
-  const imgWrap = hero.querySelector('.hero-card-img');
-  const body = hero.querySelector('.hero-card-body');
-  if (imgWrap) imgWrap.style.opacity = '0.15';
-  if (body) body.innerHTML = `
-    <div class="hero-empty">
-      <div class="hero-empty-label">// No Featured Product</div>
-      <div class="hero-empty-text">Select a product and set it to Featured</div>
-    </div>`;
-  hero.removeAttribute('onclick');
+  if (isAdmin) {
+    // Admin sees dimmed placeholder
+    hero.classList.add('no-featured');
+    const imgWrap = hero.querySelector('.hero-card-img');
+    const body = hero.querySelector('.hero-card-body');
+    if (imgWrap) imgWrap.style.opacity = '0.15';
+    if (body) body.innerHTML = `
+      <div class="hero-empty">
+        <div class="hero-empty-label">// No Featured Product</div>
+        <div class="hero-empty-text">Select a product and set it to Featured</div>
+      </div>`;
+    hero.removeAttribute('onclick');
+    hero.style.display = '';
+  } else {
+    // Visitors see nothing
+    hero.style.display = 'none';
+  }
 }
 
 function showHeroContent() {
