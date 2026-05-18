@@ -754,13 +754,44 @@
       transition: all 0.2s; display: none;
       border: 1px solid;
       pointer-events: auto !important;
+      user-select: none;
     }
+    .admin-status-wrap {
+      position: absolute; top: 10px; right: 10px; z-index: 20;
+      display: none; flex-direction: column; align-items: flex-end;
+      pointer-events: auto !important;
+    }
+    body.edit-mode .admin-status-wrap { display: flex; }
+    .admin-status-dropdown {
+      display: none; flex-direction: column;
+      background: var(--surface, #13121a);
+      border: 1px solid var(--border, rgba(255,255,255,0.1));
+      border-top: 2px solid var(--accent, #8b4fc8);
+      margin-top: 4px; min-width: 110px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .admin-status-wrap.open .admin-status-dropdown { display: flex; }
+    .admin-status-option {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+      padding: 8px 12px; cursor: pointer; border: none; background: none;
+      text-align: left; transition: background 0.15s;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      white-space: nowrap;
+    }
+    .admin-status-option:last-child { border-bottom: none; }
+    .admin-status-option:hover { background: rgba(139,79,200,0.12); }
+    .admin-status-option.opt-live     { color: #00e87a; }
+    .admin-status-option.opt-draft    { color: #f5a623; }
+    .admin-status-option.opt-hidden   { color: #ff5050; }
+    .admin-status-option.opt-featured { color: #ffd700; }
+    .admin-status-option.active-opt   { opacity: 0.4; cursor: default; pointer-events: none; }
     .status-live     { color: #00e87a; border-color: rgba(0,232,122,0.4); background: rgba(0,232,122,0.1); }
     .status-draft    { color: #f5a623; border-color: rgba(245,166,35,0.4); background: rgba(245,166,35,0.1); }
     .status-hidden   { color: #ff5050; border-color: rgba(255,80,80,0.4);  background: rgba(255,80,80,0.1); }
     .status-featured { color: #ffd700; border-color: rgba(255,215,0,0.4);  background: rgba(255,215,0,0.1); }
 
-    body.edit-mode .admin-status-badge { display: block; }
+    /* badge visibility now handled by .admin-status-wrap */
     body.edit-mode .product-card { outline: 1px dashed rgba(139,79,200,0.3); }
     body.edit-mode .hero-card    { outline: 1px dashed rgba(139,79,200,0.3); }
 
@@ -938,6 +969,8 @@
     document.addEventListener('click', () => {
       const dd = document.getElementById('nav-user-dropdown');
       if (dd) dd.classList.remove('open');
+      // Close any open status dropdowns
+      document.querySelectorAll('.admin-status-wrap.open').forEach(w => w.classList.remove('open'));
     });
 
     function toggleEditMode() {
@@ -1068,7 +1101,15 @@
 
         <div class="product-card" data-product-id="f1-sf25" data-status="live" data-cat="rig" data-href="/pages/product-f1" data-img="/projects/f1_SF25/images/F1_Rendered.png" data-tag="// Hard Surface" data-category="Maya Rig" data-title="Formula 1 SF-25 Livery" data-desc="A fully rigged F1 car for Maya. Hamilton or Leclerc livery included — choose your side very carefully." data-price="€19.99" data-price-sub="EUR · Pay what you want" data-buy-url="https://payhip.com/b/4akCM" data-buy-label="Buy Now" onclick="window.location.href='/pages/product-f1'">
           <div class="pc-thumb">
-            <span class="admin-status-badge status-live" onclick="event.stopPropagation();cycleProductStatus('f1-sf25','live',this.closest('[data-product-id]'))">LIVE</span>
+            <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')">
+          <span class="admin-status-badge status-live">LIVE ▾</span>
+          <div class="admin-status-dropdown">
+          <button class="admin-status-option opt-live active-opt" onclick="event.stopPropagation();setProductStatus('f1-sf25','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
+          <button class="admin-status-option opt-draft" onclick="event.stopPropagation();setProductStatus('f1-sf25','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
+          <button class="admin-status-option opt-hidden" onclick="event.stopPropagation();setProductStatus('f1-sf25','hidden',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button>
+          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('f1-sf25','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button>
+          </div>
+        </div>
             <img class="pc-img" src="/projects/f1_SF25/images/F1_Rendered.png" alt="F1 SF-25 Rig">
             <div class="pc-tag">// Hard Surface</div>
           </div>
@@ -1085,7 +1126,15 @@
 
         <div class="product-card" data-product-id="controller-shape-menu" data-status="live" data-cat="tool" data-href="/pages/product-curvelib" data-img="/projects/AviaRigg_CurvLib/images/Main Window.png" data-tag="// Maya Tool" data-category="Python Tool · v2.1.0" data-title="Controller Shape Menu" data-desc="A Maya tool built by a rigger, for riggers — create, manage, and customize controllers without the headache." data-price="€4.99" data-price-sub="EUR · Pay what you want" data-buy-url="https://payhip.com/b/bZ1mE" data-buy-label="Buy Now" onclick="window.location.href='/pages/product-curvelib'">
           <div class="pc-thumb">
-            <span class="admin-status-badge status-live" onclick="event.stopPropagation();cycleProductStatus('controller-shape-menu','live',this.closest('[data-product-id]'))">LIVE</span>
+            <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')">
+          <span class="admin-status-badge status-live">LIVE ▾</span>
+          <div class="admin-status-dropdown">
+          <button class="admin-status-option opt-live active-opt" onclick="event.stopPropagation();setProductStatus('controller-shape-menu','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
+          <button class="admin-status-option opt-draft" onclick="event.stopPropagation();setProductStatus('controller-shape-menu','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
+          <button class="admin-status-option opt-hidden" onclick="event.stopPropagation();setProductStatus('controller-shape-menu','hidden',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button>
+          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('controller-shape-menu','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button>
+          </div>
+        </div>
             <img class="pc-img" src="/projects/AviaRigg_CurvLib/images/Main Window.png" alt="Controller Shape Menu">
             <div class="pc-tag">// Maya Tool</div>
           </div>
@@ -1102,7 +1151,15 @@
 
         <div class="product-card dim" data-product-id="character-rig-template" data-status="draft" data-cat="soon">
           <div class="pc-thumb">
-            <span class="admin-status-badge status-draft" onclick="event.stopPropagation();cycleProductStatus('character-rig-template','draft',this.closest('[data-product-id]'))">DRAFT</span>
+            <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')">
+          <span class="admin-status-badge status-draft">DRAFT ▾</span>
+          <div class="admin-status-dropdown">
+          <button class="admin-status-option opt-live" onclick="event.stopPropagation();setProductStatus('character-rig-template','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
+          <button class="admin-status-option opt-draft active-opt" onclick="event.stopPropagation();setProductStatus('character-rig-template','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
+          <button class="admin-status-option opt-hidden" onclick="event.stopPropagation();setProductStatus('character-rig-template','hidden',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button>
+          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('character-rig-template','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button>
+          </div>
+        </div>
             <div class="pc-placeholder">// Coming Soon</div>
           </div>
           <div class="pc-body">
@@ -1118,7 +1175,15 @@
 
         <div class="product-card dim" data-product-id="mel-python-scripts" data-status="draft" data-cat="soon">
           <div class="pc-thumb">
-            <span class="admin-status-badge status-draft" onclick="event.stopPropagation();cycleProductStatus('mel-python-scripts','draft',this.closest('[data-product-id]'))">DRAFT</span>
+            <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')">
+          <span class="admin-status-badge status-draft">DRAFT ▾</span>
+          <div class="admin-status-dropdown">
+          <button class="admin-status-option opt-live" onclick="event.stopPropagation();setProductStatus('mel-python-scripts','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
+          <button class="admin-status-option opt-draft active-opt" onclick="event.stopPropagation();setProductStatus('mel-python-scripts','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
+          <button class="admin-status-option opt-hidden" onclick="event.stopPropagation();setProductStatus('mel-python-scripts','hidden',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button>
+          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('mel-python-scripts','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button>
+          </div>
+        </div>
             <div class="pc-placeholder">// Coming Soon</div>
           </div>
           <div class="pc-body">
@@ -1581,10 +1646,9 @@ function filterProducts(cat, btn) {
   });
 }
 
-function cycleProductStatus(productId, currentStatus, cardEl) {
+function setProductStatus(productId, newStatus, cardEl) {
   if (!isAdmin || !editMode) return;
-  const cycle = { live: 'draft', draft: 'hidden', hidden: 'featured', featured: 'live' };
-  const newStatus = cycle[currentStatus] || 'live';
+  if (newStatus === cardEl.dataset.status) return; // no change
 
   // Demote any other featured card first
   if (newStatus === 'featured') {
@@ -1594,6 +1658,11 @@ function cycleProductStatus(productId, currentStatus, cardEl) {
   }
 
   applyStatusToCard(productId, newStatus, cardEl, true);
+}
+
+// Keep old name as alias for backwards compat
+function cycleProductStatus(productId, currentStatus, cardEl) {
+  setProductStatus(productId, currentStatus, cardEl);
 }
 
 function updateScanHeights() {
@@ -1638,15 +1707,16 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
 
   cardEl.dataset.status = newStatus;
 
-  // Update badge
+  // Update badge label and color
   const badge = cardEl.querySelector('.admin-status-badge');
   if (badge) {
-    badge.textContent = newStatus.toUpperCase();
+    badge.textContent = newStatus.toUpperCase() + ' ▾';
     badge.className = 'admin-status-badge status-' + newStatus;
-    badge.setAttribute('onclick', `event.stopPropagation();cycleProductStatus('${productId}','${newStatus}',this.closest('[data-product-id]'))`);
-    badge.style.pointerEvents = 'auto';
-    badge.style.cursor = 'pointer';
   }
+  // Update active option highlight in dropdown
+  cardEl.querySelectorAll('.admin-status-option').forEach(opt => {
+    opt.classList.toggle('active-opt', opt.classList.contains('opt-' + newStatus));
+  });
 
   if (!cardEl.dataset.originalCat) cardEl.dataset.originalCat = cardEl.dataset.cat;
   const originalCat = cardEl.dataset.originalCat;
