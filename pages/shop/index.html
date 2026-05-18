@@ -763,6 +763,28 @@
     body.edit-mode .admin-status-badge { display: block; }
     body.edit-mode .product-card { outline: 1px dashed rgba(139,79,200,0.3); }
     body.edit-mode .hero-card    { outline: 1px dashed rgba(139,79,200,0.3); }
+
+    /* No featured empty state */
+    .hero-empty {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: 100%; min-height: 200px; gap: 12px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .hero-empty-label {
+      font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--text-dim, #6a6a8a);
+    }
+    .hero-empty-text {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: clamp(20px, 2vw, 28px); font-weight: 700;
+      color: rgba(255,255,255,0.15); letter-spacing: 1px;
+    }
+    .hero-card.no-featured {
+      cursor: default; pointer-events: none; opacity: 0.5;
+    }
+    .hero-card.no-featured:hover { background: var(--surface); }
+    .hero-card.no-featured:hover .hero-img { transform: none; }
   </style>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
@@ -1041,9 +1063,9 @@
       <!-- Product grid -->
       <div class="product-grid" id="product-grid">
 
-        <div class="product-card" data-product-id="f1-sf25-grid" data-status="live" data-cat="rig" data-href="/pages/product-f1" data-img="/projects/f1_SF25/images/F1_Rendered.png" data-tag="// Hard Surface" data-category="Maya Rig" data-title="Formula 1 SF-25 Livery" data-desc="A fully rigged F1 car for Maya. Hamilton or Leclerc livery included — choose your side very carefully." data-price="€19.99" data-price-sub="EUR · Pay what you want" data-buy-url="https://payhip.com/b/4akCM" data-buy-label="Buy Now" onclick="window.location.href='/pages/product-f1'">
+        <div class="product-card" data-product-id="f1-sf25" data-status="live" data-cat="rig" data-href="/pages/product-f1" data-img="/projects/f1_SF25/images/F1_Rendered.png" data-tag="// Hard Surface" data-category="Maya Rig" data-title="Formula 1 SF-25 Livery" data-desc="A fully rigged F1 car for Maya. Hamilton or Leclerc livery included — choose your side very carefully." data-price="€19.99" data-price-sub="EUR · Pay what you want" data-buy-url="https://payhip.com/b/4akCM" data-buy-label="Buy Now" onclick="window.location.href='/pages/product-f1'">
           <div class="pc-thumb">
-            <span class="admin-status-badge status-live" onclick="event.stopPropagation();cycleProductStatus('f1-sf25-grid','live',this.closest('[data-product-id]'))">LIVE</span>
+            <span class="admin-status-badge status-live" onclick="event.stopPropagation();cycleProductStatus('f1-sf25','live',this.closest('[data-product-id]'))">LIVE</span>
             <img class="pc-img" src="/projects/f1_SF25/images/F1_Rendered.png" alt="F1 SF-25 Rig">
             <div class="pc-tag">// Hard Surface</div>
           </div>
@@ -1435,9 +1457,34 @@ function toggleMobileNav() {
   btn.classList.toggle('open', !isOpen);
 }
 
+function showHeroEmpty() {
+  const hero = document.querySelector('.hero-card');
+  if (!hero) return;
+  hero.classList.add('no-featured');
+  const imgWrap = hero.querySelector('.hero-card-img');
+  const body = hero.querySelector('.hero-card-body');
+  if (imgWrap) imgWrap.style.opacity = '0.15';
+  if (body) body.innerHTML = `
+    <div class="hero-empty">
+      <div class="hero-empty-label">// No Featured Product</div>
+      <div class="hero-empty-text">Select a product and set it to Featured</div>
+    </div>`;
+  hero.removeAttribute('onclick');
+}
+
+function showHeroContent() {
+  const hero = document.querySelector('.hero-card');
+  if (!hero) return;
+  hero.classList.remove('no-featured');
+  const imgWrap = hero.querySelector('.hero-card-img');
+  if (imgWrap) imgWrap.style.opacity = '';
+}
+
 function swapHeroCard(cardEl) {
   const hero = document.querySelector('.hero-card');
   if (!hero) return;
+
+  showHeroContent();
 
   const img     = cardEl.dataset.img     || '';
   const tag     = cardEl.dataset.tag     || '';
@@ -1450,15 +1497,12 @@ function swapHeroCard(cardEl) {
   const buyLabel= cardEl.dataset.buyLabel|| 'Buy Now';
   const href    = cardEl.dataset.href    || '#';
 
-  // Update hero image
   const heroImg = hero.querySelector('.hero-img');
   if (heroImg) { heroImg.src = img; heroImg.alt = title; }
 
-  // Update hero tag
   const heroTag = hero.querySelector('.hero-card-tag');
   if (heroTag) heroTag.textContent = tag + ' · Featured';
 
-  // Update hero body
   const heroCat   = hero.querySelector('.hero-cat');
   const heroTitle = hero.querySelector('.hero-title');
   const heroDesc  = hero.querySelector('.hero-desc');
@@ -1477,10 +1521,7 @@ function swapHeroCard(cardEl) {
     heroBuy.setAttribute('onclick', `event.preventDefault();event.stopPropagation();openCheckout('${buyUrl}')`);
   }
 
-  // Update hero card link
   hero.setAttribute('onclick', `window.location.href='${href}'`);
-
-  // Mark hero with this product's id
   hero.dataset.productId = cardEl.dataset.productId;
   hero.dataset.status = 'featured';
 }
@@ -1506,86 +1547,14 @@ function cycleProductStatus(productId, currentStatus, cardEl) {
   const cycle = { live: 'draft', draft: 'hidden', hidden: 'featured', featured: 'live' };
   const newStatus = cycle[currentStatus] || 'live';
 
-  if (newStatus === 'draft') {
-    cardEl.dataset.cat = 'soon';
-    cardEl.classList.add('dim');
-    cardEl.style.opacity = '';
-    cardEl.style.cursor = 'default';
-    cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
-    cardEl.removeAttribute('onclick');
-  } else if (newStatus === 'hidden') {
-    cardEl.dataset.cat = originalCat;
-    cardEl.classList.remove('dim');
-    if (isAdmin) {
-      cardEl.style.display = '';
-      cardEl.style.opacity = '0.25';
-    } else {
-      cardEl.style.display = 'none';
-      cardEl.style.opacity = '';
-    }
-    cardEl.style.cursor = 'default';
-    cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
-    cardEl.removeAttribute('onclick');
-  } else if (newStatus === 'featured') {
-    // Demote any existing featured card back to live first
+  // Demote any other featured card first
+  if (newStatus === 'featured') {
     document.querySelectorAll('[data-product-id][data-status="featured"]').forEach(other => {
-      if (other !== cardEl) {
-        other.dataset.status = 'live';
-        const otherBadge = other.querySelector('.admin-status-badge');
-        if (otherBadge) {
-          otherBadge.textContent = 'LIVE';
-          otherBadge.className = 'admin-status-badge status-live';
-          const otherId = other.dataset.productId;
-          otherBadge.setAttribute('onclick', `event.stopPropagation();cycleProductStatus('${otherId}','live',this.closest('[data-product-id]'))`);
-        }
-        // Restore its thumbnail
-        const otherImg = other.querySelector('.pc-img');
-        const otherPh = other.querySelector('.admin-placeholder');
-        if (otherImg) { if (otherImg.dataset.realSrc) otherImg.src = otherImg.dataset.realSrc; otherImg.style.display = ''; }
-        if (otherPh) otherPh.style.display = 'none';
-        other.classList.remove('dim');
-        other.style.opacity = '';
-        other.style.cursor = '';
-        const otherSaved = other.getAttribute('data-onclick-disabled');
-        if (otherSaved) { other.setAttribute('onclick', otherSaved); other.removeAttribute('data-onclick-disabled'); }
-      }
+      if (other !== cardEl) applyStatusToCard(other.dataset.productId, 'live', other, true);
     });
-    // Also demote the hero card featured item if it exists
-    const heroCard = document.querySelector('.hero-card[data-product-id]');
-    if (heroCard && heroCard.dataset.status === 'featured' && heroCard !== cardEl) {
-      heroCard.dataset.status = 'live';
-      const hBadge = heroCard.querySelector('.admin-status-badge');
-      if (hBadge) { hBadge.textContent = 'LIVE'; hBadge.className = 'admin-status-badge status-live'; }
-    }
-
-    cardEl.dataset.cat = originalCat;
-    cardEl.classList.remove('dim');
-    cardEl.style.opacity = '';
-    cardEl.style.cursor = '';
-    const savedOnclick2 = cardEl.getAttribute('data-onclick-disabled');
-    if (savedOnclick2) { cardEl.setAttribute('onclick', savedOnclick2); cardEl.removeAttribute('data-onclick-disabled'); }
-
-    // Swap hero card content with this card's data
-    swapHeroCard(cardEl);
-
-  } else {
-    cardEl.dataset.cat = originalCat;
-    cardEl.classList.remove('dim');
-    cardEl.style.opacity = '';
-    cardEl.style.cursor = '';
-    const savedOnclick = cardEl.getAttribute('data-onclick-disabled');
-    if (savedOnclick) {
-      cardEl.setAttribute('onclick', savedOnclick);
-      cardEl.removeAttribute('data-onclick-disabled');
-    }
   }
 
-  // Re-apply current filter
-  const activeFilter = document.querySelector('.filter-btn.active');
-  if (activeFilter) {
-    const currentCat = activeFilter.getAttribute('onclick').match(/'([^']+)'/)?.[1] || 'all';
-    filterProducts(currentCat, activeFilter);
-  }
+  applyStatusToCard(productId, newStatus, cardEl, true);
 }
 
 function updateScanHeights() {
@@ -1597,12 +1566,14 @@ window.addEventListener('resize', updateScanHeights);
 async function loadProductStatuses() {
   const { data: products } = await _sb.from('shop_products').select('id, status');
   if (!products) return;
+  let hasFeatured = false;
   products.forEach(({ id, status }) => {
     const card = document.querySelector(`[data-product-id="${id}"]`);
     if (!card || status === 'live') return;
-    // Apply saved status visually (without re-saving to DB)
+    if (status === 'featured') hasFeatured = true;
     applyStatusToCard(id, status, card, false);
   });
+  if (!hasFeatured) showHeroEmpty();
 }
 
 function applyStatusToCard(productId, newStatus, cardEl, save = true) {
@@ -1679,6 +1650,7 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
     swapHeroCard(cardEl);
   } else {
     // live
+    const wasFeatured = cardEl.dataset.status === 'featured';
     cardEl.dataset.cat = originalCat;
     cardEl.classList.remove('dim');
     cardEl.style.display = '';
@@ -1686,6 +1658,11 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
     cardEl.style.cursor = '';
     const savedOnclick = cardEl.getAttribute('data-onclick-disabled');
     if (savedOnclick) { cardEl.setAttribute('onclick', savedOnclick); cardEl.removeAttribute('data-onclick-disabled'); }
+    // If this card was featured and is now live, check if hero needs empty state
+    if (wasFeatured) {
+      const stillFeatured = document.querySelector('[data-product-id][data-status="featured"]');
+      if (!stillFeatured) showHeroEmpty();
+    }
   }
 
   // Re-apply current filter
