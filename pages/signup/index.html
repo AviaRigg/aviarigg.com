@@ -3,63 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Create Account — AviaRigg</title>
+<title>Login — AviaRigg</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
 <link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
 <link rel="shortcut icon" href="/assets/icons/SiteIcon.png">
 <link rel="apple-touch-icon" href="/assets/icons/SiteIcon.png">
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
-  const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  async function checkSession() {
-    const { data: { session } } = await _sb.auth.getSession();
-    if (session) window.location.href = '/';
+<style>
+  #nav-auth-container { display: flex; align-items: center; }
+  .nav-auth-link {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent2, #b06ef5); background: transparent;
+    border: 1px solid rgba(139,79,200,0.4); padding: 7px 16px;
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
   }
-
-  async function handleSignup(e) {
-    e.preventDefault();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const confirm = document.getElementById('confirm').value;
-    const errEl = document.getElementById('auth-error');
-    const successEl = document.getElementById('auth-success');
-    const btn = document.getElementById('submit-btn');
-
-    errEl.textContent = '';
-    successEl.style.display = 'none';
-
-    if (password !== confirm) {
-      errEl.textContent = 'Passwords do not match.';
-      return;
-    }
-    if (password.length < 8) {
-      errEl.textContent = 'Password must be at least 8 characters.';
-      return;
-    }
-
-    btn.textContent = 'CREATING ACCOUNT...';
-    btn.disabled = true;
-
-    const { error } = await _sb.auth.signUp({ email, password });
-
-    if (error) {
-      errEl.textContent = error.message;
-      btn.textContent = 'Create Account';
-      btn.disabled = false;
-    } else {
-      btn.textContent = 'ACCOUNT CREATED ✓';
-      successEl.style.display = 'block';
-      document.querySelector('form').style.display = 'none';
-    }
+  .nav-auth-link:hover { border-color: var(--accent2, #b06ef5); }
+  .nav-user-wrap { position: relative; }
+  .nav-user-btn {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent2, #b06ef5); background: transparent;
+    border: 1px solid rgba(139,79,200,0.4); padding: 7px 14px;
+    cursor: pointer; display: flex; align-items: center; gap: 8px;
   }
+  .nav-user-btn:hover { border-color: var(--accent2, #b06ef5); background: rgba(139,79,200,0.08); }
+  .nav-user-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green, #00e87a); flex-shrink: 0; animation: blink 2.5s ease-in-out infinite; }
+  .nav-user-caret { font-size: 9px; opacity: 0.6; }
+  .nav-user-dropdown {
+    display: none; position: absolute; top: calc(100% + 8px); right: 0; min-width: 180px;
+    background: var(--surface, #13121a); border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-top: 2px solid var(--accent, #8b4fc8); z-index: 9999; flex-direction: column;
+  }
+  .nav-user-dropdown.open { display: flex; }
+  .nav-user-email {
+    font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 1px;
+    color: var(--text-dim, #6a6a8a); padding: 10px 14px 8px;
+    border-bottom: 1px solid var(--border, rgba(255,255,255,0.08));
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .nav-dropdown-item {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text, #ccc); background: none; border: none; padding: 10px 14px;
+    cursor: pointer; text-align: left; text-decoration: none; display: block;
+    border-bottom: 1px solid var(--border, rgba(255,255,255,0.05)); transition: background 0.15s, color 0.15s;
+  }
+  .nav-dropdown-item:last-child { border-bottom: none; }
+  .nav-dropdown-item:hover { background: rgba(139,79,200,0.08); color: var(--text-bright, #eeeef8); }
+  .nav-dropdown-danger { color: #ff5050 !important; }
+  .nav-dropdown-danger:hover { background: rgba(255,80,80,0.08) !important; }
+</style>
 
-  document.addEventListener('DOMContentLoaded', checkSession);
-</script>
+<!-- Supabase -->
+
 
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -73,6 +67,7 @@
     background: var(--bg, #0c0b10);
   }
 
+  /* ── GRID BACKGROUND ── */
   .login-bg {
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
     background-image:
@@ -87,15 +82,19 @@
     top: -200px; left: 50%; transform: translateX(-50%);
   }
 
+  /* ── MAIN LAYOUT ── */
   .login-wrap {
     position: relative; z-index: 1;
-    flex: 1; display: flex;
-    align-items: center; justify-content: center;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 40px 20px;
   }
 
   .login-panel {
-    width: 100%; max-width: 420px;
+    width: 100%;
+    max-width: 420px;
     background: var(--surface, #13121a);
     border: 1px solid var(--border, rgba(255,255,255,0.08));
     border-top: 2px solid var(--accent, #8b4fc8);
@@ -108,30 +107,39 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
+  /* ── HEADER ── */
   .login-eyebrow {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
-    color: var(--accent2, #b06ef5); margin-bottom: 10px;
+    font-size: 10px; letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent2, #b06ef5);
+    margin-bottom: 10px;
     display: flex; align-items: center; gap: 10px;
   }
   .login-eyebrow::before {
-    content: ''; display: block; width: 20px; height: 1px;
+    content: ''; display: block;
+    width: 20px; height: 1px;
     background: var(--accent, #8b4fc8);
   }
 
   .login-title {
     font-family: 'Rajdhani', sans-serif;
     font-size: 32px; font-weight: 700; letter-spacing: 1px;
-    color: var(--text-bright, #eeeef8); margin-bottom: 6px;
+    color: var(--text-bright, #eeeef8);
+    margin-bottom: 6px;
   }
 
   .login-sub {
     font-size: 13px; font-weight: 300;
     color: var(--text-dim, #6a6a8a);
-    margin-bottom: 36px; line-height: 1.5;
+    margin-bottom: 36px;
+    line-height: 1.5;
   }
 
-  .login-field { margin-bottom: 20px; }
+  /* ── FORM ── */
+  .login-field {
+    margin-bottom: 20px;
+  }
 
   .login-label {
     font-family: 'Share Tech Mono', monospace;
@@ -147,101 +155,170 @@
     color: var(--text-bright, #eeeef8);
     font-family: 'Share Tech Mono', monospace;
     font-size: 13px; letter-spacing: 1px;
-    padding: 12px 14px; outline: none;
-    transition: border-color 0.2s; -webkit-appearance: none;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
   }
-  .login-input:focus { border-color: var(--accent, #8b4fc8); }
-  .login-input::placeholder { color: rgba(106,106,138,0.5); }
+  .login-input:focus {
+    border-color: var(--accent, #8b4fc8);
+  }
+  .login-input::placeholder {
+    color: rgba(106,106,138,0.5);
+  }
 
+  /* ── ERROR ── */
   #auth-error {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 10px; letter-spacing: 2px; color: #ff5050;
+    font-size: 10px; letter-spacing: 2px;
+    color: #ff5050;
     background: rgba(255,80,80,0.07);
     border: 1px solid rgba(255,80,80,0.2);
     border-left: 2px solid #ff5050;
-    padding: 10px 14px; margin-bottom: 20px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
     display: block;
+    min-height: 0;
+    transition: all 0.2s;
   }
   #auth-error:empty { display: none; }
 
-  #auth-success {
-    display: none;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px; letter-spacing: 2px;
-    color: #00e87a;
-    background: rgba(0,232,122,0.07);
-    border: 1px solid rgba(0,232,122,0.2);
-    border-left: 2px solid #00e87a;
-    padding: 16px 14px; line-height: 1.8;
-  }
-
+  /* ── SUBMIT ── */
   .login-submit {
     width: 100%;
     font-family: 'Share Tech Mono', monospace;
     font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
-    color: #fff; background: var(--accent, #8b4fc8);
+    color: #fff;
+    background: var(--accent, #8b4fc8);
     border: 1px solid var(--accent, #8b4fc8);
-    padding: 14px; cursor: pointer;
-    transition: background 0.2s, opacity 0.2s; margin-top: 8px;
+    padding: 14px;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+    margin-top: 8px;
   }
   .login-submit:hover:not(:disabled) {
     background: var(--accent2, #b06ef5);
     border-color: var(--accent2, #b06ef5);
   }
-  .login-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-
-  .login-perks {
-    margin-bottom: 28px;
-    border: 1px solid var(--border, rgba(255,255,255,0.08));
-    border-left: 2px solid var(--accent, #8b4fc8);
-    padding: 14px 16px;
-    background: rgba(139,79,200,0.04);
-  }
-  .login-perks-title {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--accent2, #b06ef5); margin-bottom: 10px;
-  }
-  .login-perks ul {
-    list-style: none; display: flex; flex-direction: column; gap: 6px;
-  }
-  .login-perks li {
-    font-size: 12px; color: var(--text-dim, #6a6a8a);
-    font-weight: 300; display: flex; align-items: center; gap: 8px;
-  }
-  .login-perks li::before {
-    content: ''; width: 4px; height: 4px; border-radius: 50%;
-    background: var(--accent, #8b4fc8); flex-shrink: 0;
+  .login-submit:disabled {
+    opacity: 0.6; cursor: not-allowed;
   }
 
+  /* ── FOOTER LINKS ── */
   .login-footer {
-    margin-top: 28px; padding-top: 24px;
+    margin-top: 28px;
+    padding-top: 24px;
     border-top: 1px solid var(--border, rgba(255,255,255,0.08));
-    display: flex; justify-content: space-between;
-    align-items: center; flex-wrap: wrap; gap: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
   }
   .login-footer-text {
     font-family: 'Share Tech Mono', monospace;
     font-size: 10px; letter-spacing: 2px;
-    color: var(--text-dim, #6a6a8a); text-transform: uppercase;
+    color: var(--text-dim, #6a6a8a);
+    text-transform: uppercase;
   }
   .login-footer a {
     font-family: 'Share Tech Mono', monospace;
     font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--accent2, #b06ef5); text-decoration: none; transition: color 0.2s;
+    color: var(--accent2, #b06ef5);
+    text-decoration: none;
+    transition: color 0.2s;
   }
   .login-footer a:hover { color: var(--text-bright, #eeeef8); }
 
+  /* ── BACK LINK ── */
   .login-back {
     display: inline-flex; align-items: center; gap: 8px;
     font-family: 'Share Tech Mono', monospace;
     font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--text-dim, #6a6a8a); text-decoration: none;
-    margin-bottom: 32px; transition: color 0.2s;
+    color: var(--text-dim, #6a6a8a);
+    text-decoration: none;
+    margin-bottom: 32px;
+    transition: color 0.2s;
   }
   .login-back:hover { color: var(--text-bright, #eeeef8); }
   .login-back::before { content: '←'; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
+  const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  async function checkSession() {
+    const { data: { session } } = await _sb.auth.getSession();
+    if (session) window.location.href = '/';
+    else updateNavAuth(null, null);
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    let identifier = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const errEl = document.getElementById('auth-error');
+    const btn = document.getElementById('submit-btn');
+    errEl.textContent = '';
+    btn.textContent = 'AUTHENTICATING...';
+    btn.disabled = true;
+
+    let email = identifier;
+    if (!identifier.includes('@')) {
+      const { data: profile } = await _sb.from('profiles').select('email').eq('username', identifier).single();
+      if (!profile) {
+        errEl.textContent = 'Username not found.';
+        btn.textContent = 'Log In'; btn.disabled = false; return;
+      }
+      email = profile.email;
+    }
+
+    const { error } = await _sb.auth.signInWithPassword({ email, password });
+    if (error) {
+      errEl.textContent = error.message;
+      btn.textContent = 'Log In'; btn.disabled = false;
+    } else {
+      btn.textContent = 'ACCESS GRANTED ✓';
+      const redirect = new URLSearchParams(window.location.search).get('redirect') || '/';
+      setTimeout(() => window.location.href = redirect, 600);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', checkSession);
+</script>
+<script>
+  function toggleUserMenu(e) {
+    e.stopPropagation();
+    const dd = document.getElementById('nav-user-dropdown');
+    if (dd) dd.classList.toggle('open');
+  }
+  document.addEventListener('click', () => {
+    const dd = document.getElementById('nav-user-dropdown');
+    if (dd) dd.classList.remove('open');
+  });
+  async function handleLogout() {
+    await _sb.auth.signOut();
+    window.location.href = '/';
+  }
+  async function handleDeleteAccount() {
+    if (!confirm('Delete your account? This cannot be undone.')) return;
+    await _sb.from('profiles').delete().eq('id', (await _sb.auth.getUser()).data.user.id);
+    await _sb.auth.signOut();
+    window.location.href = '/';
+  }
+  function updateNavAuth(user, profile) {
+    const c = document.getElementById('nav-auth-container');
+    if (!c) return;
+    if (user) {
+      const name = profile?.username || user.email.split('@')[0];
+      c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="toggleUserMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${user.email}</div><a class="nav-dropdown-item" href="#">My Profile</a><button class="nav-dropdown-item" onclick="handleLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="handleDeleteAccount()">Delete Account</button></div></div>`;
+    } else {
+      c.innerHTML = '<a class="nav-auth-link" href="/pages/login">Log In</a>';
+    }
+  }
+</script>
 </head>
 <body>
 
@@ -257,6 +334,7 @@
     <a class="nav-link" href="/pages/shop">Shop</a>
     <a class="nav-link" href="/pages/about">About</a>
     <a class="nav-link" href="/pages/contact">Contact</a>
+    <div id="nav-auth-container"><a class="nav-auth-link" href="/pages/login">Log In</a></div>
   </div>
   <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu" onclick="toggleMobileNav()">
     <span></span><span></span><span></span>
@@ -274,46 +352,28 @@
   <div class="login-panel">
     <a class="login-back" href="/">Back to site</a>
 
-    <div class="login-eyebrow">Free Account</div>
-    <div class="login-title">Create Account</div>
-    <div class="login-sub">Get free access to the Script Library and more.</div>
-
-    <div class="login-perks">
-      <div class="login-perks-title">// What you get</div>
-      <ul>
-        <li>Full access to the Script Library</li>
-        <li>Free Maya scripts and tools</li>
-        <li>Early access to new releases</li>
-      </ul>
-    </div>
+    <div class="login-eyebrow">Access Portal</div>
+    <div class="login-title">Log In</div>
+    <div class="login-sub">Script Library access and commission tracking for registered users.</div>
 
     <span id="auth-error"></span>
 
-    <div id="auth-success">
-      ✓ &nbsp;Account created!<br>
-      Check your email to confirm your address,<br>
-      then <a href="/pages/login" style="color:#00e87a;">log in here →</a>
-    </div>
-
-    <form onsubmit="handleSignup(event)">
+    <form onsubmit="handleLogin(event)">
       <div class="login-field">
-        <label class="login-label" for="email">Email Address</label>
-        <input class="login-input" type="email" id="email" placeholder="you@example.com" required autocomplete="email">
+        <label class="login-label" for="email">Email or Username</label>
+        <input class="login-input" type="email" id="email" placeholder="you@example.com or username" required autocomplete="username">
       </div>
       <div class="login-field">
         <label class="login-label" for="password">Password</label>
-        <input class="login-input" type="password" id="password" placeholder="Min. 8 characters" required autocomplete="new-password">
+        <input class="login-input" type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
       </div>
-      <div class="login-field">
-        <label class="login-label" for="confirm">Confirm Password</label>
-        <input class="login-input" type="password" id="confirm" placeholder="••••••••" required autocomplete="new-password">
-      </div>
-      <button class="login-submit" type="submit" id="submit-btn">Create Account →</button>
+
+      <button class="login-submit" type="submit" id="submit-btn">Log In →</button>
     </form>
 
     <div class="login-footer">
-      <span class="login-footer-text">Already have an account?</span>
-      <a href="/pages/login">Log in →</a>
+      <span class="login-footer-text">No account?</span>
+      <a href="/pages/signup">Create free account →</a>
     </div>
   </div>
 </div>
