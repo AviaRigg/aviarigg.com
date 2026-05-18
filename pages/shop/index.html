@@ -1786,8 +1786,31 @@ function filterProducts(cat, btn) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.querySelectorAll('.product-card').forEach(card => {
+    const isHidden = card.dataset.status === 'hidden' && !isAdmin;
+    if (isHidden) { card.classList.add('hidden'); return; }
     if (cat === 'all' || card.dataset.cat === cat) card.classList.remove('hidden');
     else card.classList.add('hidden');
+  });
+  updateFilterCounts();
+}
+
+function updateFilterCounts() {
+  const cards = document.querySelectorAll('.product-card');
+  const counts = { all: 0, rig: 0, tool: 0, soon: 0 };
+  cards.forEach(card => {
+    const isHidden = card.dataset.status === 'hidden' && !isAdmin;
+    if (isHidden) return;
+    counts.all++;
+    const cat = card.dataset.cat;
+    if (counts[cat] !== undefined) counts[cat]++;
+  });
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    const onclick = btn.getAttribute('onclick') || '';
+    const match = onclick.match(/'(\w+)'/);
+    if (!match) return;
+    const cat = match[1];
+    const countEl = btn.querySelector('.filter-count');
+    if (countEl && counts[cat] !== undefined) countEl.textContent = counts[cat];
   });
 }
 
@@ -1841,6 +1864,7 @@ async function loadProductStatuses() {
   } else {
     showHeroEmpty();
   }
+  updateFilterCounts();
 }
 
 function applyStatusToCard(productId, newStatus, cardEl, save = true) {
