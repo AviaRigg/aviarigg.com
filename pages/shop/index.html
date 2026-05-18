@@ -1927,17 +1927,30 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
   } else if (newStatus === 'hidden') {
     cardEl.dataset.cat = originalCat;
     cardEl.classList.remove('dim');
-    // Admins always see hidden cards dimmed — visitors never see them
     if (isAdmin) {
       cardEl.style.display = '';
-      cardEl.style.opacity = '0.25';
+      cardEl.style.opacity = '0.35';
+      cardEl.style.cursor = '';
+      if (cardEl.dataset.href) {
+        cardEl.setAttribute('onclick', `window.location.href='${cardEl.dataset.href}'`);
+      }
+      cardEl.querySelectorAll('.shop-buy-btn').forEach(btn => {
+        btn.style.opacity = '';
+        btn.style.cursor = '';
+      });
     } else {
       cardEl.style.display = 'none';
       cardEl.style.opacity = '';
+      cardEl.style.cursor = 'default';
+      cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
+      cardEl.removeAttribute('onclick');
+      cardEl.querySelectorAll('.shop-buy-btn').forEach(btn => {
+        btn.setAttribute('onclick', "event.preventDefault();event.stopPropagation();window.location.href='/pages/not-available?reason=hidden'");
+        btn.href = '#';
+        btn.style.opacity = '0.4';
+        btn.style.cursor = 'not-allowed';
+      });
     }
-    cardEl.style.cursor = 'default';
-    cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
-    cardEl.removeAttribute('onclick');
   } else if (newStatus === 'featured') {
     cardEl.dataset.cat = originalCat;
     cardEl.classList.remove('dim');
