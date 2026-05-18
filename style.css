@@ -3380,6 +3380,141 @@ body::before {
 }
 
 /* ══════════════════════════════════════════
+   MOBILE — NO-SCROLL HOMEPAGE
+   Forces entire hero to fit in one viewport
+══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Lock page-level scroll on homepage */
+  html:has(#page-home.active),
+  body:has(#page-home.active) {
+    overflow: hidden;
+    height: 100%;
+  }
+
+  /* Hero fills exactly the remaining viewport */
+  .hero-pf {
+    height: calc(100dvh - var(--nav-h));
+    max-height: calc(100dvh - var(--nav-h));
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Tighten top section */
+  .pf-top {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 20px 12px;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  /* Shrink the big tagline */
+  .pf-tagline {
+    font-size: clamp(32px, 11vw, 52px);
+    line-height: 0.92;
+  }
+
+  .pf-kicker {
+    font-size: 9px;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+
+  /* Right-side info block */
+  .pf-top-right {
+    align-items: flex-start;
+    text-align: left;
+    max-width: 100%;
+    gap: 8px;
+  }
+
+  .pf-name-sig {
+    font-size: 9px;
+    letter-spacing: 2px;
+  }
+
+  .pf-bio-short {
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+    text-align: left;
+  }
+
+  /* Buttons side by side and compact */
+  .pf-actions {
+    flex-direction: row !important;
+    gap: 8px;
+  }
+  .pf-actions .btn-primary,
+  .pf-actions .btn-ghost {
+    width: auto !important;
+    justify-content: center;
+    padding: 8px 14px;
+    font-size: 9px;
+    letter-spacing: 2px;
+  }
+
+  /* Cards section takes remaining space */
+  .pf-works-wrap {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Hide the swipe hint pseudo-element to save space */
+  .pf-works-wrap::after {
+    padding: 4px 0;
+    font-size: 8px;
+  }
+
+  /* Cards row: fixed height, horizontal scroll */
+  .pf-works {
+    flex: 1;
+    min-height: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .work-card {
+    min-height: 0;
+    height: 100%;
+  }
+
+  /* Compact work card internals */
+  .work-card-graphic { padding: 6px 0; }
+  .wcg-grid { height: 48px; }
+  .wcg-code { font-size: 8px; line-height: 1.6; }
+  .work-title { font-size: clamp(14px, 4vw, 20px); margin-bottom: 2px; }
+  .work-sub { font-size: 8px; }
+  .work-bar-wrap { margin-bottom: 6px; }
+
+  /* Bottom info bar — compact single line */
+  .hero-pf .hero-bar {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+    padding: 8px 16px;
+    flex-shrink: 0;
+  }
+
+  .hero-bar-item {
+    font-size: 8px;
+    letter-spacing: 2px;
+    gap: 5px;
+  }
+
+  .hero-pf .hero-bar .hero-bar-item:last-child {
+    margin-left: 0 !important;
+    padding: 4px 10px;
+    font-size: 8px;
+  }
+}
+
+/* ══════════════════════════════════════════
    WORK CARD GRAPHICS
 ══════════════════════════════════════════ */
 .work-card-graphic {
