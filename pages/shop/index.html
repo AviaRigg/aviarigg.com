@@ -1000,9 +1000,9 @@
       <div class="shop-inner">
 
       <!-- Hero featured card -->
-      <div class="hero-card" data-product-id="f1-sf25" data-status="live" onclick="window.location.href='/pages/product-f1'">
+      <div class="hero-card" data-product-id="hero-featured" data-status="live" onclick="window.location.href='/pages/product-f1'">
         <div class="hero-card-img">
-          <span class="admin-status-badge status-live" onclick="event.stopPropagation();cycleProductStatus('f1-sf25','live',this.closest('[data-product-id]'))">LIVE</span>
+          <span class="admin-status-badge status-live" onclick="event.stopPropagation();cycleProductStatus('hero-featured','live',this.closest('[data-product-id]'))">LIVE</span>
           <img class="hero-img" src="/projects/f1_SF25/images/F1_Rendered.png" alt="F1 SF-25 Rig">
           <div class="hero-img-overlay"></div>
           <div class="hero-card-tag">// Hard Surface · Featured</div>
@@ -1498,47 +1498,6 @@ function cycleProductStatus(productId, currentStatus, cardEl) {
   const cycle = { live: 'draft', draft: 'hidden', hidden: 'featured', featured: 'live' };
   const newStatus = cycle[currentStatus] || 'live';
 
-  // Save to Supabase in background
-  _sb.from('shop_products').update({ status: newStatus }).eq('id', productId).then(() => {});
-
-  cardEl.dataset.status = newStatus;
-
-  // Update badge — always keep clickable
-  const badge = cardEl.querySelector('.admin-status-badge');
-  if (badge) {
-    badge.textContent = newStatus.toUpperCase();
-    badge.className = 'admin-status-badge status-' + newStatus;
-    badge.setAttribute('onclick', `event.stopPropagation();cycleProductStatus('${productId}','${newStatus}',this.closest('[data-product-id]'))`);
-    badge.style.pointerEvents = 'auto';
-    badge.style.cursor = 'pointer';
-  }
-
-  if (!cardEl.dataset.originalCat) cardEl.dataset.originalCat = cardEl.dataset.cat;
-  const originalCat = cardEl.dataset.originalCat;
-
-  // Swap thumbnail between real image and coming soon placeholder
-  const thumb = cardEl.querySelector('.pc-thumb');
-  if (thumb) {
-    const img = thumb.querySelector('.pc-img');
-    const placeholder = thumb.querySelector('.pc-placeholder');
-    if (newStatus === 'draft') {
-      // Save real src, show placeholder
-      if (img) { img.dataset.realSrc = img.dataset.realSrc || img.src; img.style.display = 'none'; }
-      if (!placeholder) {
-        const ph = document.createElement('div');
-        ph.className = 'pc-placeholder admin-placeholder';
-        ph.textContent = '// Coming Soon';
-        thumb.appendChild(ph);
-      } else { placeholder.style.display = ''; }
-    } else {
-      // Restore real image, hide placeholder
-      if (img) { if (img.dataset.realSrc) img.src = img.dataset.realSrc; img.style.display = ''; }
-      const ph = thumb.querySelector('.admin-placeholder');
-      if (ph) ph.style.display = 'none';
-      if (placeholder && !placeholder.classList.contains('admin-placeholder')) placeholder.style.display = 'none';
-    }
-  }
-
   if (newStatus === 'draft') {
     cardEl.dataset.cat = 'soon';
     cardEl.classList.add('dim');
@@ -1621,8 +1580,105 @@ function updateScanHeights() {
   });
 }
 window.addEventListener('resize', updateScanHeights);
+async function loadProductStatuses() {
+  const { data: products } = await _sb.from('shop_products').select('id, status');
+  if (!products) return;
+  products.forEach(({ id, status }) => {
+    const card = document.querySelector(`[data-product-id="${id}"]`);
+    if (!card || status === 'live') return;
+    // Apply saved status visually (without re-saving to DB)
+    applyStatusToCard(id, status, card, false);
+  });
+}
+
+function applyStatusToCard(productId, newStatus, cardEl, save = true) {
+  if (save) {
+    _sb.from('shop_products')
+      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .eq('id', productId).then(() => {});
+  }
+
+  cardEl.dataset.status = newStatus;
+
+  // Update badge
+  const badge = cardEl.querySelector('.admin-status-badge');
+  if (badge) {
+    badge.textContent = newStatus.toUpperCase();
+    badge.className = 'admin-status-badge status-' + newStatus;
+    badge.setAttribute('onclick', `event.stopPropagation();cycleProductStatus('${productId}','${newStatus}',this.closest('[data-product-id]'))`);
+    badge.style.pointerEvents = 'auto';
+    badge.style.cursor = 'pointer';
+  }
+
+  if (!cardEl.dataset.originalCat) cardEl.dataset.originalCat = cardEl.dataset.cat;
+  const originalCat = cardEl.dataset.originalCat;
+
+  // Thumbnail swap
+  const thumb = cardEl.querySelector('.pc-thumb');
+  if (thumb) {
+    const img = thumb.querySelector('.pc-img');
+    const placeholder = thumb.querySelector('.pc-placeholder');
+    if (newStatus === 'draft') {
+      if (img) { img.dataset.realSrc = img.dataset.realSrc || img.src; img.style.display = 'none'; }
+      if (!thumb.querySelector('.admin-placeholder')) {
+        const ph = document.createElement('div');
+        ph.className = 'pc-placeholder admin-placeholder';
+        ph.textContent = '// Coming Soon';
+        thumb.appendChild(ph);
+      }
+    } else {
+      if (img) { if (img.dataset.realSrc) img.src = img.dataset.realSrc; img.style.display = ''; }
+      const ph = thumb.querySelector('.admin-placeholder');
+      if (ph) ph.style.display = 'none';
+      if (placeholder && !placeholder.classList.contains('admin-placeholder')) placeholder.style.display = 'none';
+    }
+  }
+
+  if (newStatus === 'draft') {
+    cardEl.dataset.cat = 'soon';
+    cardEl.classList.add('dim');
+    cardEl.style.opacity = '';
+    cardEl.style.cursor = 'default';
+    cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
+    cardEl.removeAttribute('onclick');
+  } else if (newStatus === 'hidden') {
+    cardEl.dataset.cat = originalCat;
+    cardEl.classList.remove('dim');
+    cardEl.style.display = isAdmin ? '' : 'none';
+    cardEl.style.opacity = isAdmin ? '0.25' : '';
+    cardEl.style.cursor = 'default';
+    cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
+    cardEl.removeAttribute('onclick');
+  } else if (newStatus === 'featured') {
+    cardEl.dataset.cat = originalCat;
+    cardEl.classList.remove('dim');
+    cardEl.style.opacity = '';
+    cardEl.style.cursor = '';
+    const savedOnclick = cardEl.getAttribute('data-onclick-disabled');
+    if (savedOnclick) { cardEl.setAttribute('onclick', savedOnclick); cardEl.removeAttribute('data-onclick-disabled'); }
+    swapHeroCard(cardEl);
+  } else {
+    // live
+    cardEl.dataset.cat = originalCat;
+    cardEl.classList.remove('dim');
+    cardEl.style.display = '';
+    cardEl.style.opacity = '';
+    cardEl.style.cursor = '';
+    const savedOnclick = cardEl.getAttribute('data-onclick-disabled');
+    if (savedOnclick) { cardEl.setAttribute('onclick', savedOnclick); cardEl.removeAttribute('data-onclick-disabled'); }
+  }
+
+  // Re-apply current filter
+  const activeFilter = document.querySelector('.filter-btn.active');
+  if (activeFilter) {
+    const currentCat = activeFilter.getAttribute('onclick').match(/'([^']+)'/)?.[1] || 'all';
+    filterProducts(currentCat, activeFilter);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   updateScanHeights();
+  loadProductStatuses();
   if (window.location.hash === '#commissions') {
     switchTab('commissions', document.getElementById('tab-btn-commissions'));
   }
