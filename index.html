@@ -39,9 +39,11 @@
     document.addEventListener('touchmove', function(e) {
       if (e.touches.length > 1) e.preventDefault();
     }, { passive: false });
-    // Prevent double-tap zoom
+    // Prevent double-tap zoom (but not on interactive elements)
     let lastTap = 0;
     document.addEventListener('touchend', function(e) {
+      const tag = e.target.tagName;
+      if (['A', 'BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'].includes(tag)) return;
       const now = Date.now();
       if (now - lastTap < 300) e.preventDefault();
       lastTap = now;
