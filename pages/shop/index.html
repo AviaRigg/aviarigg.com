@@ -1465,18 +1465,37 @@ function showHeroEmpty() {
   const hero = document.querySelector('.hero-card');
   if (!hero) return;
   if (isAdmin) {
-    // Admin sees dimmed placeholder
     hero.classList.add('no-featured');
+    hero.style.display = '';
+    hero.removeAttribute('onclick');
+    // Hide the actual image completely
+    const heroImg = hero.querySelector('.hero-img');
+    const heroOverlay = hero.querySelector('.hero-img-overlay');
+    const heroTag = hero.querySelector('.hero-card-tag');
+    if (heroImg) heroImg.style.display = 'none';
+    if (heroOverlay) heroOverlay.style.display = 'none';
+    if (heroTag) heroTag.style.display = 'none';
+    // Show placeholder in image area
     const imgWrap = hero.querySelector('.hero-card-img');
+    if (imgWrap) {
+      imgWrap.style.opacity = '';
+      let ph = imgWrap.querySelector('.hero-empty-ph');
+      if (!ph) {
+        ph = document.createElement('div');
+        ph.className = 'hero-empty-ph';
+        ph.style.cssText = 'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:"Share Tech Mono",monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(139,79,200,0.4);';
+        ph.textContent = '// No Featured Product';
+        imgWrap.appendChild(ph);
+      }
+      ph.style.display = '';
+    }
+    // Update body
     const body = hero.querySelector('.hero-card-body');
-    if (imgWrap) imgWrap.style.opacity = '0.15';
     if (body) body.innerHTML = `
       <div class="hero-empty">
-        <div class="hero-empty-label">// No Featured Product</div>
+        <div class="hero-empty-label">// Admin Only</div>
         <div class="hero-empty-text">Select a product and set it to Featured</div>
       </div>`;
-    hero.removeAttribute('onclick');
-    hero.style.display = '';
   } else {
     // Visitors see nothing
     hero.style.display = 'none';
@@ -1487,6 +1506,17 @@ function showHeroContent() {
   const hero = document.querySelector('.hero-card');
   if (!hero) return;
   hero.classList.remove('no-featured');
+  hero.style.display = '';
+  // Restore image elements
+  const heroImg = hero.querySelector('.hero-img');
+  const heroOverlay = hero.querySelector('.hero-img-overlay');
+  const heroTag = hero.querySelector('.hero-card-tag');
+  if (heroImg) heroImg.style.display = '';
+  if (heroOverlay) heroOverlay.style.display = '';
+  if (heroTag) heroTag.style.display = '';
+  // Hide placeholder
+  const ph = hero.querySelector('.hero-empty-ph');
+  if (ph) ph.style.display = 'none';
   const imgWrap = hero.querySelector('.hero-card-img');
   if (imgWrap) imgWrap.style.opacity = '';
 }
@@ -1590,8 +1620,8 @@ async function loadProductStatuses() {
 function applyStatusToCard(productId, newStatus, cardEl, save = true) {
   if (save) {
     _sb.from('shop_products')
-      .update({ status: newStatus, updated_at: new Date().toISOString() })
-      .eq('id', productId).then(() => {});
+      .upsert({ id: productId, status: newStatus, updated_at: new Date().toISOString() })
+      .then(({ error }) => { if (error) console.error('Save error:', error); });
   }
 
   cardEl.dataset.status = newStatus;
