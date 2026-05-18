@@ -1442,6 +1442,63 @@ function filterProducts(cat, btn) {
   });
 }
 
+function cycleProductStatus(productId, currentStatus, cardEl) {
+  if (!isAdmin || !editMode) return;
+  const cycle = { live: 'draft', draft: 'hidden', hidden: 'live' };
+  const newStatus = cycle[currentStatus] || 'live';
+
+  // Save to Supabase in background
+  _sb.from('shop_products').update({ status: newStatus }).eq('id', productId).then(() => {});
+
+  cardEl.dataset.status = newStatus;
+
+  // Update badge — always keep clickable
+  const badge = cardEl.querySelector('.admin-status-badge');
+  if (badge) {
+    badge.textContent = newStatus.toUpperCase();
+    badge.className = 'admin-status-badge status-' + newStatus;
+    badge.setAttribute('onclick', `event.stopPropagation();cycleProductStatus('${productId}','${newStatus}',this.closest('[data-product-id]'))`);
+    badge.style.pointerEvents = 'auto';
+    badge.style.cursor = 'pointer';
+  }
+
+  if (!cardEl.dataset.originalCat) cardEl.dataset.originalCat = cardEl.dataset.cat;
+  const originalCat = cardEl.dataset.originalCat;
+
+  if (newStatus === 'draft') {
+    cardEl.dataset.cat = 'soon';
+    cardEl.classList.add('dim');
+    cardEl.style.opacity = '';
+    cardEl.style.cursor = 'default';
+    cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
+    cardEl.removeAttribute('onclick');
+  } else if (newStatus === 'hidden') {
+    cardEl.dataset.cat = originalCat;
+    cardEl.classList.remove('dim');
+    cardEl.style.opacity = '0.25';
+    cardEl.style.cursor = 'default';
+    cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
+    cardEl.removeAttribute('onclick');
+  } else {
+    cardEl.dataset.cat = originalCat;
+    cardEl.classList.remove('dim');
+    cardEl.style.opacity = '';
+    cardEl.style.cursor = '';
+    const savedOnclick = cardEl.getAttribute('data-onclick-disabled');
+    if (savedOnclick) {
+      cardEl.setAttribute('onclick', savedOnclick);
+      cardEl.removeAttribute('data-onclick-disabled');
+    }
+  }
+
+  // Re-apply current filter
+  const activeFilter = document.querySelector('.filter-btn.active');
+  if (activeFilter) {
+    const currentCat = activeFilter.getAttribute('onclick').match(/'([^']+)'/)?.[1] || 'all';
+    filterProducts(currentCat, activeFilter);
+  }
+}
+
 function updateScanHeights() {
   document.querySelectorAll('.shop-card-thumb--img').forEach(el => {
     el.style.setProperty('--thumb-h', el.offsetHeight + 'px');
