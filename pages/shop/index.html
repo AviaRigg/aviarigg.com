@@ -786,10 +786,12 @@
       if (!isAdmin || !editMode) return;
       const cycle = { live: 'draft', draft: 'hidden', hidden: 'live' };
       const newStatus = cycle[currentStatus] || 'live';
-      const { error } = await _sb.from('shop_products').update({ status: newStatus }).eq('id', productId);
-      if (!error) {
-        const prevStatus = cardEl.dataset.status;
-        cardEl.dataset.status = newStatus;
+      // Save to Supabase in background (table optional)
+      _sb.from('shop_products').update({ status: newStatus }).eq('id', productId).then(() => {});
+
+      // Update UI immediately
+      const prevStatus = cardEl.dataset.status;
+      cardEl.dataset.status = newStatus;
 
         // Update badge
         const badge = cardEl.querySelector('.admin-status-badge');
@@ -832,12 +834,11 @@
           }
         }
 
-        // Re-apply current filter so card moves to correct tab view
-        const activeFilter = document.querySelector('.filter-btn.active');
-        if (activeFilter) {
-          const currentCat = activeFilter.getAttribute('onclick').match(/'([^']+)'/)?.[1] || 'all';
-          filterProducts(currentCat, activeFilter);
-        }
+      // Re-apply current filter so card moves to correct tab view
+      const activeFilter = document.querySelector('.filter-btn.active');
+      if (activeFilter) {
+        const currentCat = activeFilter.getAttribute('onclick').match(/'([^']+)'/)?.[1] || 'all';
+        filterProducts(currentCat, activeFilter);
       }
     }
 
