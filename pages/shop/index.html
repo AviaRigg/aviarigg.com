@@ -722,6 +722,126 @@
     .filter-btn         { font-size: 16px; }
   }
 </style>
+  <!-- ── SUPABASE ── -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
+    const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let currentUser = null;
+    let isAdmin = false;
+    let editMode = false;
+
+    async function initAuth() {
+      const { data: { session } } = await _sb.auth.getSession();
+      if (session) await handleSession(session.user);
+      _sb.auth.onAuthStateChange(async (_event, session) => {
+        if (session) await handleSession(session.user);
+        else handleSignOut();
+      });
+    }
+
+    async function handleSession(user) {
+      currentUser = user;
+      const { data: profile } = await _sb.from('profiles').select('role').eq('id', user.id).single();
+      isAdmin = profile?.role === 'admin';
+      updateAuthUI();
+    }
+
+    function handleSignOut() {
+      currentUser = null;
+      isAdmin = false;
+      editMode = false;
+      updateAuthUI();
+    }
+
+    function updateAuthUI() {
+      const loginBtn = document.getElementById('nav-auth-btn');
+      const editToggle = document.getElementById('admin-edit-toggle');
+      if (!loginBtn) return;
+      if (currentUser) {
+        loginBtn.textContent = 'Log Out';
+        loginBtn.onclick = () => _sb.auth.signOut();
+      } else {
+        loginBtn.textContent = 'Log In';
+        loginBtn.onclick = () => window.location.href = '/pages/login';
+      }
+      if (editToggle) editToggle.style.display = isAdmin ? 'flex' : 'none';
+    }
+
+    function toggleEditMode() {
+      editMode = !editMode;
+      document.body.classList.toggle('edit-mode', editMode);
+      const btn = document.getElementById('edit-mode-btn');
+      if (btn) {
+        btn.textContent = editMode ? '✕ Exit Edit Mode' : '✎ Edit Mode';
+        btn.style.background = editMode ? 'rgba(255,80,80,0.15)' : 'rgba(139,79,200,0.15)';
+        btn.style.borderColor = editMode ? 'rgba(255,80,80,0.5)' : 'rgba(139,79,200,0.5)';
+        btn.style.color = editMode ? '#ff5050' : '#b06ef5';
+      }
+    }
+
+    async function cycleProductStatus(productId, currentStatus, cardEl) {
+      if (!isAdmin || !editMode) return;
+      const cycle = { live: 'draft', draft: 'hidden', hidden: 'live' };
+      const newStatus = cycle[currentStatus] || 'live';
+      const { error } = await _sb.from('shop_products').update({ status: newStatus }).eq('id', productId);
+      if (!error) {
+        cardEl.dataset.status = newStatus;
+        const badge = cardEl.querySelector('.admin-status-badge');
+        if (badge) {
+          badge.textContent = newStatus.toUpperCase();
+          badge.className = 'admin-status-badge status-' + newStatus;
+        }
+        if (newStatus === 'hidden') cardEl.style.opacity = '0.35';
+        else if (newStatus === 'draft') cardEl.style.opacity = '0.6';
+        else cardEl.style.opacity = '1';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initAuth);
+  </script>
+
+  <style>
+    /* ── ADMIN EDIT MODE STYLES ── */
+    #admin-edit-toggle {
+      display: none;
+      position: fixed;
+      bottom: 28px; right: 28px;
+      z-index: 9000;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    #edit-mode-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+      color: #b06ef5;
+      background: rgba(139,79,200,0.15);
+      border: 1px solid rgba(139,79,200,0.5);
+      padding: 10px 20px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    #edit-mode-btn:hover { background: rgba(139,79,200,0.25); }
+
+    .admin-status-badge {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+      padding: 3px 8px; cursor: pointer;
+      position: absolute; top: 10px; right: 10px; z-index: 10;
+      transition: all 0.2s; display: none;
+      border: 1px solid;
+    }
+    .status-live   { color: #00e87a; border-color: rgba(0,232,122,0.4); background: rgba(0,232,122,0.1); }
+    .status-draft  { color: #f5a623; border-color: rgba(245,166,35,0.4); background: rgba(245,166,35,0.1); }
+    .status-hidden { color: #ff5050; border-color: rgba(255,80,80,0.4);  background: rgba(255,80,80,0.1); }
+
+    body.edit-mode .admin-status-badge { display: block; }
+    body.edit-mode .product-card { outline: 1px dashed rgba(139,79,200,0.3); }
+    body.edit-mode .hero-card    { outline: 1px dashed rgba(139,79,200,0.3); }
+  </style>
+
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -746,6 +866,7 @@
     <a class="nav-link" href="/pages/about">About</a>
     <a class="nav-link" href="/pages/contact">Contact</a>
     <a class="nav-badge" href="/pages/contact">&#9679; Open to Work</a>
+    <button id="nav-auth-btn" onclick="window.location.href='/pages/login'" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent2);background:transparent;border:1px solid rgba(139,79,200,0.4);padding:7px 16px;cursor:pointer;transition:all 0.2s;white-space:nowrap;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='rgba(139,79,200,0.4)'">Log In</button>
   </div>
   <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu" onclick="toggleMobileNav()">
     <span></span><span></span><span></span>
@@ -800,8 +921,9 @@
       <div class="shop-inner">
 
       <!-- Hero featured card -->
-      <div class="hero-card" onclick="window.location.href='/pages/product-f1'">
+      <div class="hero-card" data-product-id="f1-sf25" data-status="live" onclick="window.location.href='/pages/product-f1'">
         <div class="hero-card-img">
+          <span class="admin-status-badge status-live" onclick="event.stopPropagation();cycleProductStatus('f1-sf25','live',this.closest('[data-product-id]'))">LIVE</span>
           <img class="hero-img" src="/projects/f1_SF25/images/F1_Rendered.png" alt="F1 SF-25 Rig">
           <div class="hero-img-overlay"></div>
           <div class="hero-card-tag">// Hard Surface · Featured</div>
@@ -832,8 +954,9 @@
       <!-- Product grid -->
       <div class="product-grid" id="product-grid">
 
-        <div class="product-card" data-cat="rig" onclick="window.location.href='/pages/product-f1'">
+        <div class="product-card" data-product-id="f1-sf25-grid" data-status="live" data-cat="rig" onclick="window.location.href='/pages/product-f1'">
           <div class="pc-thumb">
+            <span class="admin-status-badge status-live" onclick="event.stopPropagation();cycleProductStatus('f1-sf25-grid','live',this.closest('[data-product-id]'))">LIVE</span>
             <img class="pc-img" src="/projects/f1_SF25/images/F1_Rendered.png" alt="F1 SF-25 Rig">
             <div class="pc-tag">// Hard Surface</div>
           </div>
@@ -848,8 +971,9 @@
           </div>
         </div>
 
-        <div class="product-card" data-cat="tool" onclick="window.location.href='/pages/product-curvelib'">
+        <div class="product-card" data-product-id="controller-shape-menu" data-status="live" data-cat="tool" onclick="window.location.href='/pages/product-curvelib'">
           <div class="pc-thumb">
+            <span class="admin-status-badge status-live" onclick="event.stopPropagation();cycleProductStatus('controller-shape-menu','live',this.closest('[data-product-id]'))">LIVE</span>
             <img class="pc-img" src="/projects/AviaRigg_CurvLib/images/Main Window.png" alt="Controller Shape Menu">
             <div class="pc-tag">// Maya Tool</div>
           </div>
@@ -864,8 +988,11 @@
           </div>
         </div>
 
-        <div class="product-card dim" data-cat="soon">
-          <div class="pc-thumb"><div class="pc-placeholder">// Coming Soon</div></div>
+        <div class="product-card dim" data-product-id="character-rig-template" data-status="draft" data-cat="soon">
+          <div class="pc-thumb">
+            <span class="admin-status-badge status-draft" onclick="event.stopPropagation();cycleProductStatus('character-rig-template','draft',this.closest('[data-product-id]'))">DRAFT</span>
+            <div class="pc-placeholder">// Coming Soon</div>
+          </div>
           <div class="pc-body">
             <div class="pc-cat">Rig Pack</div>
             <div class="pc-title">Character Rig Template</div>
@@ -877,8 +1004,11 @@
           </div>
         </div>
 
-        <div class="product-card dim" data-cat="soon">
-          <div class="pc-thumb"><div class="pc-placeholder">// Coming Soon</div></div>
+        <div class="product-card dim" data-product-id="mel-python-scripts" data-status="draft" data-cat="soon">
+          <div class="pc-thumb">
+            <span class="admin-status-badge status-draft" onclick="event.stopPropagation();cycleProductStatus('mel-python-scripts','draft',this.closest('[data-product-id]'))">DRAFT</span>
+            <div class="pc-placeholder">// Coming Soon</div>
+          </div>
           <div class="pc-body">
             <div class="pc-cat">Script Pack</div>
             <div class="pc-title">MEL &amp; Python Scripts</div>
@@ -1202,6 +1332,11 @@
     <!-- end commissions tab -->
 
   </div>
+</div>
+
+<!-- ADMIN EDIT TOGGLE -->
+<div id="admin-edit-toggle">
+  <button id="edit-mode-btn" onclick="toggleEditMode()">✎ Edit Mode</button>
 </div>
 
 <script>
