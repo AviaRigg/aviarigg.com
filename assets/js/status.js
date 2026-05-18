@@ -4,18 +4,18 @@
 //  Fallback to hardcoded values if Supabase unavailable
 // ══════════════════════════════════════════
 
-const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
+const _STATUS_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
+const _STATUS_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
 
 async function loadAndApplySettings() {
   let openToWork = true;
   let commissionsOpen = true;
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?select=key,value`, {
+    const res = await fetch(`${_STATUS_URL}/rest/v1/site_settings?select=key,value`, {
       headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
+        'apikey': _STATUS_KEY,
+        'Authorization': `Bearer ${_STATUS_KEY}`
       }
     });
     if (res.ok) {
