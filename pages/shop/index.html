@@ -934,13 +934,88 @@
       if (session) {
         await handleSession(session.user);
       } else {
-        // No session — still load statuses (isAdmin=false, so hidden=invisible)
         await loadProductStatuses();
       }
+      loadSiteSettings(); // load open-to-work + commissions status
       _sb.auth.onAuthStateChange(async (_event, session) => {
         if (session) await handleSession(session.user);
         else handleSignOut();
       });
+    }
+
+    // ── SITE SETTINGS ──
+    let siteSettings = { open_to_work: true, commissions_open: true };
+
+    async function loadSiteSettings() {
+      const { data } = await _sb.from('site_settings').select('key, value');
+      if (!data) return;
+      data.forEach(({ key, value }) => { siteSettings[key] = value === 'true'; });
+      applyOpenToWork(siteSettings.open_to_work);
+      applyCommissionsStatus(siteSettings.commissions_open);
+      updateSettingsUI();
+    }
+
+    async function toggleSetting(key) {
+      if (!isAdmin) return;
+      const newVal = !siteSettings[key];
+      siteSettings[key] = newVal;
+      await _sb.from('site_settings').upsert({ key, value: String(newVal) });
+      if (key === 'open_to_work') applyOpenToWork(newVal);
+      if (key === 'commissions_open') applyCommissionsStatus(newVal);
+      updateSettingsUI();
+    }
+
+    function applyOpenToWork(val) {
+      document.querySelectorAll('.nav-badge').forEach(el => el.style.display = val ? '' : 'none');
+    }
+
+    function applyCommissionsStatus(val) {
+      const avail = document.querySelector('.comm-avail-badge');
+      const unavail = document.querySelector('.comm-unavail-badge');
+      if (avail) avail.style.display = val ? '' : 'none';
+      if (unavail) unavail.style.display = val ? 'none' : '';
+      // Disable commission buttons if closed (for non-admins)
+      if (!isAdmin) {
+        document.querySelectorAll('.comm-btn-primary').forEach(btn => {
+          btn.style.opacity = val ? '' : '0.4';
+          btn.style.pointerEvents = val ? '' : 'none';
+        });
+      }
+      // Update commissions tab badge
+      const tabBtn = document.getElementById('tab-btn-commissions');
+      if (tabBtn) {
+        const pill = tabBtn.querySelector('.comm-tab-pill');
+        if (pill) {
+          pill.textContent = val ? 'Open' : 'Closed';
+          pill.style.color = val ? '#00e87a' : '#ff5050';
+          pill.style.borderColor = val ? 'rgba(0,232,122,0.4)' : 'rgba(255,80,80,0.4)';
+        }
+      }
+    }
+
+    function updateSettingsUI() {
+      // Update admin nav dropdown toggles
+      const otwBtn = document.getElementById('admin-toggle-otw');
+      const commBtn = document.getElementById('admin-toggle-comm');
+      if (otwBtn) {
+        const on = siteSettings.open_to_work;
+        otwBtn.textContent = 'Work Status: ' + (on ? 'OPEN ✓' : 'CLOSED ✗');
+        otwBtn.style.color = on ? '#00e87a' : '#ff5050';
+      }
+      if (commBtn) {
+        const on = siteSettings.commissions_open;
+        commBtn.textContent = 'Commissions: ' + (on ? 'OPEN ✓' : 'CLOSED ✗');
+        commBtn.style.color = on ? '#00e87a' : '#ff5050';
+      }
+      // Update commissions edit-mode toggle button
+      const commEditBtn = document.getElementById('comm-edit-toggle');
+      if (commEditBtn) {
+        const on = siteSettings.commissions_open;
+        commEditBtn.textContent = on ? '● Open — Click to Close' : '● Closed — Click to Open';
+        commEditBtn.style.borderColor = on ? 'rgba(0,232,122,0.5)' : 'rgba(255,80,80,0.5)';
+        commEditBtn.style.color = on ? '#00e87a' : '#ff5050';
+        commEditBtn.style.background = on ? 'rgba(0,232,122,0.08)' : 'rgba(255,80,80,0.08)';
+      }
     }
 
     async function handleSession(user) {
@@ -977,6 +1052,12 @@
             <div class="nav-user-dropdown" id="nav-user-dropdown">
               <div class="nav-user-email">${currentUser.email}</div>
               <a class="nav-dropdown-item" href="#">My Profile</a>
+              ${isAdmin ? `
+              <div style="height:1px;background:rgba(139,79,200,0.2);margin:4px 0;"></div>
+              <button class="nav-dropdown-item" id="admin-toggle-otw" onclick="toggleSetting('open_to_work')" style="font-size:9px;">Work Status: OPEN ✓</button>
+              <button class="nav-dropdown-item" id="admin-toggle-comm" onclick="toggleSetting('commissions_open')" style="font-size:9px;">Commissions: OPEN ✓</button>
+              <div style="height:1px;background:rgba(139,79,200,0.2);margin:4px 0;"></div>
+              ` : ''}
               <button class="nav-dropdown-item" onclick="handleLogout()">Log Out</button>
               <button class="nav-dropdown-item nav-dropdown-danger" onclick="handleDeleteAccount()">Delete Account</button>
             </div>
@@ -1014,6 +1095,10 @@
       document.querySelectorAll('.product-card').forEach(c => {
         c.style.overflow = editMode ? 'visible' : '';
       });
+      // Show/hide commissions admin toggle
+      const commAdminToggle = document.getElementById('comm-admin-toggle');
+      if (commAdminToggle) commAdminToggle.style.display = (isAdmin && editMode) ? 'block' : 'none';
+      if (editMode) updateSettingsUI();
     }
 
     async function handleLogout() {
@@ -1239,6 +1324,17 @@
     <!-- ══ TAB: COMMISSIONS ══════════════════════════════════ -->
     <div class="shop-tab-panel" id="tab-commissions">
       <div class="comm-wrap">
+
+        <!-- Admin edit-mode commissions toggle -->
+        <div id="comm-admin-toggle" style="display:none;margin-bottom:20px;">
+          <button id="comm-edit-toggle"
+            onclick="toggleSetting('commissions_open')"
+            style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;
+                   padding:10px 20px;cursor:pointer;border:1px solid rgba(0,232,122,0.5);
+                   color:#00e87a;background:rgba(0,232,122,0.08);transition:all 0.2s;">
+            ● Open — Click to Close
+          </button>
+        </div>
 
         <div class="comm-avail-badge">Currently Available for Commissions</div>
         <div class="comm-unavail-badge">&#9679; &nbsp;Currently Unavailable — Check Back Soon</div>
