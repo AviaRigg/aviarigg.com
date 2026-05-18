@@ -788,15 +788,56 @@
       const newStatus = cycle[currentStatus] || 'live';
       const { error } = await _sb.from('shop_products').update({ status: newStatus }).eq('id', productId);
       if (!error) {
+        const prevStatus = cardEl.dataset.status;
         cardEl.dataset.status = newStatus;
+
+        // Update badge
         const badge = cardEl.querySelector('.admin-status-badge');
         if (badge) {
           badge.textContent = newStatus.toUpperCase();
           badge.className = 'admin-status-badge status-' + newStatus;
+          // Update onclick to pass new status
+          badge.setAttribute('onclick', `event.stopPropagation();cycleProductStatus('${productId}','${newStatus}',this.closest('[data-product-id]'))`);
         }
-        if (newStatus === 'hidden') cardEl.style.opacity = '0.35';
-        else if (newStatus === 'draft') cardEl.style.opacity = '0.6';
-        else cardEl.style.opacity = '1';
+
+        // draft → move to 'soon' tab, grey out like coming soon cards
+        // hidden → fully hide from public (admin sees dimmed)
+        // live → restore original category
+        const originalCat = cardEl.dataset.originalCat || cardEl.dataset.cat;
+        if (!cardEl.dataset.originalCat) cardEl.dataset.originalCat = cardEl.dataset.cat;
+
+        if (newStatus === 'draft') {
+          cardEl.dataset.cat = 'soon';
+          cardEl.classList.add('dim');
+          cardEl.style.opacity = '';
+          cardEl.style.pointerEvents = 'none';
+          // Swap onclick to nothing
+          cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
+          cardEl.removeAttribute('onclick');
+        } else if (newStatus === 'hidden') {
+          cardEl.dataset.cat = originalCat;
+          cardEl.classList.remove('dim');
+          cardEl.style.opacity = '0.2';
+          cardEl.style.pointerEvents = 'none';
+        } else {
+          // live
+          cardEl.dataset.cat = originalCat;
+          cardEl.classList.remove('dim');
+          cardEl.style.opacity = '';
+          cardEl.style.pointerEvents = '';
+          const savedOnclick = cardEl.getAttribute('data-onclick-disabled');
+          if (savedOnclick) {
+            cardEl.setAttribute('onclick', savedOnclick);
+            cardEl.removeAttribute('data-onclick-disabled');
+          }
+        }
+
+        // Re-apply current filter so card moves to correct tab view
+        const activeFilter = document.querySelector('.filter-btn.active');
+        if (activeFilter) {
+          const currentCat = activeFilter.getAttribute('onclick').match(/'([^']+)'/)?.[1] || 'all';
+          filterProducts(currentCat, activeFilter);
+        }
       }
     }
 
