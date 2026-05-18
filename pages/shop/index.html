@@ -1508,7 +1508,13 @@ function cycleProductStatus(productId, currentStatus, cardEl) {
   } else if (newStatus === 'hidden') {
     cardEl.dataset.cat = originalCat;
     cardEl.classList.remove('dim');
-    cardEl.style.opacity = '0.25';
+    if (isAdmin) {
+      cardEl.style.display = '';
+      cardEl.style.opacity = '0.25';
+    } else {
+      cardEl.style.display = 'none';
+      cardEl.style.opacity = '';
+    }
     cardEl.style.cursor = 'default';
     cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
     cardEl.removeAttribute('onclick');
@@ -1644,8 +1650,14 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
   } else if (newStatus === 'hidden') {
     cardEl.dataset.cat = originalCat;
     cardEl.classList.remove('dim');
-    cardEl.style.display = isAdmin ? '' : 'none';
-    cardEl.style.opacity = isAdmin ? '0.25' : '';
+    // Admins always see hidden cards dimmed — visitors never see them
+    if (isAdmin) {
+      cardEl.style.display = '';
+      cardEl.style.opacity = '0.25';
+    } else {
+      cardEl.style.display = 'none';
+      cardEl.style.opacity = '';
+    }
     cardEl.style.cursor = 'default';
     cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
     cardEl.removeAttribute('onclick');
