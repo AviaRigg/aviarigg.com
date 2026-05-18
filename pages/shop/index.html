@@ -761,9 +761,13 @@
       display: none; flex-direction: column; align-items: flex-end;
       pointer-events: auto !important;
     }
-    /* Override: allow badge/dropdown to overflow card in edit mode */
     body.edit-mode .product-card { overflow: visible !important; }
+    body.edit-mode .product-card::before { display: none; }
     .pc-thumb { position: relative; }
+    /* Ensure dropdown appears above everything */
+    .admin-status-dropdown {
+      position: relative; z-index: 200;
+    }
     body.edit-mode .admin-status-wrap { display: flex; }
     .admin-status-dropdown {
       display: none; flex-direction: column;
@@ -1006,6 +1010,10 @@
         btn.style.borderColor = editMode ? 'rgba(255,80,80,0.7)' : 'rgba(139,79,200,0.5)';
         btn.style.color = editMode ? '#ff5050' : '#b06ef5';
       }
+      // Force overflow visible on all cards so badges show
+      document.querySelectorAll('.product-card').forEach(c => {
+        c.style.overflow = editMode ? 'visible' : '';
+      });
     }
 
     async function handleLogout() {
