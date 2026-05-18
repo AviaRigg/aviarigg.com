@@ -788,49 +788,50 @@
       _sb.from('shop_products').update({ status: newStatus }).eq('id', productId).then(() => {});
 
       // Update UI immediately
-      const prevStatus = cardEl.dataset.status;
       cardEl.dataset.status = newStatus;
 
-        // Update badge
-        const badge = cardEl.querySelector('.admin-status-badge');
-        if (badge) {
-          badge.textContent = newStatus.toUpperCase();
-          badge.className = 'admin-status-badge status-' + newStatus;
-          // Update onclick to pass new status
-          badge.setAttribute('onclick', `event.stopPropagation();cycleProductStatus('${productId}','${newStatus}',this.closest('[data-product-id]'))`);
-        }
+      // Update badge — always keep it clickable
+      const badge = cardEl.querySelector('.admin-status-badge');
+      if (badge) {
+        badge.textContent = newStatus.toUpperCase();
+        badge.className = 'admin-status-badge status-' + newStatus;
+        badge.setAttribute('onclick', `event.stopPropagation();cycleProductStatus('${productId}','${newStatus}',this.closest('[data-product-id]'))`);
+        // Badge must always be clickable regardless of card pointer-events
+        badge.style.pointerEvents = 'auto';
+        badge.style.cursor = 'pointer';
+      }
 
-        // draft → move to 'soon' tab, grey out like coming soon cards
-        // hidden → fully hide from public (admin sees dimmed)
-        // live → restore original category
-        const originalCat = cardEl.dataset.originalCat || cardEl.dataset.cat;
-        if (!cardEl.dataset.originalCat) cardEl.dataset.originalCat = cardEl.dataset.cat;
+      // Save original cat
+      if (!cardEl.dataset.originalCat) cardEl.dataset.originalCat = cardEl.dataset.cat;
+      const originalCat = cardEl.dataset.originalCat;
 
-        if (newStatus === 'draft') {
-          cardEl.dataset.cat = 'soon';
-          cardEl.classList.add('dim');
-          cardEl.style.opacity = '';
-          cardEl.style.pointerEvents = 'none';
-          // Swap onclick to nothing
-          cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
-          cardEl.removeAttribute('onclick');
-        } else if (newStatus === 'hidden') {
-          cardEl.dataset.cat = originalCat;
-          cardEl.classList.remove('dim');
-          cardEl.style.opacity = '0.2';
-          cardEl.style.pointerEvents = 'none';
-        } else {
-          // live
-          cardEl.dataset.cat = originalCat;
-          cardEl.classList.remove('dim');
-          cardEl.style.opacity = '';
-          cardEl.style.pointerEvents = '';
-          const savedOnclick = cardEl.getAttribute('data-onclick-disabled');
-          if (savedOnclick) {
-            cardEl.setAttribute('onclick', savedOnclick);
-            cardEl.removeAttribute('data-onclick-disabled');
-          }
+      if (newStatus === 'draft') {
+        cardEl.dataset.cat = 'soon';
+        cardEl.classList.add('dim');
+        cardEl.style.opacity = '';
+        // Disable card navigation but NOT the badge
+        cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
+        cardEl.removeAttribute('onclick');
+        cardEl.style.cursor = 'default';
+      } else if (newStatus === 'hidden') {
+        cardEl.dataset.cat = originalCat;
+        cardEl.classList.remove('dim');
+        cardEl.style.opacity = '0.25';
+        cardEl.style.cursor = 'default';
+        cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
+        cardEl.removeAttribute('onclick');
+      } else {
+        // live — restore everything
+        cardEl.dataset.cat = originalCat;
+        cardEl.classList.remove('dim');
+        cardEl.style.opacity = '';
+        cardEl.style.cursor = '';
+        const savedOnclick = cardEl.getAttribute('data-onclick-disabled');
+        if (savedOnclick) {
+          cardEl.setAttribute('onclick', savedOnclick);
+          cardEl.removeAttribute('data-onclick-disabled');
         }
+      }
 
       // Re-apply current filter so card moves to correct tab view
       const activeFilter = document.querySelector('.filter-btn.active');
@@ -872,6 +873,7 @@
       position: absolute; top: 10px; right: 10px; z-index: 10;
       transition: all 0.2s; display: none;
       border: 1px solid;
+      pointer-events: auto !important;
     }
     .status-live   { color: #00e87a; border-color: rgba(0,232,122,0.4); background: rgba(0,232,122,0.1); }
     .status-draft  { color: #f5a623; border-color: rgba(245,166,35,0.4); background: rgba(245,166,35,0.1); }
