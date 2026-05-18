@@ -722,127 +722,7 @@
     .filter-btn         { font-size: 16px; }
   }
 </style>
-  <script>
-    const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
-    const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let currentUser = null;
-    let isAdmin = false;
-    let editMode = false;
-
-    async function initAuth() {
-      const { data: { session } } = await _sb.auth.getSession();
-      if (session) await handleSession(session.user);
-      _sb.auth.onAuthStateChange(async (_event, session) => {
-        if (session) await handleSession(session.user);
-        else handleSignOut();
-      });
-    }
-
-    async function handleSession(user) {
-      currentUser = user;
-      const { data: profile } = await _sb.from('profiles').select('role').eq('id', user.id).single();
-      isAdmin = profile?.role === 'admin';
-      updateAuthUI();
-    }
-
-    function handleSignOut() {
-      currentUser = null;
-      isAdmin = false;
-      editMode = false;
-      updateAuthUI();
-    }
-
-    function updateAuthUI() {
-      const loginBtn = document.getElementById('nav-auth-btn');
-      const editToggle = document.getElementById('admin-edit-toggle');
-      if (!loginBtn) return;
-      if (currentUser) {
-        loginBtn.textContent = 'Log Out';
-        loginBtn.onclick = () => _sb.auth.signOut();
-      } else {
-        loginBtn.textContent = 'Log In';
-        loginBtn.onclick = () => window.location.href = '/pages/login';
-      }
-      if (editToggle) editToggle.style.display = isAdmin ? 'flex' : 'none';
-    }
-
-    function toggleEditMode() {
-      editMode = !editMode;
-      document.body.classList.toggle('edit-mode', editMode);
-      const btn = document.getElementById('edit-mode-btn');
-      if (btn) {
-        btn.textContent = editMode ? '✕ Exit Edit Mode' : '✎ Edit Mode';
-        btn.style.background = editMode ? 'rgba(255,80,80,0.15)' : 'rgba(139,79,200,0.15)';
-        btn.style.borderColor = editMode ? 'rgba(255,80,80,0.5)' : 'rgba(139,79,200,0.5)';
-        btn.style.color = editMode ? '#ff5050' : '#b06ef5';
-      }
-    }
-
-    async function cycleProductStatus(productId, currentStatus, cardEl) {
-      if (!isAdmin || !editMode) return;
-      const cycle = { live: 'draft', draft: 'hidden', hidden: 'live' };
-      const newStatus = cycle[currentStatus] || 'live';
-      // Save to Supabase in background (table optional)
-      _sb.from('shop_products').update({ status: newStatus }).eq('id', productId).then(() => {});
-
-      // Update UI immediately
-      cardEl.dataset.status = newStatus;
-
-      // Update badge — always keep it clickable
-      const badge = cardEl.querySelector('.admin-status-badge');
-      if (badge) {
-        badge.textContent = newStatus.toUpperCase();
-        badge.className = 'admin-status-badge status-' + newStatus;
-        badge.setAttribute('onclick', `event.stopPropagation();cycleProductStatus('${productId}','${newStatus}',this.closest('[data-product-id]'))`);
-        // Badge must always be clickable regardless of card pointer-events
-        badge.style.pointerEvents = 'auto';
-        badge.style.cursor = 'pointer';
-      }
-
-      // Save original cat
-      if (!cardEl.dataset.originalCat) cardEl.dataset.originalCat = cardEl.dataset.cat;
-      const originalCat = cardEl.dataset.originalCat;
-
-      if (newStatus === 'draft') {
-        cardEl.dataset.cat = 'soon';
-        cardEl.classList.add('dim');
-        cardEl.style.opacity = '';
-        // Disable card navigation but NOT the badge
-        cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
-        cardEl.removeAttribute('onclick');
-        cardEl.style.cursor = 'default';
-      } else if (newStatus === 'hidden') {
-        cardEl.dataset.cat = originalCat;
-        cardEl.classList.remove('dim');
-        cardEl.style.opacity = '0.25';
-        cardEl.style.cursor = 'default';
-        cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
-        cardEl.removeAttribute('onclick');
-      } else {
-        // live — restore everything
-        cardEl.dataset.cat = originalCat;
-        cardEl.classList.remove('dim');
-        cardEl.style.opacity = '';
-        cardEl.style.cursor = '';
-        const savedOnclick = cardEl.getAttribute('data-onclick-disabled');
-        if (savedOnclick) {
-          cardEl.setAttribute('onclick', savedOnclick);
-          cardEl.removeAttribute('data-onclick-disabled');
-        }
-      }
-
-      // Re-apply current filter so card moves to correct tab view
-      const activeFilter = document.querySelector('.filter-btn.active');
-      if (activeFilter) {
-        const currentCat = activeFilter.getAttribute('onclick').match(/'([^']+)'/)?.[1] || 'all';
-        filterProducts(currentCat, activeFilter);
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', initAuth);
-  </script>
 
   <style>
     /* ── ADMIN EDIT MODE STYLES ── */
@@ -950,6 +830,8 @@
     .nav-dropdown-danger:hover { background: rgba(255,80,80,0.08) !important; }
   </style>
 
+
+
   <!-- ── SUPABASE AUTH ── -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -960,6 +842,7 @@
     let currentUser = null;
     let currentProfile = null;
     let isAdmin = false;
+    let editMode = false;
 
     async function initAuth() {
       const { data: { session } } = await _sb.auth.getSession();
@@ -982,6 +865,7 @@
       currentUser = null;
       currentProfile = null;
       isAdmin = false;
+      editMode = false;
       updateAuthUI();
     }
 
@@ -1003,8 +887,7 @@
               <button class="nav-dropdown-item" onclick="handleLogout()">Log Out</button>
               <button class="nav-dropdown-item nav-dropdown-danger" onclick="handleDeleteAccount()">Delete Account</button>
             </div>
-          </div>
-        `;
+          </div>`;
       } else {
         authContainer.innerHTML = '<a class="nav-auth-link" href="/pages/login">Log In</a>';
       }
@@ -1017,11 +900,22 @@
       const dd = document.getElementById('nav-user-dropdown');
       if (dd) dd.classList.toggle('open');
     }
-
     document.addEventListener('click', () => {
       const dd = document.getElementById('nav-user-dropdown');
       if (dd) dd.classList.remove('open');
     });
+
+    function toggleEditMode() {
+      editMode = !editMode;
+      document.body.classList.toggle('edit-mode', editMode);
+      const btn = document.getElementById('edit-mode-btn');
+      if (btn) {
+        btn.textContent = editMode ? '✕ Exit Edit Mode' : '✎ Edit Mode';
+        btn.style.background = editMode ? 'rgba(255,80,80,0.15)' : 'rgba(139,79,200,0.15)';
+        btn.style.borderColor = editMode ? 'rgba(255,80,80,0.5)' : 'rgba(139,79,200,0.5)';
+        btn.style.color = editMode ? '#ff5050' : '#b06ef5';
+      }
+    }
 
     async function handleLogout() {
       await _sb.auth.signOut();
