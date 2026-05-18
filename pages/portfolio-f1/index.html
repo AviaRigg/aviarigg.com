@@ -3,12 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>F1 SF-25 Breakdown — AviaRigg</title>
+<title>Paul Chedozeau — AviaRigg</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="./style.css">
 <style>
   .page { display: block !important; }
   .nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
+  #lib-mobile-toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-left: 3px solid var(--accent);
+    padding: 14px 24px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-bright);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    white-space: nowrap;
+  }
+  #lib-mobile-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 </style>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
@@ -18,23 +42,101 @@
     gtag('js', new Date());
     gtag('config', 'G-RYTKYEPJG2');
   </script>
-  <link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
-  <link rel="shortcut icon" href="/assets/icons/SiteIcon.png">
-  <link rel="apple-touch-icon" href="/assets/icons/SiteIcon.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.ico">
   <script src="/assets/js/status.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    #nav-auth-container { display: flex; align-items: center; }
+    .nav-auth-link { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent2, #b06ef5); background: transparent; border: 1px solid rgba(139,79,200,0.4); padding: 7px 16px; cursor: pointer; transition: all 0.2s; text-decoration: none; white-space: nowrap; }
+    .nav-auth-link:hover { border-color: var(--accent2, #b06ef5); }
+    .nav-user-wrap { position: relative; }
+    .nav-user-btn { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent2, #b06ef5); background: transparent; border: 1px solid rgba(139,79,200,0.4); padding: 7px 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .nav-user-btn:hover { border-color: var(--accent2, #b06ef5); background: rgba(139,79,200,0.08); }
+    .nav-user-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green, #00e87a); flex-shrink: 0; animation: blink 2.5s ease-in-out infinite; }
+    .nav-user-caret { font-size: 9px; opacity: 0.6; }
+    .nav-user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; min-width: 180px; background: var(--surface, #13121a); border: 1px solid var(--border, rgba(255,255,255,0.08)); border-top: 2px solid var(--accent, #8b4fc8); z-index: 9999; flex-direction: column; }
+    .nav-user-dropdown.open { display: flex; }
+    .nav-user-email { font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 1px; color: var(--text-dim, #6a6a8a); padding: 10px 14px 8px; border-bottom: 1px solid var(--border, rgba(255,255,255,0.08)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nav-dropdown-item { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text, #ccc); background: none; border: none; padding: 10px 14px; cursor: pointer; text-align: left; text-decoration: none; display: block; border-bottom: 1px solid var(--border, rgba(255,255,255,0.05)); transition: background 0.15s, color 0.15s; }
+    .nav-dropdown-item:last-child { border-bottom: none; }
+    .nav-dropdown-item:hover { background: rgba(139,79,200,0.08); color: var(--text-bright, #eeeef8); }
+    .nav-dropdown-danger { color: #ff5050 !important; }
+    .nav-dropdown-danger:hover { background: rgba(255,80,80,0.08) !important; }
+  </style>
+  <script>
+    const _NAV_SB_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
+    const _NAV_SB_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
+    const _navSb = supabase.createClient(_NAV_SB_URL, _NAV_SB_KEY);
+    let _navUser = null, _navProfile = null;
+    async function _initNavAuth() {
+      const { data: { session } } = await _navSb.auth.getSession();
+      if (session) await _handleNavSession(session.user);
+      _navSb.auth.onAuthStateChange(async (_e, session) => {
+        if (session) await _handleNavSession(session.user);
+        else { _navUser = null; _navProfile = null; _updateNavAuth(); }
+      });
+    }
+    async function _handleNavSession(user) {
+      _navUser = user;
+      const { data: profile } = await _navSb.from('profiles').select('role, username').eq('id', user.id).single();
+      _navProfile = profile;
+      _updateNavAuth();
+    }
+    function _updateNavAuth() {
+      const c = document.getElementById('nav-auth-container');
+      if (!c) return;
+      if (_navUser) {
+        const name = _navProfile?.username || _navUser.email.split('@')[0];
+        const isAdmin = _navProfile?.role === 'admin';
+        c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="_toggleNavMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${_navUser.email}</div><a class="nav-dropdown-item" href="#">My Profile</a>${isAdmin ? '<div style="height:1px;background:rgba(139,79,200,0.2);margin:4px 0;"></div><button class="nav-dropdown-item" id="admin-toggle-otw" onclick="_navToggleOTW()" style="font-size:9px;">Work Status: ...</button><div style="height:1px;background:rgba(139,79,200,0.2);margin:4px 0;"></div>' : ''}<button class="nav-dropdown-item" onclick="_navLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="_navDeleteAccount()">Delete Account</button></div></div>`;
+        if (isAdmin) _navLoadOTW();
+      } else {
+        c.innerHTML = '<a class="nav-auth-link" href="/pages/login">Log In</a>';
+      }
+    }
+    function _toggleNavMenu(e) { e.stopPropagation(); const dd = document.getElementById('nav-user-dropdown'); if (dd) dd.classList.toggle('open'); }
+    document.addEventListener('click', () => { const dd = document.getElementById('nav-user-dropdown'); if (dd) dd.classList.remove('open'); });
+    async function _navLogout() { await _navSb.auth.signOut(); window.location.href = '/'; }
+    async function _navDeleteAccount() {
+      if (!confirm('Delete your account? This cannot be undone.')) return;
+      await _navSb.from('profiles').delete().eq('id', _navUser.id);
+      await _navSb.auth.signOut(); window.location.href = '/';
+    }
+    async function _navLoadOTW() {
+      const { data } = await _navSb.from('site_settings').select('value').eq('key', 'open_to_work').single();
+      const on = data?.value === 'true';
+      const btn = document.getElementById('admin-toggle-otw');
+      if (btn) { btn.textContent = 'Work Status: ' + (on ? 'OPEN ✓' : 'CLOSED ✗'); btn.style.color = on ? '#00e87a' : '#ff5050'; }
+    }
+    async function _navToggleOTW() {
+      const { data } = await _navSb.from('site_settings').select('value').eq('key', 'open_to_work').single();
+      const newVal = data?.value !== 'true';
+      await _navSb.from('site_settings').upsert({ key: 'open_to_work', value: String(newVal) });
+      document.querySelectorAll('.nav-badge').forEach(el => el.style.display = newVal ? '' : 'none');
+      const btn = document.getElementById('admin-toggle-otw');
+      if (btn) { btn.textContent = 'Work Status: ' + (newVal ? 'OPEN ✓' : 'CLOSED ✗'); btn.style.color = newVal ? '#00e87a' : '#ff5050'; }
+    }
+    document.addEventListener('DOMContentLoaded', _initNavAuth);
+  </script>
 </head>
 <body>
+
+<!-- NAV -->
+<div id="lib-mobile-toast">// Desktop only — open on PC</div>
 
 <nav class="topnav">
   <a class="nav-logo" href="/"><img src="/assets/icons/SiteIcon.png" alt="AviaRigg Logo" style="height:clamp(24px,2.2vw,36px);width:auto;display:inline-block;vertical-align:middle;margin-right:clamp(8px,0.8vw,14px);"><span style="display:inline-block;width:1px;height:clamp(18px,1.6vw,26px);background:rgba(139,79,200,0.4);vertical-align:middle;margin-right:clamp(8px,0.8vw,14px);"></span>Avia<span>Rigg</span></a>
   <div class="nav-links">
-    <a class="nav-link" href="/">Home</a>
-    <a class="nav-link active" href="/pages/portfolio">Portfolio</a>
+    <a class="nav-link active" href="/">Home</a>
+    <a class="nav-link" href="/pages/portfolio">Portfolio</a>
     <a class="nav-link" href="/pages/library">Script Library</a>
     <a class="nav-link" href="/pages/shop">Shop</a>
     <a class="nav-link" href="/pages/about">About</a>
     <a class="nav-link" href="/pages/contact">Contact</a>
     <a class="nav-badge" href="/pages/contact">&#9679; Open to Work</a>
+    <div id="nav-auth-container"><a class="nav-auth-link" href="/pages/login">Log In</a></div>
   </div>
   <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu" onclick="toggleMobileNav()">
     <span></span><span></span><span></span>
@@ -49,99 +151,133 @@
   <a class="nav-badge" href="/pages/contact">&#9679; Open to Work</a>
 </div>
 
-<div class="page active" id="page-port-f1">
-  <div class="port-breakdown-wrap">
-    <a class="product-back" href="/pages/portfolio" style="text-decoration:none;">&#8592; Back to Portfolio</a>
+<div class="page active" id="page-home">
+  <div class="hero-pf">
 
-    <div class="pb-hero">
-      <div class="pb-hero-left">
-        <div class="eyebrow">Hard Surface · 2025</div>
-        <div class="section-h">Formula 1<br><span class="accent">SF-25 Livery</span></div>
-        <p class="pb-desc">A production-ready hard surface rig for the Ferrari SF-25 F1 car. Built entirely in Maya 2022+ with a clean, animator-friendly hierarchy. Features auto-spinning wheels driven by motion, a DRS rear wing system, dual livery switching between Hamilton and Leclerc via custom attribute, and full AnimSchool Picker support.</p>
-        <div class="port-featured-tags" style="margin-bottom:0;">
-          <span class="ptag">Maya 2022+</span>
-          <span class="ptag">Hard Surface</span>
-          <span class="ptag">DRS System</span>
-          <span class="ptag">Dual Livery</span>
-          <span class="ptag">AnimSchool Picker</span>
-        </div>
+    <div class="pf-top">
+      <div class="pf-tagline-block">
+        <div class="pf-kicker">Character Rigger — Amsterdam / Annecy</div>
+        <div class="pf-tagline">Rigs built<br>to <span>move.</span></div>
       </div>
-      <div class="pb-hero-right">
-        <div class="pb-img-frame">
-          <img src="/projects/f1_SF25/images/F1_Rendered.png" alt="F1 SF-25 Rendered">
-          <div class="pb-img-caption">// Final Render — Hamilton Livery</div>
+      <div class="pf-top-right">
+        <div class="pf-name-sig">Paul Chedozeau — AviaRigg</div>
+        <div class="pf-bio-short">Specializing in character rigging — anatomical<br>and hard surface. Building tools that make<br>pipelines faster.</div>
+        <div class="pf-actions">
+          <a class="btn-primary" href="/pages/portfolio">View Portfolio</a>
+          <a class="btn-ghost" href="/pages/contact">Contact</a>
         </div>
       </div>
     </div>
 
-    <div class="pb-specs">
-      <div class="pb-spec"><span class="pb-spec-label">Software</span><span class="pb-spec-val">Maya 2022+</span></div>
-      <div class="pb-spec"><span class="pb-spec-label">Type</span><span class="pb-spec-val">Hard Surface</span></div>
-      <div class="pb-spec"><span class="pb-spec-label">Textures</span><span class="pb-spec-val">4K / 2K / 1K</span></div>
-      <div class="pb-spec"><span class="pb-spec-label">Liveries</span><span class="pb-spec-val">Hamilton + Leclerc</span></div>
-      <div class="pb-spec"><span class="pb-spec-label">Picker</span><span class="pb-spec-val">AnimSchool</span></div>
-      <div class="pb-spec"><span class="pb-spec-label">Year</span><span class="pb-spec-val">2025</span></div>
-    </div>
-
-    <div class="pb-section-label">// Breakdown</div>
-    <div class="pb-carousel">
-      <button class="pb-carousel-btn pb-carousel-prev" onclick="carouselPrev()">&#8592;</button>
-      <div class="pb-carousel-track-wrap">
-        <div class="pb-carousel-track" id="pb-carousel-track">
-          <div class="pb-img-frame pb-carousel-slide">
-            <img src="/projects/f1_SF25/images/F1_Rig.png" alt="Rig">
-            <div class="pb-img-caption">// Rig View</div>
-          </div>
-          <div class="pb-img-frame pb-carousel-slide">
-            <img src="/projects/f1_SF25/images/F1_Picker.png" alt="Picker">
-            <div class="pb-img-caption">// AnimSchool Picker</div>
-          </div>
-          <div class="pb-img-frame pb-carousel-slide">
-            <img src="/projects/f1_SF25/images/F1_FBX.png" alt="FBX">
-            <div class="pb-img-caption">// FBX Model</div>
-          </div>
-          <div class="pb-img-frame pb-carousel-slide">
-            <img src="/projects/f1_SF25/images/F1_Blender.png" alt="Blender">
-            <div class="pb-img-caption">// Blender Version</div>
+    <div class="pf-works-wrap">
+    <div class="pf-works">
+      <!-- Card 1: Portfolio -->
+      <a class="work-card" href="/pages/portfolio">
+        <div class="work-top">
+          <div class="work-num">01</div>
+          <div class="work-cat">Work</div>
+        </div>
+        <div class="work-card-graphic work-card-graphic--portfolio">
+          <div class="wcg-grid">
+            <div class="wcg-block wcg-block--tall"></div>
+            <div class="wcg-block"></div>
+            <div class="wcg-block wcg-block--med"></div>
+            <div class="wcg-block wcg-block--short"></div>
+            <div class="wcg-block wcg-block--med"></div>
+            <div class="wcg-block wcg-block--tall"></div>
           </div>
         </div>
-      </div>
-      <button class="pb-carousel-btn pb-carousel-next" onclick="carouselNext()">&#8594;</button>
-      <div class="pb-carousel-dots" id="pb-carousel-dots">
-        <span class="pb-dot active" onclick="carouselGoTo(0)"></span>
-        <span class="pb-dot" onclick="carouselGoTo(1)"></span>
-        <span class="pb-dot" onclick="carouselGoTo(2)"></span>
-        <span class="pb-dot" onclick="carouselGoTo(3)"></span>
-      </div>
+        <div class="work-bottom">
+          <div class="work-bar-wrap"><div class="work-bar" style="width:88%"></div></div>
+          <div class="work-title">Portfolio</div>
+          <div class="work-sub">// Character & Hard Surface Rigs</div>
+        </div>
+      </a>
+
+      <!-- Card 2: Shop -->
+      <a class="work-card" href="/pages/shop">
+        <div class="work-top">
+          <div class="work-num">02</div>
+          <div class="work-cat">Store</div>
+        </div>
+        <div class="work-card-graphic work-card-graphic--shop">
+          <div class="wcg-code">
+            <div class="wcg-code-line"><span class="wcg-kw">def</span> <span class="wcg-fn">build_rig</span>(geo):</div>
+            <div class="wcg-code-line wcg-indent"><span class="wcg-kw">ctrl</span> = create_control()</div>
+            <div class="wcg-code-line wcg-indent"><span class="wcg-kw">skin</span> = bind_skin(geo)</div>
+            <div class="wcg-code-line wcg-indent wcg-dim"># automate pipeline</div>
+            <div class="wcg-code-line wcg-indent"><span class="wcg-kw">return</span> <span class="wcg-fn">ctrl</span></div>
+          </div>
+        </div>
+        <div class="work-bottom">
+          <div class="work-bar-wrap"><div class="work-bar" style="width:60%"></div></div>
+          <div class="work-title">Shop</div>
+          <div class="work-sub">// Scripts & Rigs — Maya / Python</div>
+        </div>
+      </a>
+
+      <!-- Card 3: Commissions -->
+      <a class="work-card" href="/pages/shop#commissions">
+        <div class="work-top">
+          <div class="work-num">03</div>
+          <div class="work-cat">Custom</div>
+        </div>
+        <div class="work-card-graphic work-card-graphic--commission">
+          <div class="wcg-rig">
+            <div class="wcg-rig-spine"></div>
+            <div class="wcg-rig-bone wcg-rig-bone--l1"></div>
+            <div class="wcg-rig-bone wcg-rig-bone--l2"></div>
+            <div class="wcg-rig-bone wcg-rig-bone--r1"></div>
+            <div class="wcg-rig-bone wcg-rig-bone--r2"></div>
+            <div class="wcg-rig-ctrl wcg-rig-ctrl--top"></div>
+            <div class="wcg-rig-ctrl wcg-rig-ctrl--mid"></div>
+            <div class="wcg-rig-ctrl wcg-rig-ctrl--bot"></div>
+          </div>
+        </div>
+        <div class="work-bottom">
+          <div class="work-bar-wrap"><div class="work-bar" style="width:75%"></div></div>
+          <div class="work-title">Commissions</div>
+          <div class="work-sub">// Custom Rigs — Currently Available</div>
+        </div>
+      </a>
+
+      <!-- Card 4: Contact -->
+      <a class="work-card" href="/pages/contact">
+        <div class="work-top">
+          <div class="work-num">04</div>
+          <div class="work-cat">Contact</div>
+        </div>
+        <div class="work-card-graphic work-card-graphic--contact">
+          <div class="wcg-contact">
+            <div class="wcg-contact-ring wcg-contact-ring--1"></div>
+            <div class="wcg-contact-ring wcg-contact-ring--2"></div>
+            <div class="wcg-contact-ring wcg-contact-ring--3"></div>
+            <div class="wcg-contact-dot"></div>
+            <div class="wcg-contact-email">contact@aviarigg.com</div>
+          </div>
+        </div>
+        <div class="work-bottom">
+          <div class="work-bar-wrap"><div class="work-bar" style="width:40%"></div></div>
+          <div class="work-title">Get in Touch</div>
+          <div class="work-sub">// Open to Work — Worldwide</div>
+        </div>
+      </a>
+    </div><!-- pf-works -->
+    </div><!-- pf-works-wrap -->
+
+    <div class="hero-bar">
+      <div class="hero-bar-item">Location <span>Amsterdam / Annecy</span></div>
+      <div class="hero-bar-item">Speciality <span>Character Rigging</span></div>
+      <div class="hero-bar-item">Software <span>Maya 2022+</span></div>
+      <div class="hero-bar-item">Language <span>Python 3</span></div>
+      <div class="hero-bar-item" style="margin-left:auto;color:var(--green);font-size:clamp(10px,0.9vw,14px);font-weight:600;letter-spacing:3px;background:rgba(0,232,122,0.08);border:1px solid rgba(0,232,122,0.3);padding:6px 16px;">&#9679; Available for Work</div>
     </div>
 
-    <div class="pb-section-label">// Interactive 3D</div>
-    <div class="pb-img-frame pb-sketchfab">
-      <iframe src="https://sketchfab.com/models/f9ae37650a9a40d88b38071ae9523c71/embed?autostart=0&ui_theme=dark&ui_infos=0&ui_watermark=0" frameborder="0" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
-      <div class="pb-img-caption">// Interactive 3D Viewer — SF-25 Rig on Sketchfab</div>
-    </div>
-
-    <div class="pb-section-label">// Technical Notes</div>
-    <div class="pb-notes-grid">
-      <div class="pb-note"><div class="pb-note-num">01</div><div class="pb-note-title">Auto Wheel Spin</div><div class="pb-note-desc">Wheels spin automatically based on world movement via expression — no manual keyframing needed. Override available for custom rotation.</div></div>
-      <div class="pb-note"><div class="pb-note-num">02</div><div class="pb-note-title">DRS System</div><div class="pb-note-desc">Rear wing elements are driven by a single DRS attribute. Open/close is fully animatable with clean deformation and no geometry intersection.</div></div>
-      <div class="pb-note"><div class="pb-note-num">03</div><div class="pb-note-title">Dual Livery</div><div class="pb-note-desc">Hamilton and Leclerc liveries switchable via a custom attribute on the main controller. No shader reassignment or manual toggling required.</div></div>
-      <div class="pb-note"><div class="pb-note-num">04</div><div class="pb-note-title">Hierarchy</div><div class="pb-note-desc">Fully organized outliner with logical grouping. Root_Scale at the top for global positioning. All controls follow AviaRigg naming conventions.</div></div>
-    </div>
-
-    <div class="pb-section-label">// Showcase Videos</div>
-    <div class="pb-videos">
-      <div class="pb-img-frame pb-video-frame">
-        <iframe src="https://www.youtube.com/embed/AbGyZreyAak?rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        <div class="pb-img-caption">// Rig Showcase</div>
-      </div>
-      <div class="pb-img-frame pb-video-frame">
-        <iframe src="https://www.youtube.com/embed/9_WERFJg4w8?rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        <div class="pb-img-caption">// Breakdown</div>
-      </div>
-    </div>
   </div>
+
+
 </div>
+
 <script>
 function toggleMobileNav() {
   const drawer = document.getElementById('nav-drawer');
@@ -150,39 +286,6 @@ function toggleMobileNav() {
   drawer.classList.toggle('open', !isOpen);
   btn.classList.toggle('open', !isOpen);
 }
-
-let carouselIndex = 0;
-const carouselTotal = 4;
-function carouselResize() {
-  const track = document.getElementById('pb-carousel-track');
-  const wrap = document.querySelector('.pb-carousel-track-wrap');
-  if (!track || !wrap) return;
-  const activeSlide = track.querySelectorAll('.pb-carousel-slide')[carouselIndex];
-  if (!activeSlide) return;
-  const img = activeSlide.querySelector('img');
-  if (!img) return;
-  if (img.complete && img.naturalHeight > 0) {
-    const ratio = img.naturalHeight / img.naturalWidth;
-    wrap.style.height = (wrap.offsetWidth * ratio) + 'px';
-  } else {
-    img.onload = () => {
-      const ratio = img.naturalHeight / img.naturalWidth;
-      wrap.style.height = (wrap.offsetWidth * ratio) + 'px';
-    };
-  }
-}
-function carouselUpdate() {
-  const track = document.getElementById('pb-carousel-track');
-  if (!track) return;
-  track.style.transform = `translateX(-${carouselIndex * 100}%)`;
-  document.querySelectorAll('.pb-dot').forEach((d, i) => d.classList.toggle('active', i === carouselIndex));
-  setTimeout(carouselResize, 50);
-}
-function carouselNext() { carouselIndex = (carouselIndex + 1) % carouselTotal; carouselUpdate(); }
-function carouselPrev() { carouselIndex = (carouselIndex - 1 + carouselTotal) % carouselTotal; carouselUpdate(); }
-function carouselGoTo(i) { carouselIndex = i; carouselUpdate(); }
-window.addEventListener('resize', carouselResize);
-window.addEventListener('load', () => setTimeout(carouselResize, 100));
 </script>
 </body>
 </html>
