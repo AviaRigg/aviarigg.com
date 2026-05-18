@@ -3384,13 +3384,6 @@ body::before {
    Forces entire hero to fit in one viewport
 ══════════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* Lock page-level scroll on homepage */
-  html:has(#page-home.active),
-  body:has(#page-home.active) {
-    overflow: hidden;
-    height: 100%;
-  }
-
   /* Hero fills exactly the remaining viewport */
   .hero-pf {
     height: calc(100dvh - var(--nav-h));
