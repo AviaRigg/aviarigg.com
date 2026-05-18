@@ -1465,6 +1465,29 @@ function cycleProductStatus(productId, currentStatus, cardEl) {
   if (!cardEl.dataset.originalCat) cardEl.dataset.originalCat = cardEl.dataset.cat;
   const originalCat = cardEl.dataset.originalCat;
 
+  // Swap thumbnail between real image and coming soon placeholder
+  const thumb = cardEl.querySelector('.pc-thumb');
+  if (thumb) {
+    const img = thumb.querySelector('.pc-img');
+    const placeholder = thumb.querySelector('.pc-placeholder');
+    if (newStatus === 'draft') {
+      // Save real src, show placeholder
+      if (img) { img.dataset.realSrc = img.dataset.realSrc || img.src; img.style.display = 'none'; }
+      if (!placeholder) {
+        const ph = document.createElement('div');
+        ph.className = 'pc-placeholder admin-placeholder';
+        ph.textContent = '// Coming Soon';
+        thumb.appendChild(ph);
+      } else { placeholder.style.display = ''; }
+    } else {
+      // Restore real image, hide placeholder
+      if (img) { if (img.dataset.realSrc) img.src = img.dataset.realSrc; img.style.display = ''; }
+      const ph = thumb.querySelector('.admin-placeholder');
+      if (ph) ph.style.display = 'none';
+      if (placeholder && !placeholder.classList.contains('admin-placeholder')) placeholder.style.display = 'none';
+    }
+  }
+
   if (newStatus === 'draft') {
     cardEl.dataset.cat = 'soon';
     cardEl.classList.add('dim');
