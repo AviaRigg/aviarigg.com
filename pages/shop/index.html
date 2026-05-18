@@ -792,8 +792,28 @@
     .status-featured { color: #ffd700; border-color: rgba(255,215,0,0.4);  background: rgba(255,215,0,0.1); }
 
     /* badge visibility now handled by .admin-status-wrap */
-    body.edit-mode .product-card { outline: 1px dashed rgba(139,79,200,0.3); }
-    body.edit-mode .hero-card    { outline: 1px dashed rgba(139,79,200,0.3); }
+    body.edit-mode .product-card { outline: 1px dashed rgba(255,80,80,0.35); }
+    body.edit-mode .hero-card    { outline: 1px dashed rgba(255,80,80,0.35); }
+
+    /* Red tinted overlay when in edit mode */
+    body.edit-mode::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 8998; pointer-events: none;
+      background: rgba(255,40,40,0.04);
+      border: 2px solid rgba(255,80,80,0.25);
+    }
+    /* Red edit mode indicator bar at top */
+    body.edit-mode::after {
+      content: '// EDIT MODE ACTIVE';
+      position: fixed; top: 0; left: 0; right: 0; z-index: 8999;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+      color: rgba(255,80,80,0.7);
+      background: rgba(255,40,40,0.08);
+      border-bottom: 1px solid rgba(255,80,80,0.2);
+      padding: 5px; text-align: center;
+      pointer-events: none;
+    }
 
     /* No featured empty state */
     .hero-empty {
@@ -978,9 +998,9 @@
       document.body.classList.toggle('edit-mode', editMode);
       const btn = document.getElementById('edit-mode-btn');
       if (btn) {
-        btn.textContent = editMode ? '✕ Exit Edit Mode' : '✎ Edit Mode';
-        btn.style.background = editMode ? 'rgba(255,80,80,0.15)' : 'rgba(139,79,200,0.15)';
-        btn.style.borderColor = editMode ? 'rgba(255,80,80,0.5)' : 'rgba(139,79,200,0.5)';
+        btn.textContent = editMode ? '✓ Save' : '✎ Edit Mode';
+        btn.style.background = editMode ? 'rgba(255,80,80,0.2)' : 'rgba(139,79,200,0.15)';
+        btn.style.borderColor = editMode ? 'rgba(255,80,80,0.7)' : 'rgba(139,79,200,0.5)';
         btn.style.color = editMode ? '#ff5050' : '#b06ef5';
       }
     }
@@ -1102,7 +1122,7 @@
         <div class="product-card" data-product-id="f1-sf25" data-status="live" data-cat="rig" data-href="/pages/product-f1" data-img="/projects/f1_SF25/images/F1_Rendered.png" data-tag="// Hard Surface" data-category="Maya Rig" data-title="Formula 1 SF-25 Livery" data-desc="A fully rigged F1 car for Maya. Hamilton or Leclerc livery included — choose your side very carefully." data-price="€19.99" data-price-sub="EUR · Pay what you want" data-buy-url="https://payhip.com/b/4akCM" data-buy-label="Buy Now" onclick="window.location.href='/pages/product-f1'">
           <div class="pc-thumb">
             <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')">
-          <span class="admin-status-badge status-live">LIVE ▾</span>
+          <span class="admin-status-badge status-live">LIVE <span style="opacity:0.7;font-size:8px;">▾</span></span>
           <div class="admin-status-dropdown">
           <button class="admin-status-option opt-live active-opt" onclick="event.stopPropagation();setProductStatus('f1-sf25','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
           <button class="admin-status-option opt-draft" onclick="event.stopPropagation();setProductStatus('f1-sf25','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
@@ -1127,7 +1147,7 @@
         <div class="product-card" data-product-id="controller-shape-menu" data-status="live" data-cat="tool" data-href="/pages/product-curvelib" data-img="/projects/AviaRigg_CurvLib/images/Main Window.png" data-tag="// Maya Tool" data-category="Python Tool · v2.1.0" data-title="Controller Shape Menu" data-desc="A Maya tool built by a rigger, for riggers — create, manage, and customize controllers without the headache." data-price="€4.99" data-price-sub="EUR · Pay what you want" data-buy-url="https://payhip.com/b/bZ1mE" data-buy-label="Buy Now" onclick="window.location.href='/pages/product-curvelib'">
           <div class="pc-thumb">
             <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')">
-          <span class="admin-status-badge status-live">LIVE ▾</span>
+          <span class="admin-status-badge status-live">LIVE <span style="opacity:0.7;font-size:8px;">▾</span></span>
           <div class="admin-status-dropdown">
           <button class="admin-status-option opt-live active-opt" onclick="event.stopPropagation();setProductStatus('controller-shape-menu','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
           <button class="admin-status-option opt-draft" onclick="event.stopPropagation();setProductStatus('controller-shape-menu','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
@@ -1152,7 +1172,7 @@
         <div class="product-card dim" data-product-id="character-rig-template" data-status="draft" data-cat="soon">
           <div class="pc-thumb">
             <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')">
-          <span class="admin-status-badge status-draft">DRAFT ▾</span>
+          <span class="admin-status-badge status-draft">DRAFT <span style="opacity:0.7;font-size:8px;">▾</span></span>
           <div class="admin-status-dropdown">
           <button class="admin-status-option opt-live" onclick="event.stopPropagation();setProductStatus('character-rig-template','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
           <button class="admin-status-option opt-draft active-opt" onclick="event.stopPropagation();setProductStatus('character-rig-template','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
@@ -1176,7 +1196,7 @@
         <div class="product-card dim" data-product-id="mel-python-scripts" data-status="draft" data-cat="soon">
           <div class="pc-thumb">
             <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')">
-          <span class="admin-status-badge status-draft">DRAFT ▾</span>
+          <span class="admin-status-badge status-draft">DRAFT <span style="opacity:0.7;font-size:8px;">▾</span></span>
           <div class="admin-status-dropdown">
           <button class="admin-status-option opt-live" onclick="event.stopPropagation();setProductStatus('mel-python-scripts','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
           <button class="admin-status-option opt-draft active-opt" onclick="event.stopPropagation();setProductStatus('mel-python-scripts','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
@@ -1710,7 +1730,7 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
   // Update badge label and color
   const badge = cardEl.querySelector('.admin-status-badge');
   if (badge) {
-    badge.textContent = newStatus.toUpperCase() + ' ▾';
+    badge.innerHTML = newStatus.toUpperCase() + ' <span style="opacity:0.7;font-size:8px;">▾</span>';
     badge.className = 'admin-status-badge status-' + newStatus;
   }
   // Update active option highlight in dropdown
