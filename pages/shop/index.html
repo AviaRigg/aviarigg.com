@@ -1538,28 +1538,28 @@ function swapHeroCard(cardEl) {
   const buyLabel= cardEl.dataset.buyLabel|| 'Buy Now';
   const href    = cardEl.dataset.href    || '#';
 
+  // Update image
   const heroImg = hero.querySelector('.hero-img');
   if (heroImg) { heroImg.src = img; heroImg.alt = title; }
 
   const heroTag = hero.querySelector('.hero-card-tag');
   if (heroTag) heroTag.textContent = tag + ' · Featured';
 
-  const heroCat   = hero.querySelector('.hero-cat');
-  const heroTitle = hero.querySelector('.hero-title');
-  const heroDesc  = hero.querySelector('.hero-desc');
-  const heroPrice = hero.querySelector('.hero-price');
-  const heroSub   = hero.querySelector('.hero-price-sub');
-  const heroBuy   = hero.querySelector('.shop-buy-btn');
-
-  if (heroCat)   heroCat.textContent = cat;
-  if (heroTitle) heroTitle.textContent = title;
-  if (heroDesc)  heroDesc.textContent = desc;
-  if (heroPrice) heroPrice.innerHTML = price;
-  if (heroSub)   heroSub.textContent = priceSub;
-  if (heroBuy) {
-    heroBuy.textContent = buyLabel + ' →';
-    heroBuy.href = buyUrl;
-    heroBuy.setAttribute('onclick', `event.preventDefault();event.stopPropagation();openCheckout('${buyUrl}')`);
+  // Always rebuild the body in case it was replaced by empty state
+  const body = hero.querySelector('.hero-card-body');
+  if (body) {
+    body.innerHTML = `
+      <div class="hero-featured-label">Featured Product</div>
+      <div class="hero-cat">${cat}</div>
+      <div class="hero-title">${title}</div>
+      <div class="hero-desc">${desc}</div>
+      <div class="hero-footer">
+        <div>
+          <div class="hero-price">${price}</div>
+          <div class="hero-price-sub">${priceSub}</div>
+        </div>
+        <a href="${buyUrl}" class="shop-buy-btn" onclick="event.preventDefault();event.stopPropagation();openCheckout('${buyUrl}')">${buyLabel} &#8594;</a>
+      </div>`;
   }
 
   hero.setAttribute('onclick', `window.location.href='${href}'`);
