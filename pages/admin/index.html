@@ -346,6 +346,102 @@
   #admin-toast.error { border-left-color: #ff5050; color: #ff5050; }
 
   .admin-gap { height: 40px; }
+
+  /* ══════════════════════════════════════════
+     2560px (2K / QHD) — scale up
+  ══════════════════════════════════════════ */
+  @media (min-width: 2560px) {
+    .admin-wrap { width: min(75vw, 2400px); }
+
+    .gate-label           { font-size: 14px; letter-spacing: 5px; }
+    .admin-last-updated   { font-size: 13px; letter-spacing: 3px; }
+    #admin-clock          { font-size: 26px !important; letter-spacing: 6px !important; }
+
+    .admin-section-label  { font-size: 14px; letter-spacing: 5px; padding: 18px 0; }
+    .admin-panel-title    { font-size: 14px; letter-spacing: 4px; margin-bottom: 28px; }
+    .admin-panel-title::before { font-size: 13px; }
+
+    .stat-label           { font-size: 13px; letter-spacing: 4px; }
+    .stat-value           { font-size: 56px; }
+    .stat-sub             { font-size: 12px; letter-spacing: 3px; }
+    .stat-dot             { width: 8px; height: 8px; }
+
+    .toggle-row           { padding: 20px 0; }
+    .toggle-row-name      { font-size: 22px; }
+    .toggle-row-desc      { font-size: 12px; letter-spacing: 2px; }
+    .toggle-switch        { width: 60px; height: 32px; }
+    .toggle-track::before { width: 22px; height: 22px; left: 4px; top: 4px; }
+    .toggle-switch input:checked + .toggle-track::before { transform: translateX(27px); }
+
+    .quick-link           { padding: 18px 20px; }
+    .quick-link-name      { font-size: 13px; letter-spacing: 3px; }
+    .quick-link-arrow     { font-size: 16px; }
+
+    .item-row             { padding: 16px 18px; gap: 20px; }
+    .item-num             { font-size: 12px; letter-spacing: 3px; width: 32px; }
+    .item-name            { font-size: 20px; }
+    .item-cat             { font-size: 12px; letter-spacing: 3px; }
+    .item-link            { font-size: 14px; }
+    .status-pill          { font-size: 11px; letter-spacing: 3px; padding: 4px 12px; }
+
+    .user-table th        { font-size: 12px; letter-spacing: 4px; padding: 12px 16px; }
+    .user-table td        { font-size: 13px; letter-spacing: 1.5px; padding: 15px 16px; }
+    .role-admin,
+    .role-user            { font-size: 11px; letter-spacing: 3px; padding: 3px 12px; }
+    .user-del-btn         { font-size: 11px; letter-spacing: 2px; padding: 5px 14px; }
+    .user-date            { font-size: 11px; }
+
+    .announcement-preview { font-size: 15px; letter-spacing: 2.5px; padding: 16px 20px; }
+    .admin-input          { font-size: 14px; letter-spacing: 1.5px; padding: 14px 18px; }
+    .field-label          { font-size: 12px; letter-spacing: 4px; margin-bottom: 10px; }
+    .admin-btn            { font-size: 13px; letter-spacing: 4px; padding: 12px 28px; }
+
+    .table-empty          { font-size: 13px; letter-spacing: 3px; padding: 32px; }
+    .admin-gap            { height: 64px; }
+
+    #admin-toast          { font-size: 13px; letter-spacing: 4px; padding: 16px 32px; }
+  }
+
+  /* ══════════════════════════════════════════
+     3840px (4K / UHD) — another ~25% bump
+  ══════════════════════════════════════════ */
+  @media (min-width: 3840px) {
+    .admin-wrap           { width: min(78vw, 3600px); }
+
+    .admin-section-label  { font-size: 18px; letter-spacing: 6px; padding: 24px 0; }
+    .admin-panel-title    { font-size: 18px; letter-spacing: 5px; }
+    #admin-clock          { font-size: 34px !important; }
+
+    .stat-label           { font-size: 16px; letter-spacing: 5px; }
+    .stat-value           { font-size: 72px; }
+    .stat-sub             { font-size: 15px; letter-spacing: 4px; }
+    .stat-dot             { width: 10px; height: 10px; }
+
+    .toggle-row-name      { font-size: 28px; }
+    .toggle-row-desc      { font-size: 15px; }
+    .toggle-switch        { width: 76px; height: 40px; }
+    .toggle-track::before { width: 28px; height: 28px; left: 5px; top: 5px; }
+    .toggle-switch input:checked + .toggle-track::before { transform: translateX(35px); }
+
+    .quick-link           { padding: 22px 24px; }
+    .quick-link-name      { font-size: 16px; letter-spacing: 4px; }
+
+    .item-row             { padding: 20px 24px; }
+    .item-num             { font-size: 15px; width: 40px; }
+    .item-name            { font-size: 26px; }
+    .item-cat             { font-size: 15px; }
+    .status-pill          { font-size: 14px; letter-spacing: 4px; padding: 6px 16px; }
+
+    .user-table th        { font-size: 15px; letter-spacing: 5px; padding: 16px 20px; }
+    .user-table td        { font-size: 16px; padding: 20px; }
+    .user-del-btn         { font-size: 14px; padding: 7px 18px; }
+
+    .announcement-preview { font-size: 18px; }
+    .admin-input          { font-size: 17px; padding: 18px 22px; }
+    .field-label          { font-size: 15px; letter-spacing: 5px; }
+    .admin-btn            { font-size: 16px; letter-spacing: 5px; padding: 16px 36px; }
+    .admin-gap            { height: 88px; }
+  }
 </style>
 
 <script src="/assets/js/status.js"></script>
