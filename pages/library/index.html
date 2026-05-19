@@ -39,8 +39,36 @@
   <script src="/assets/js/nav.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/assets/js/nav-auth.js"></script>
+  <script>
+    // ── LIBRARY LOGIN GATE ──
+    // Wait for auth to resolve, then check if user is logged in
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Give nav-auth.js time to initialize
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Check session directly
+      const _gateSb = supabase.createClient(
+        'https://bbyiezjvonacajigqoik.supabase.co',
+        'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb'
+      );
+      const { data: { session } } = await _gateSb.auth.getSession();
+      
+      if (!session) {
+        // Not logged in — redirect to login with return URL
+        window.location.replace('/pages/login?redirect=' + encodeURIComponent(window.location.pathname));
+      } else {
+        // Logged in — reveal the page
+        document.getElementById('library-gate-overlay').style.display = 'none';
+        document.getElementById('page-library').style.visibility = 'visible';
+      }
+    });
+  </script>
 </head>
 <body>
+<!-- Login gate overlay -->
+<div id="library-gate-overlay" style="position:fixed;inset:0;z-index:9998;background:var(--bg,#0c0b10);display:flex;align-items:center;justify-content:center;">
+  <div style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);animation:blink 2.5s ease-in-out infinite;">// Checking access...</div>
+</div>
 
 <div id="nav-root"></div>
 
@@ -51,7 +79,7 @@
   <a href="/" class="btn-ghost" style="margin-top:8px;">&#8592; Back to Home</a>
 </div>
 
-<div class="page active" id="page-library">
+<div class="page active" id="page-library" style="visibility:hidden;">
   <div class="lib-page">
     <aside class="lib-sidebar">
       <div onclick="libHome()" style="cursor:pointer; padding:24px 20px; border-bottom:1px solid var(--border);">
