@@ -127,6 +127,7 @@ body::before {
   text-transform: uppercase;
   animation: blink 2.5s ease-in-out infinite;
   cursor: pointer;
+  display: none; /* hidden by default — status.js shows it after Supabase check */
 }
 
 @keyframes blink {
