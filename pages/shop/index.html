@@ -739,6 +739,10 @@
 
 
   <style>
+    /* ── LOADING STATE — hide cards until Supabase loads ── */
+    body.shop-loading .product-card { visibility: hidden; }
+    body.shop-loading .hero-card { visibility: hidden; }
+
     /* ── ADMIN EDIT MODE STYLES ── */
     #admin-edit-toggle {
       display: none;
@@ -1790,6 +1794,8 @@ function filterProducts(cat, btn) {
     else card.classList.add('hidden');
   });
   updateFilterCounts();
+  // Remove loading state — cards now correctly shown/hidden
+  document.body.classList.remove('shop-loading');
 }
 
 function updateFilterCounts() {
