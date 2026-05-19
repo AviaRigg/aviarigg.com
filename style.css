@@ -112,6 +112,7 @@ body::before {
   border-bottom: 1px solid transparent;
   transition: color 0.2s, border-color 0.2s;
   user-select: none;
+  text-decoration: none;
 }
 .nav-link:hover { color: var(--text); }
 .nav-link.active { color: var(--accent2); border-bottom-color: var(--accent2); }
