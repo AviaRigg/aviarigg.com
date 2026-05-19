@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — AviaRigg</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
+<link rel="shortcut icon" href="/assets/icons/SiteIcon.png">
+<link rel="apple-touch-icon" href="/assets/icons/SiteIcon.png">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-RYTKYEPJG2');
+</script>
+
+<style>
+  .page { display: block !important; }
+  .nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
+
+  /* ── LAYOUT ── */
+  .admin-wrap {
+    width: min(72vw, 1400px);
+    max-width: 100%;
+    margin: 0 auto;
+    padding: clamp(32px,4vw,64px) 0 80px;
+  }
+  @media (max-width: 1400px) { .admin-wrap { width: min(85vw, 1400px); } }
+  @media (max-width: 900px)  { .admin-wrap { width: 92vw; } }
+
+  /* ── ACCESS GATE ── */
+  #admin-gate {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 60vh; gap: 18px; text-align: center;
+  }
+  .gate-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: #ff5050;
+  }
+  .gate-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(28px,3vw,48px); font-weight: 700;
+    color: rgba(255,255,255,0.15); letter-spacing: 2px;
+  }
+
+  /* ── HEADER ── */
+  .admin-header {
+    display: flex; align-items: flex-end;
+    justify-content: space-between; gap: 16px;
+    margin-bottom: 48px; flex-wrap: wrap;
+  }
+  .admin-title-block .eyebrow { margin-bottom: 10px; }
+  .admin-title-block .section-h { margin-bottom: 0; }
+  .admin-last-updated {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* ── SECTION LABEL ── */
+  .admin-section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 12px 0;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+  }
+
+  /* ── STAT CARDS ── */
+  .admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: var(--border);
+  }
+  @media (max-width: 900px) { .admin-stats-grid { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 500px) { .admin-stats-grid { grid-template-columns: 1fr; } }
+
+  .admin-stat {
+    background: var(--surface);
+    padding: clamp(20px,2vw,32px) clamp(18px,2vw,28px);
+    display: flex; flex-direction: column; gap: 8px;
+    position: relative; overflow: hidden;
+    transition: background 0.2s;
+  }
+  .admin-stat:hover { background: var(--surface2); }
+  .admin-stat::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+  .admin-stat:hover::before { transform: scaleX(1); }
+
+  .stat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .stat-value {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(28px,3vw,44px); font-weight: 700;
+    color: var(--text-bright); line-height: 1;
+  }
+  .stat-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 2px;
+    color: var(--text-dim); text-transform: uppercase;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .stat-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); flex-shrink: 0;
+    animation: blink 2.5s ease-in-out infinite;
+    display: inline-block;
+  }
+  .stat-dot.orange { background: #f5a623; }
+  .stat-dot.red    { background: #ff5050; animation: none; }
+  .stat-dot.purple { background: var(--accent2); }
+
+  /* ── 2-COL GRID ── */
+  .admin-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--border);
+    margin-bottom: 1px;
+  }
+  @media (max-width: 800px) { .admin-row { grid-template-columns: 1fr; } }
+
+  .admin-panel {
+    background: var(--surface);
+    padding: clamp(20px,2.5vw,36px);
+  }
+  .admin-panel-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent2); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .admin-panel-title::before { content: '//'; color: var(--accent); font-size: 9px; }
+
+  /* ── TOGGLE ROWS ── */
+  .toggle-row {
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-row-left { display: flex; flex-direction: column; gap: 4px; }
+  .toggle-row-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(15px,1.4vw,19px); font-weight: 600;
+    color: var(--text-bright);
+  }
+  .toggle-row-desc {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 1px; color: var(--text-dim);
+  }
+  .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-track {
+    position: absolute; inset: 0; cursor: pointer;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .toggle-track::before {
+    content: '';
+    position: absolute; height: 16px; width: 16px;
+    left: 3px; top: 3px;
+    background: var(--text-dim);
+    transition: transform 0.2s, background 0.2s;
+  }
+  .toggle-switch input:checked + .toggle-track { background: rgba(0,232,122,0.15); border-color: rgba(0,232,122,0.5); }
+  .toggle-switch input:checked + .toggle-track::before { transform: translateX(20px); background: var(--green); }
+
+  /* ── QUICK LINKS ── */
+  .quick-links { display: flex; flex-direction: column; gap: 1px; }
+  .quick-link {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 13px 16px;
+    background: var(--surface2); border: 1px solid var(--border); border-top: none;
+    text-decoration: none; color: inherit; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .quick-link:first-child { border-top: 1px solid var(--border); }
+  .quick-link:hover { background: rgba(139,79,200,0.08); border-color: rgba(139,79,200,0.25); }
+  .quick-link-name {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text);
+  }
+  .quick-link:hover .quick-link-name { color: var(--accent2); }
+  .quick-link-arrow { color: var(--text-dim); font-size: 12px; transition: transform 0.15s; }
+  .quick-link:hover .quick-link-arrow { transform: translateX(4px); color: var(--accent2); }
+
+  /* ── STATUS PILLS ── */
+  .status-pill {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 3px 9px; border: 1px solid; flex-shrink: 0;
+  }
+  .pill-live      { color: #00e87a; border-color: rgba(0,232,122,0.35);   background: rgba(0,232,122,0.06); }
+  .pill-draft     { color: #f5a623; border-color: rgba(245,166,35,0.35);  background: rgba(245,166,35,0.06); }
+  .pill-hidden    { color: #ff5050; border-color: rgba(255,80,80,0.35);   background: rgba(255,80,80,0.06); }
+  .pill-featured  { color: #ffd700; border-color: rgba(255,215,0,0.35);   background: rgba(255,215,0,0.06); }
+  .pill-published { color: #00e87a; border-color: rgba(0,232,122,0.35);   background: rgba(0,232,122,0.06); }
+
+  /* ── ITEM ROWS (products / portfolio) ── */
+  .item-list { display: flex; flex-direction: column; gap: 1px; }
+  .item-row {
+    display: flex; align-items: center;
+    gap: 14px; padding: 12px 14px;
+    background: var(--surface2); border: 1px solid var(--border); border-top: none;
+    transition: background 0.15s;
+  }
+  .item-row:first-child { border-top: 1px solid var(--border); }
+  .item-row:hover { background: rgba(139,79,200,0.06); }
+  .item-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 2px; color: var(--text-dim); flex-shrink: 0; width: 24px;
+  }
+  .item-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(14px,1.3vw,17px); font-weight: 600;
+    color: var(--text-bright); flex: 1; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .item-cat {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-dim); flex-shrink: 0;
+  }
+  .item-link {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; color: var(--accent2);
+    text-decoration: none; flex-shrink: 0;
+    transition: color 0.15s;
+  }
+  .item-link:hover { color: var(--accent3); }
+
+  /* ── USER TABLE ── */
+  .user-table { width: 100%; border-collapse: collapse; }
+  .user-table th {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-dim); padding: 8px 12px;
+    border-bottom: 1px solid var(--border); text-align: left;
+  }
+  .user-table td {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 1px; color: var(--text);
+    padding: 11px 12px; border-bottom: 1px solid rgba(255,255,255,0.03);
+    vertical-align: middle;
+  }
+  .user-table tr:last-child td { border-bottom: none; }
+  .user-table tr:hover td { background: rgba(139,79,200,0.04); }
+  .role-admin { color: var(--accent2); border: 1px solid rgba(139,79,200,0.3); padding: 2px 8px; font-size: 8px; letter-spacing: 2px; background: rgba(139,79,200,0.08); }
+  .role-user  { color: var(--text-dim); border: 1px solid var(--border); padding: 2px 8px; font-size: 8px; letter-spacing: 2px; }
+  .user-date  { color: var(--text-dim); font-size: 8px; }
+  .user-del-btn {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px; letter-spacing: 1px; text-transform: uppercase;
+    color: #ff5050; background: none; border: 1px solid rgba(255,80,80,0.3);
+    padding: 3px 9px; cursor: pointer; transition: background 0.15s;
+  }
+  .user-del-btn:hover { background: rgba(255,80,80,0.1); }
+  .table-empty {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-dim); text-align: center; padding: 24px;
+  }
+
+  /* ── ANNOUNCEMENT ── */
+  .announcement-preview {
+    border: 1px solid var(--border); border-left: 2px solid var(--accent);
+    background: rgba(139,79,200,0.04);
+    padding: 12px 16px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px; letter-spacing: 2px; color: var(--text);
+  }
+  .announcement-preview::before { content: '//'; color: var(--accent); flex-shrink: 0; }
+  .announcement-preview.empty  { color: var(--text-dim); font-style: italic; }
+
+  /* ── INPUTS ── */
+  .admin-input {
+    width: 100%;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px; letter-spacing: 1px;
+    color: var(--text); background: var(--surface2);
+    border: 1px solid var(--border); padding: 10px 14px;
+    outline: none; transition: border-color 0.2s; resize: vertical;
+  }
+  .admin-input:focus { border-color: var(--accent); }
+  .admin-input::placeholder { color: var(--text-dim); }
+  .field-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 6px;
+  }
+
+  /* ── BUTTONS ── */
+  .admin-btn {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    border: 1px solid; padding: 9px 20px; cursor: pointer;
+    transition: all 0.2s; white-space: nowrap; background: none;
+  }
+  .admin-btn-primary { color: #fff; background: var(--accent); border-color: var(--accent); }
+  .admin-btn-primary:hover { background: var(--accent2); border-color: var(--accent2); }
+  .admin-btn-ghost { color: var(--text-dim); border-color: var(--border); }
+  .admin-btn-ghost:hover { border-color: var(--accent2); color: var(--accent2); }
+  .admin-btn-danger { color: #ff5050; border-color: rgba(255,80,80,0.4); }
+  .admin-btn-danger:hover { background: rgba(255,80,80,0.1); }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+  /* ── FULL-WIDTH PANEL ── */
+  .admin-full {
+    background: var(--surface);
+    padding: clamp(20px,2.5vw,36px);
+    margin-bottom: 1px;
+  }
+
+  /* ── TOAST ── */
+  #admin-toast {
+    position: fixed; bottom: 32px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface2); border: 1px solid var(--border);
+    border-left: 2px solid var(--green);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--green); padding: 12px 24px;
+    z-index: 9999; pointer-events: none;
+    transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0;
+    white-space: nowrap;
+  }
+  #admin-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  #admin-toast.error { border-left-color: #ff5050; color: #ff5050; }
+
+  .admin-gap { height: 40px; }
+</style>
+
+<script src="/assets/js/status.js"></script>
+<script src="/assets/js/nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/nav-auth.js"></script>
+</head>
+<body>
+
+<div id="nav-root"></div>
+<div id="admin-toast"></div>
+
+<div class="page active" id="page-admin">
+<div class="admin-wrap">
+
+  <!-- ── ACCESS GATE ── -->
+  <div id="admin-gate" style="display:none;">
+    <div class="gate-label">// Access Denied</div>
+    <div class="gate-title">ADMINS ONLY</div>
+    <a class="admin-btn admin-btn-ghost" href="/" style="margin-top:8px;">← Back to Site</a>
+  </div>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div id="admin-content" style="display:none;">
+
+    <!-- HEADER -->
+    <div class="admin-header">
+      <div class="admin-title-block">
+        <div class="eyebrow">Control Panel</div>
+        <div class="section-h">Admin</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="admin-last-updated" id="admin-timestamp">—</div>
+        <div id="admin-clock" style="font-family:'Share Tech Mono',monospace;font-size:18px;letter-spacing:4px;color:var(--text-bright);margin-top:4px;">—</div>
+      </div>
+    </div>
+
+    <!-- ══ OVERVIEW STATS ══════════════════════════════════════ -->
+    <div class="admin-section-label">
+      <span>// Overview</span>
+      <span style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;">Live snapshot</span>
+    </div>
+    <div class="admin-stats-grid">
+      <div class="admin-stat">
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value" id="stat-users">—</div>
+        <div class="stat-sub"><span class="stat-dot purple"></span>Registered accounts</div>
+      </div>
+      <div class="admin-stat">
+        <div class="stat-label">Products Live</div>
+        <div class="stat-value" id="stat-products">—</div>
+        <div class="stat-sub"><span class="stat-dot"></span>In the shop</div>
+      </div>
+      <div class="admin-stat">
+        <div class="stat-label">Portfolio</div>
+        <div class="stat-value" id="stat-portfolio">—</div>
+        <div class="stat-sub"><span class="stat-dot purple"></span>Published entries</div>
+      </div>
+      <div class="admin-stat">
+        <div class="stat-label">Work Status</div>
+        <div class="stat-value" id="stat-site" style="font-size:clamp(18px,2vw,28px);">—</div>
+        <div class="stat-sub" id="stat-site-sub">—</div>
+      </div>
+    </div>
+    <div class="admin-gap"></div>
+
+    <!-- ══ SITE CONTROLS ══════════════════════════════════════ -->
+    <div class="admin-section-label">
+      <span>// Site Controls</span>
+    </div>
+    <div class="admin-row">
+
+      <!-- Toggles -->
+      <div class="admin-panel">
+        <div class="admin-panel-title">Status Toggles</div>
+        <div class="toggle-row">
+          <div class="toggle-row-left">
+            <div class="toggle-row-name">Open to Work</div>
+            <div class="toggle-row-desc">Shows "Available" badge in nav + hero bar</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-otw" onchange="saveSetting('open_to_work', this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-row-left">
+            <div class="toggle-row-name">Commissions Open</div>
+            <div class="toggle-row-desc">Shows available indicator on Shop → Commissions</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-comm" onchange="saveSetting('commissions_open', this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-row-left">
+            <div class="toggle-row-name">Announcement Banner</div>
+            <div class="toggle-row-desc">Shows the banner strip sitewide</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-banner" onchange="saveSetting('banner_enabled', this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Quick links -->
+      <div class="admin-panel">
+        <div class="admin-panel-title">Quick Links</div>
+        <div class="quick-links">
+          <a class="quick-link" href="/"><span class="quick-link-name">Home</span><span class="quick-link-arrow">→</span></a>
+          <a class="quick-link" href="/pages/portfolio"><span class="quick-link-name">Portfolio</span><span class="quick-link-arrow">→</span></a>
+          <a class="quick-link" href="/pages/shop"><span class="quick-link-name">Shop</span><span class="quick-link-arrow">→</span></a>
+          <a class="quick-link" href="/pages/library"><span class="quick-link-name">Script Library</span><span class="quick-link-arrow">→</span></a>
+          <a class="quick-link" href="/pages/about"><span class="quick-link-name">About</span><span class="quick-link-arrow">→</span></a>
+          <a class="quick-link" href="/pages/contact"><span class="quick-link-name">Contact</span><span class="quick-link-arrow">→</span></a>
+          <a class="quick-link" href="https://app.supabase.com" target="_blank"><span class="quick-link-name">Supabase Dashboard ↗</span><span class="quick-link-arrow">→</span></a>
+          <a class="quick-link" href="https://github.com" target="_blank"><span class="quick-link-name">GitHub Repo ↗</span><span class="quick-link-arrow">→</span></a>
+        </div>
+      </div>
+
+    </div>
+    <div class="admin-gap"></div>
+
+    <!-- ══ ANNOUNCEMENT BANNER ════════════════════════════════ -->
+    <div class="admin-section-label">
+      <span>// Announcement Banner</span>
+      <span style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;">Shown sitewide when enabled</span>
+    </div>
+    <div class="admin-full">
+      <div class="admin-panel-title">Banner Content</div>
+      <div class="announcement-preview empty" id="banner-preview">
+        <span id="banner-preview-text">No banner text set.</span>
+      </div>
+      <div class="field-label">Banner Text</div>
+      <textarea class="admin-input" id="banner-text" rows="2"
+        placeholder="e.g. New product dropping this week — stay tuned."
+        oninput="updateBannerPreview()"></textarea>
+      <div class="btn-row">
+        <button class="admin-btn admin-btn-primary" onclick="saveBanner()">Save Banner</button>
+        <button class="admin-btn admin-btn-ghost"   onclick="clearBanner()">Clear</button>
+      </div>
+    </div>
+    <div class="admin-gap"></div>
+
+    <!-- ══ SHOP MANAGEMENT ════════════════════════════════════ -->
+    <div class="admin-section-label">
+      <span>// Shop</span>
+      <a href="/pages/shop" style="color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-decoration:none;">Open Shop →</a>
+    </div>
+    <div class="admin-full">
+      <div class="admin-panel-title">Products</div>
+      <div class="item-list" id="product-list">
+        <div class="table-empty skeleton" style="height:48px;"></div>
+        <div class="table-empty skeleton" style="height:48px;opacity:0.6;"></div>
+      </div>
+    </div>
+    <div class="admin-gap"></div>
+
+    <!-- ══ PORTFOLIO MANAGEMENT ═══════════════════════════════ -->
+    <div class="admin-section-label">
+      <span>// Portfolio</span>
+      <a href="/pages/portfolio" style="color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-decoration:none;">Open Portfolio →</a>
+    </div>
+    <div class="admin-full">
+      <div class="admin-panel-title">Projects</div>
+      <div class="item-list" id="port-list">
+        <div class="table-empty skeleton" style="height:48px;"></div>
+        <div class="table-empty skeleton" style="height:48px;opacity:0.6;"></div>
+      </div>
+    </div>
+    <div class="admin-gap"></div>
+
+    <!-- ══ USER MANAGEMENT ════════════════════════════════════ -->
+    <div class="admin-section-label">
+      <span>// Users</span>
+      <span id="user-count-label" style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;">—</span>
+    </div>
+    <div class="admin-full">
+      <div class="admin-panel-title">Registered Users</div>
+      <div style="overflow-x:auto;">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Joined</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="user-table-body">
+            <tr><td colspan="4" class="table-empty">Loading users...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="admin-gap"></div>
+
+    <!-- ══ MASS EMAIL ══════════════════════════════════════════ -->
+    <div class="admin-section-label">
+      <span>// Mass Email</span>
+      <span style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;">via Resend edge function</span>
+    </div>
+    <div class="admin-full">
+      <div class="admin-panel-title">Send to All Users</div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div>
+          <div class="field-label">Subject Line</div>
+          <input type="text" class="admin-input" id="email-subject"
+            placeholder="e.g. New rig pack just dropped">
+        </div>
+        <div>
+          <div class="field-label">Body (plain text or HTML)</div>
+          <textarea class="admin-input" id="email-body" rows="7"
+            placeholder="Write your email content here..."></textarea>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <button class="admin-btn admin-btn-primary" onclick="sendMassEmail()">Send Email</button>
+          <span id="email-status" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim);"></span>
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--text-dim);padding:10px 14px;border:1px solid var(--border);border-left:2px solid rgba(139,79,200,0.5);background:rgba(139,79,200,0.03);line-height:1.8;">
+          // This sends to all profiles in Supabase via the <strong style="color:var(--accent2);">send-mass-email</strong> edge function.<br>
+          // Make sure RESEND_API_KEY is set in your Supabase project secrets.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- #admin-content -->
+</div><!-- .admin-wrap -->
+</div><!-- .page -->
+
+
+<script>
+  // ── HELPERS ──
+  async function _getAdminSb() {
+    let n = 0;
+    while (typeof _navSb === 'undefined' && n++ < 40) await new Promise(r => setTimeout(r, 50));
+    return _navSb;
+  }
+
+  let _adminUser = null;
+
+  function toast(msg, isError = false) {
+    const el = document.getElementById('admin-toast');
+    el.textContent = msg;
+    el.className = 'show' + (isError ? ' error' : '');
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => { el.className = ''; }, 3000);
+  }
+
+  // ── CLOCK ──
+  function updateClock() {
+    const el = document.getElementById('admin-clock');
+    if (el) el.textContent = new Date().toLocaleTimeString('en-GB', { hour12: false });
+  }
+
+  // ── INIT ──
+  document.addEventListener('DOMContentLoaded', async () => {
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    const sb = await _getAdminSb();
+    const { data: { session } } = await sb.auth.getSession();
+
+    if (!session) { showGate(); return; }
+    _adminUser = session.user;
+
+    const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+    if (profile?.role !== 'admin') { showGate(); return; }
+
+    showContent();
+    document.getElementById('admin-timestamp').textContent =
+      '// Loaded ' + new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+
+    // Load all sections in parallel
+    await Promise.all([
+      loadSettings(),
+      loadStats(),
+      loadProducts(),
+      loadPortfolio(),
+      loadUsers(),
+      loadBanner(),
+    ]);
+  });
+
+  function showGate()    { document.getElementById('admin-gate').style.display = 'flex'; }
+  function showContent() { document.getElementById('admin-content').style.display = 'block'; }
+
+  // ── SETTINGS / TOGGLES ──
+  async function loadSettings() {
+    const sb = await _getAdminSb();
+    const { data } = await sb.from('site_settings').select('key, value');
+    if (!data) return;
+    const map = Object.fromEntries(data.map(r => [r.key, r.value]));
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.checked = val === 'true'; };
+    set('toggle-otw',    map['open_to_work']);
+    set('toggle-comm',   map['commissions_open']);
+    set('toggle-banner', map['banner_enabled']);
+    updateSiteStatFromMap(map);
+  }
+
+  async function saveSetting(key, value) {
+    const sb = await _getAdminSb();
+    const { error } = await sb.from('site_settings').upsert({ key, value: String(value) });
+    if (error) { toast('// Save failed', true); return; }
+    toast('// ' + key.replace(/_/g,' ') + ': ' + (value ? 'on' : 'off'));
+    // Sync nav badge for open_to_work
+    if (key === 'open_to_work') {
+      document.querySelectorAll('.nav-badge').forEach(el => el.style.display = value ? '' : 'none');
+      const btn = document.getElementById('admin-toggle-otw');
+      if (btn) { btn.textContent = 'Work Status: ' + (value ? 'OPEN ✓' : 'CLOSED ✗'); btn.style.color = value ? '#00e87a' : '#ff5050'; }
+    }
+    // Refresh site stat card
+    const otw  = document.getElementById('toggle-otw')?.checked;
+    const comm = document.getElementById('toggle-comm')?.checked;
+    updateSiteStatFromValues(otw, comm);
+  }
+
+  function updateSiteStatFromMap(map) {
+    updateSiteStatFromValues(map['open_to_work'] === 'true', map['commissions_open'] === 'true');
+  }
+  function updateSiteStatFromValues(otw, comm) {
+    const el  = document.getElementById('stat-site');
+    const sub = document.getElementById('stat-site-sub');
+    if (el)  { el.textContent = otw ? 'OPEN' : 'CLOSED'; el.style.color = otw ? 'var(--green)' : '#ff5050'; }
+    if (sub) sub.innerHTML = `<span class="stat-dot ${comm ? '' : 'red'}"></span>Commissions ${comm ? 'open' : 'closed'}`;
+  }
+
+  // ── STATS ──
+  async function loadStats() {
+    const sb = await _getAdminSb();
+    const [users, products, portfolio] = await Promise.all([
+      sb.from('profiles').select('id', { count: 'exact', head: true }),
+      sb.from('shop_products').select('id, status'),
+      sb.from('portfolio_projects').select('id, status'),
+    ]);
+    document.getElementById('stat-users').textContent    = users.count ?? 0;
+    document.getElementById('stat-products').textContent =
+      (products.data  || []).filter(p => ['live','featured'].includes(p.status)).length;
+    document.getElementById('stat-portfolio').textContent =
+      (portfolio.data || []).filter(p => ['published','featured'].includes(p.status)).length;
+  }
+
+  // ── PRODUCTS ──
+  const PRODUCT_META = {
+    'f1-sf25':                { name: 'Formula 1 SF-25 Livery', cat: 'Maya Rig',    href: '/pages/product-f1' },
+    'controller-shape-menu':  { name: 'Controller Shape Menu',  cat: 'Python Tool', href: '/pages/product-curvelib' },
+    'character-rig-template': { name: 'Character Rig Template', cat: 'Rig Pack',    href: '#' },
+    'mel-python-scripts':     { name: 'MEL / Python Scripts',   cat: 'Tool Pack',   href: '#' },
+  };
+
+  async function loadProducts() {
+    const sb = await _getAdminSb();
+    const { data } = await sb.from('shop_products').select('id, status').order('id');
+    const el = document.getElementById('product-list');
+    if (!data?.length) { el.innerHTML = '<div class="table-empty">No products found.</div>'; return; }
+    el.innerHTML = data.map(({ id, status }, i) => {
+      const m = PRODUCT_META[id] || { name: id, cat: '—', href: '#' };
+      return `<div class="item-row">
+        <span class="item-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="item-cat">${m.cat}</span>
+        <span class="item-name">${m.name}</span>
+        <span class="status-pill pill-${status}">${status.toUpperCase()}</span>
+        <a class="item-link" href="${m.href}">→</a>
+      </div>`;
+    }).join('');
+  }
+
+  // ── PORTFOLIO ──
+  const PORT_META = {
+    'f1-sf25':       { name: 'Formula 1 SF-25 Rig', cat: 'Hard Surface',  href: '/pages/portfolio-f1' },
+    'nordic-bandit': { name: 'Nordic Bandit',        cat: 'Character Rig', href: '#' },
+    'placeholder-3': { name: '—',                    cat: 'Coming Soon',   href: '#' },
+    'placeholder-4': { name: '—',                    cat: 'Coming Soon',   href: '#' },
+    'placeholder-5': { name: '—',                    cat: 'Coming Soon',   href: '#' },
+    'placeholder-6': { name: '—',                    cat: 'Coming Soon',   href: '#' },
+  };
+
+  async function loadPortfolio() {
+    const sb = await _getAdminSb();
+    const { data } = await sb.from('portfolio_projects').select('id, status').order('id');
+    const el = document.getElementById('port-list');
+    if (!data?.length) { el.innerHTML = '<div class="table-empty">No projects found.</div>'; return; }
+    el.innerHTML = data.map(({ id, status }, i) => {
+      const m = PORT_META[id] || { name: id, cat: '—', href: '#' };
+      return `<div class="item-row">
+        <span class="item-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="item-cat">${m.cat}</span>
+        <span class="item-name">${m.name || id}</span>
+        <span class="status-pill pill-${status}">${status.toUpperCase()}</span>
+        <a class="item-link" href="${m.href}">→</a>
+      </div>`;
+    }).join('');
+  }
+
+  // ── USERS ──
+  async function loadUsers() {
+    const sb = await _getAdminSb();
+    const { data } = await sb.from('profiles').select('id, username, role, created_at').order('created_at', { ascending: false });
+    const tbody = document.getElementById('user-table-body');
+    const countEl = document.getElementById('user-count-label');
+
+    if (!data?.length) {
+      tbody.innerHTML = '<tr><td colspan="4" class="table-empty">No users found.</td></tr>';
+      if (countEl) countEl.textContent = '0 total';
+      return;
+    }
+    if (countEl) countEl.textContent = data.length + ' total';
+
+    tbody.innerHTML = data.map(p => {
+      const date = p.created_at
+        ? new Date(p.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'2-digit' })
+        : '—';
+      const roleClass = p.role === 'admin' ? 'role-admin' : 'role-user';
+      const isMe = p.id === _adminUser?.id;
+      return `<tr>
+        <td>${p.username || '—'}</td>
+        <td><span class="${roleClass}">${(p.role || 'user').toUpperCase()}</span></td>
+        <td class="user-date">${date}</td>
+        <td>${isMe
+          ? '<span style="color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:8px;letter-spacing:1px;">YOU</span>'
+          : `<button class="user-del-btn" onclick="deleteUser('${p.id}', this)">Delete</button>`
+        }</td>
+      </tr>`;
+    }).join('');
+  }
+
+  async function deleteUser(userId, btn) {
+    if (!confirm('Delete this user? This cannot be undone.')) return;
+    btn.textContent = '...'; btn.disabled = true;
+    const sb = await _getAdminSb();
+    const { error } = await sb.from('profiles').delete().eq('id', userId);
+    if (error) { toast('// Delete failed', true); btn.textContent = 'Delete'; btn.disabled = false; return; }
+    btn.closest('tr').remove();
+    toast('// User deleted');
+    // Recount
+    const rows = document.querySelectorAll('#user-table-body tr');
+    const countEl = document.getElementById('user-count-label');
+    if (countEl) countEl.textContent = rows.length + ' total';
+    document.getElementById('stat-users').textContent = rows.length;
+  }
+
+  // ── BANNER ──
+  async function loadBanner() {
+    const sb = await _getAdminSb();
+    const { data } = await sb.from('site_settings').select('value').eq('key', 'banner_text').single();
+    const text = data?.value || '';
+    const input = document.getElementById('banner-text');
+    if (input) input.value = text;
+    updateBannerPreview();
+  }
+
+  function updateBannerPreview() {
+    const text = document.getElementById('banner-text')?.value?.trim();
+    const previewText = document.getElementById('banner-preview-text');
+    const previewWrap = document.getElementById('banner-preview');
+    if (previewText) previewText.textContent = text || 'No banner text set.';
+    if (previewWrap) previewWrap.classList.toggle('empty', !text);
+  }
+
+  async function saveBanner() {
+    const text = document.getElementById('banner-text')?.value?.trim() || '';
+    const sb = await _getAdminSb();
+    const { error } = await sb.from('site_settings').upsert({ key: 'banner_text', value: text });
+    if (error) { toast('// Save failed', true); return; }
+    toast('// Banner saved');
+    updateBannerPreview();
+  }
+
+  async function clearBanner() {
+    const input = document.getElementById('banner-text');
+    if (input) input.value = '';
+    updateBannerPreview();
+    await saveBanner();
+  }
+
+  // ── MASS EMAIL ──
+  async function sendMassEmail() {
+    const subject = document.getElementById('email-subject')?.value?.trim();
+    const body    = document.getElementById('email-body')?.value?.trim();
+    const statusEl = document.getElementById('email-status');
+
+    if (!subject || !body) { toast('// Subject and body required', true); return; }
+    if (!confirm(`Send to all users?\n\nSubject: ${subject}`)) return;
+
+    statusEl.textContent = '// Sending...';
+    statusEl.style.color = 'var(--accent2)';
+
+    try {
+      const sb = await _getAdminSb();
+      const { error } = await sb.functions.invoke('send-mass-email', {
+        body: { subject, html: body }
+      });
+      if (error) throw error;
+      statusEl.textContent = '// Sent ✓';
+      statusEl.style.color = 'var(--green)';
+      toast('// Email sent');
+      document.getElementById('email-subject').value = '';
+      document.getElementById('email-body').value = '';
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = '// Failed — check edge fn + Resend key';
+      statusEl.style.color = '#ff5050';
+      toast('// Send failed', true);
+    }
+  }
+</script>
+</body>
+</html>
