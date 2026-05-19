@@ -178,6 +178,7 @@
     function _updateNavAuth() {
       const c = document.getElementById('nav-auth-container');
       if (!c) return;
+      c.classList.add('ready');
       if (_navUser) {
         const name = _navProfile?.username || _navUser.email.split('@')[0];
         const isAdmin = _navProfile?.role === 'admin';

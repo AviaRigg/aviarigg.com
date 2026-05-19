@@ -311,6 +311,7 @@
   function updateNavAuth(user, profile) {
     const c = document.getElementById('nav-auth-container');
     if (!c) return;
+      c.classList.add('ready');
     if (user) {
       const name = profile?.username || user.email.split('@')[0];
       c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="toggleUserMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${user.email}</div><a class="nav-dropdown-item" href="#">My Profile</a><button class="nav-dropdown-item" onclick="handleLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="handleDeleteAccount()">Delete Account</button></div></div>`;
