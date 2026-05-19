@@ -914,15 +914,22 @@
     if (!confirm('Delete this user? This cannot be undone.')) return;
     btn.textContent = '...'; btn.disabled = true;
     const sb = await _getAdminSb();
-    const { error } = await sb.from('profiles').delete().eq('id', userId);
-    if (error) { toast('// Delete failed', true); btn.textContent = 'Delete'; btn.disabled = false; return; }
-    btn.closest('tr').remove();
-    toast('// User deleted');
-    // Recount
-    const rows = document.querySelectorAll('#user-table-body tr');
-    const countEl = document.getElementById('user-count-label');
-    if (countEl) countEl.textContent = rows.length + ' total';
-    document.getElementById('stat-users').textContent = rows.length;
+    try {
+      const { error } = await sb.functions.invoke('delete-user', {
+        body: { userId }
+      });
+      if (error) throw error;
+      btn.closest('tr').remove();
+      toast('// User deleted');
+      const rows = document.querySelectorAll('#user-table-body tr');
+      const countEl = document.getElementById('user-count-label');
+      if (countEl) countEl.textContent = rows.length + ' total';
+      document.getElementById('stat-users').textContent = rows.length;
+    } catch (err) {
+      console.error('Delete failed:', err);
+      toast('// Delete failed', true);
+      btn.textContent = 'Delete'; btn.disabled = false;
+    }
   }
 
   // ── BANNER ──

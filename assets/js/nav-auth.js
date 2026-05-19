@@ -57,9 +57,19 @@ async function _navLogout() {
 
 async function _navDeleteAccount() {
   if (!confirm('Delete your account? This cannot be undone.')) return;
-  await _navSb.from('profiles').delete().eq('id', _navUser.id);
-  await _navSb.auth.signOut();
-  window.location.href = '/';
+  try {
+    const { data: { session } } = await _navSb.auth.getSession();
+    if (!session) { alert('Not logged in.'); return; }
+    const res = await _navSb.functions.invoke('delete-user', {
+      body: { userId: session.user.id }
+    });
+    if (res.error) throw res.error;
+    await _navSb.auth.signOut();
+    window.location.href = '/';
+  } catch (err) {
+    console.error('Delete account failed:', err);
+    alert('Failed to delete account. Please try again.');
+  }
 }
 
 async function _navLoadOTW() {
