@@ -8,6 +8,7 @@ const _STATUS_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
 const _STATUS_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
 
 async function loadAndApplySettings() {
+  window._statusApplied = true;
   let openToWork = true;
   let commissionsOpen = true;
 
@@ -88,4 +89,7 @@ function applyCommissionsStatus(val) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadAndApplySettings);
+// Called by nav.js after nav is injected, or directly if nav.js not present
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof loadAndApplySettings === 'function' && !window._statusApplied) loadAndApplySettings();
+});

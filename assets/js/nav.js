@@ -55,6 +55,9 @@ document.addEventListener("DOMContentLoaded", function() {(function() {
   } else {
     document.body.insertAdjacentHTML('afterbegin', NAV_HTML);
   }
+
+  // Apply status AFTER nav is injected so .nav-badge exists
+  if (typeof loadAndApplySettings === 'function') loadAndApplySettings();
 })();});
 
 function toggleMobileNav() {
