@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>F1 SF-25 Breakdown — AviaRigg</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 SF-25 Rig — AviaRigg Shop</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
 <style>
@@ -23,218 +23,223 @@
   <link rel="apple-touch-icon" href="/assets/icons/SiteIcon.png">
   <script src="/assets/js/status.js"></script>
   <script src="/assets/js/nav.js"></script>
+  <!-- Supabase + product availability check -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<<<<<<< HEAD
-  <script src="/assets/js/nav-auth.js"></script>
-=======
-  <style>
-    #nav-auth-container { display: flex; align-items: center; }
-    .nav-auth-link { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent2, #b06ef5); background: transparent; border: 1px solid rgba(139,79,200,0.4); padding: 7px 16px; cursor: pointer; transition: all 0.2s; text-decoration: none; white-space: nowrap; }
-    .nav-auth-link:hover { border-color: var(--accent2, #b06ef5); }
-    .nav-user-wrap { position: relative; }
-    .nav-user-btn { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent2, #b06ef5); background: transparent; border: 1px solid rgba(139,79,200,0.4); padding: 7px 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
-    .nav-user-btn:hover { border-color: var(--accent2, #b06ef5); background: rgba(139,79,200,0.08); }
-    .nav-user-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green, #00e87a); flex-shrink: 0; animation: blink 2.5s ease-in-out infinite; }
-    .nav-user-caret { font-size: 9px; opacity: 0.6; }
-    .nav-user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; min-width: 180px; background: var(--surface, #13121a); border: 1px solid var(--border, rgba(255,255,255,0.08)); border-top: 2px solid var(--accent, #8b4fc8); z-index: 9999; flex-direction: column; }
-    .nav-user-dropdown.open { display: flex; }
-    .nav-user-email { font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 1px; color: var(--text-dim, #6a6a8a); padding: 10px 14px 8px; border-bottom: 1px solid var(--border, rgba(255,255,255,0.08)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .nav-dropdown-item { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text, #ccc); background: none; border: none; padding: 10px 14px; cursor: pointer; text-align: left; text-decoration: none; display: block; border-bottom: 1px solid var(--border, rgba(255,255,255,0.05)); transition: background 0.15s, color 0.15s; }
-    .nav-dropdown-item:last-child { border-bottom: none; }
-    .nav-dropdown-item:hover { background: rgba(139,79,200,0.08); color: var(--text-bright, #eeeef8); }
-    .nav-dropdown-danger { color: #ff5050 !important; }
-    .nav-dropdown-danger:hover { background: rgba(255,80,80,0.08) !important; }
-  </style>
+  <script src="/assets/js/product-check.js"></script>
+  <!-- Nav auth styles -->
+<!-- Nav auth script -->
   <script>
-    const _NAV_SB_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
-    const _NAV_SB_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
-    const _navSb = supabase.createClient(_NAV_SB_URL, _NAV_SB_KEY);
-    let _navUser = null, _navProfile = null;
-    async function _initNavAuth() {
-      const { data: { session } } = await _navSb.auth.getSession();
-      if (session) await _handleNavSession(session.user);
-      _navSb.auth.onAuthStateChange(async (_e, session) => {
-        if (session) await _handleNavSession(session.user);
-        else { _navUser = null; _navProfile = null; _updateNavAuth(); }
+    const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
+    const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let currentUser = null, currentProfile = null, isAdmin = false;
+
+    async function initAuth() {
+      const { data: { session } } = await _sb.auth.getSession();
+      if (session) await handleSession(session.user);
+      _sb.auth.onAuthStateChange(async (_e, session) => {
+        if (session) await handleSession(session.user);
+        else { currentUser = null; currentProfile = null; isAdmin = false; updateNavAuth(); }
       });
     }
-    async function _handleNavSession(user) {
-      _navUser = user;
-      const { data: profile } = await _navSb.from('profiles').select('role, username').eq('id', user.id).single();
-      _navProfile = profile;
-      _updateNavAuth();
+    async function handleSession(user) {
+      currentUser = user;
+      const { data: profile } = await _sb.from('profiles').select('role, username').eq('id', user.id).single();
+      currentProfile = profile; isAdmin = profile?.role === 'admin';
+      updateNavAuth();
     }
-    function _updateNavAuth() {
+    function updateNavAuth() {
       const c = document.getElementById('nav-auth-container');
       if (!c) return;
-      c.classList.add('ready');
-      if (_navUser) {
-        const name = _navProfile?.username || _navUser.email.split('@')[0];
-        const isAdmin = _navProfile?.role === 'admin';
-        c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="_toggleNavMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${_navUser.email}</div><a class="nav-dropdown-item" href="#">My Profile</a>${isAdmin ? '<div style="height:1px;background:rgba(139,79,200,0.2);margin:4px 0;"></div><button class="nav-dropdown-item" id="admin-toggle-otw" onclick="_navToggleOTW()" style="font-size:9px;">Work Status: ...</button><div style="height:1px;background:rgba(139,79,200,0.2);margin:4px 0;"></div>' : ''}<button class="nav-dropdown-item" onclick="_navLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="_navDeleteAccount()">Delete Account</button></div></div>`;
-        if (isAdmin) _navLoadOTW();
+      if (currentUser) {
+        const name = currentProfile?.username || currentUser.email.split('@')[0];
+        c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="toggleUserMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${currentUser.email}</div><a class="nav-dropdown-item" href="#">My Profile</a><button class="nav-dropdown-item" onclick="handleLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="handleDeleteAccount()">Delete Account</button></div></div>`;
       } else {
         c.innerHTML = '<a class="nav-auth-link" href="/pages/login">Log In</a>';
       }
     }
-    function _toggleNavMenu(e) { e.stopPropagation(); const dd = document.getElementById('nav-user-dropdown'); if (dd) dd.classList.toggle('open'); }
+    function toggleUserMenu(e) {
+      e.stopPropagation();
+      const dd = document.getElementById('nav-user-dropdown');
+      if (dd) dd.classList.toggle('open');
+    }
     document.addEventListener('click', () => { const dd = document.getElementById('nav-user-dropdown'); if (dd) dd.classList.remove('open'); });
-    async function _navLogout() { await _navSb.auth.signOut(); window.location.href = '/'; }
-    async function _navDeleteAccount() {
+    async function handleLogout() { await _sb.auth.signOut(); window.location.href = '/'; }
+    async function handleDeleteAccount() {
       if (!confirm('Delete your account? This cannot be undone.')) return;
-      await _navSb.from('profiles').delete().eq('id', _navUser.id);
-      await _navSb.auth.signOut(); window.location.href = '/';
+      await _sb.from('profiles').delete().eq('id', currentUser.id);
+      await _sb.auth.signOut(); window.location.href = '/';
     }
-    async function _navLoadOTW() {
-      const { data } = await _navSb.from('site_settings').select('value').eq('key', 'open_to_work').single();
-      const on = data?.value === 'true';
-      document.querySelectorAll('.nav-badge').forEach(el => el.style.display = on ? '' : 'none');
-      const btn = document.getElementById('admin-toggle-otw');
-      if (btn) { btn.textContent = 'Work Status: ' + (on ? 'OPEN ✓' : 'CLOSED ✗'); btn.style.color = on ? '#00e87a' : '#ff5050'; }
-    }
-    async function _navToggleOTW() {
-      const { data } = await _navSb.from('site_settings').select('value').eq('key', 'open_to_work').single();
-      const newVal = data?.value !== 'true';
-      await _navSb.from('site_settings').upsert({ key: 'open_to_work', value: String(newVal) });
-      document.querySelectorAll('.nav-badge').forEach(el => el.style.display = newVal ? '' : 'none');
-      const btn = document.getElementById('admin-toggle-otw');
-      if (btn) { btn.textContent = 'Work Status: ' + (newVal ? 'OPEN ✓' : 'CLOSED ✗'); btn.style.color = newVal ? '#00e87a' : '#ff5050'; }
-    }
-    document.addEventListener('DOMContentLoaded', _initNavAuth);
+    document.addEventListener('DOMContentLoaded', initAuth);
   </script>
->>>>>>> e547b4b14eb688046b4cc28fd696c890b4a8241b
+  </script>
+  <script>
+    </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/nav-auth.js"></script>
 </head>
-<body>
+<body data-product-id="f1-sf25">
 
 <div id="nav-root"></div>
 
-<div class="page active" id="page-port-f1">
-  <div class="port-breakdown-wrap">
-    <a class="product-back" href="/pages/portfolio" style="text-decoration:none;">&#8592; Back to Portfolio</a>
+<!-- CHECKOUT MODAL -->
+<div id="checkout-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+  <div style="position:relative;width:min(680px,95vw);height:min(820px,92vh);background:#0d0d12;border:1px solid rgba(255,255,255,0.1);box-shadow:0 0 60px rgba(139,79,200,0.2);display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.07);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:#666680;text-transform:uppercase;">
+      <span>// Checkout &#8212; AviaRigg</span>
+      <button onclick="closeCheckout()" style="background:none;border:none;color:#666680;font-size:20px;cursor:pointer;line-height:1;padding:0 4px;transition:color 0.2s;">&#10005;</button>
+    </div>
+    <iframe id="checkout-iframe" src="" style="flex:1;border:none;width:100%;"></iframe>
+    <div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,0.07);background:#0d0d12;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <span style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:#555570;text-transform:uppercase;">If Payhip does not load, open directly ↓</span>
+      <a id="checkout-fallback-btn" href="#" target="_blank" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#00e87a;border:1px solid rgba(0,232,122,0.4);padding:7px 16px;text-decoration:none;white-space:nowrap;" onmouseover="this.style.background='rgba(0,232,122,0.1)'" onmouseout="this.style.background='transparent'">Open in Browser ↗</a>
+    </div>
+  </div>
+</div>
 
-    <div class="pb-hero">
-      <div class="pb-hero-left">
-        <div class="eyebrow">Hard Surface · 2025</div>
+<div class="page active" id="page-product-f1">
+  <div class="product-wrap">
+    <a class="product-back" href="/pages/shop" style="text-decoration:none;">&#8592; Back to Shop</a>
+    <div class="product-hero">
+      <div class="product-hero-left">
+        <div class="eyebrow">Hard Surface Rig</div>
         <div class="section-h">Formula 1<br><span class="accent">SF-25 Livery</span></div>
-        <p class="pb-desc">A production-ready hard surface rig for the Ferrari SF-25 F1 car. Built entirely in Maya 2022+ with a clean, animator-friendly hierarchy. Features auto-spinning wheels driven by motion, a DRS rear wing system, dual livery switching between Hamilton and Leclerc via custom attribute, and full AnimSchool Picker support.</p>
-        <div class="port-featured-tags" style="margin-bottom:0;">
-          <span class="ptag">Maya 2022+</span>
-          <span class="ptag">Hard Surface</span>
-          <span class="ptag">DRS System</span>
-          <span class="ptag">Dual Livery</span>
-          <span class="ptag">AnimSchool Picker</span>
+        <p class="product-tagline">A fully rigged F1 car for Maya. Hamilton or Leclerc livery included — choose your side carefully.</p>
+        <div class="product-tags">
+          <span class="ptag">Maya 2022+</span><span class="ptag">Hard Surface</span><span class="ptag">AnimSchool Picker</span><span class="ptag">DRS System</span><span class="ptag">Two Liveries</span>
         </div>
+        <div class="product-buy-row">
+          <span class="product-price">&#8364;19.99+</span>
+          <a href="https://payhip.com/b/4akCM" class="product-buy-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/4akCM')">Buy Now &#8594;</a>
+        </div>
+        <div class="product-license">// Personal, educational &amp; portfolio use only</div>
       </div>
-      <div class="pb-hero-right">
-        <div class="pb-img-frame">
-          <img src="/projects/f1_SF25/images/F1_Rendered.png" alt="F1 SF-25 Rendered">
-          <div class="pb-img-caption">// Final Render — Hamilton Livery</div>
+      <div class="product-hero-right">
+        <div class="product-img-wrap">
+          <div class="shop-card-scan"></div>
+          <img src="/projects/f1_SF25/images/F1_Rendered.png" alt="F1 SF-25 Rendered" class="product-hero-img">
         </div>
       </div>
     </div>
 
-    <div class="pb-specs">
-      <div class="pb-spec"><span class="pb-spec-label">Software</span><span class="pb-spec-val">Maya 2022+</span></div>
-      <div class="pb-spec"><span class="pb-spec-label">Type</span><span class="pb-spec-val">Hard Surface</span></div>
-      <div class="pb-spec"><span class="pb-spec-label">Textures</span><span class="pb-spec-val">4K / 2K / 1K</span></div>
-      <div class="pb-spec"><span class="pb-spec-label">Liveries</span><span class="pb-spec-val">Hamilton + Leclerc</span></div>
-      <div class="pb-spec"><span class="pb-spec-label">Picker</span><span class="pb-spec-val">AnimSchool</span></div>
-      <div class="pb-spec"><span class="pb-spec-label">Year</span><span class="pb-spec-val">2025</span></div>
+    <div class="product-features-grid">
+      <div class="product-feature"><div class="pf-icon">&#9672;</div><div class="pf-title">Fully Rigged F1 Car</div><div class="pf-desc">Clean, animator-friendly rig for Maya 2022+. Organized hierarchy and scalable for production.</div></div>
+      <div class="product-feature"><div class="pf-icon">&#9678;</div><div class="pf-title">Auto Wheel Spin &amp; Steering</div><div class="pf-desc">Wheels spin automatically based on motion, with manual steering rotation control.</div></div>
+      <div class="product-feature"><div class="pf-icon">&#9635;</div><div class="pf-title">DRS System</div><div class="pf-desc">Rear wing animates open/closed for full Drag Reduction System control.</div></div>
+      <div class="product-feature"><div class="pf-icon">&#11041;</div><div class="pf-title">AnimSchool Picker Support</div><div class="pf-desc">Rig picker file included. Requires the free AnimSchool Picker plugin.</div></div>
+      <div class="product-feature"><div class="pf-icon">&#10022;</div><div class="pf-title">Two Liveries</div><div class="pf-desc">Switch between Hamilton and Leclerc skins via a custom attribute — no shader swaps needed.</div></div>
+      <div class="product-feature"><div class="pf-icon">&#9650;</div><div class="pf-title">Global Control + Scale</div><div class="pf-desc">Easy world movement and scene scaling from a single top-level control.</div></div>
     </div>
 
-    <div class="pb-section-label">// Breakdown</div>
-    <div class="pb-carousel">
-      <button class="pb-carousel-btn pb-carousel-prev" onclick="carouselPrev()">&#8592;</button>
-      <div class="pb-carousel-track-wrap">
-        <div class="pb-carousel-track" id="pb-carousel-track">
-          <div class="pb-img-frame pb-carousel-slide">
+    <div class="product-gallery-section">
+      <div class="eyebrow">Preview</div>
+      <div class="section-h" style="margin-bottom:32px;">Gallery</div>
+      <div class="product-gallery-wrap">
+        <div class="product-gallery-thumbs">
+          <div class="product-thumb active" onclick="setGalleryVideo(this,'yt:AbGyZreyAak')">
+            <img src="https://img.youtube.com/vi/AbGyZreyAak/mqdefault.jpg" alt="Showcase 1"><div class="thumb-play">&#9654;</div>
+          </div>
+          <div class="product-thumb" onclick="setGalleryVideo(this,'yt:9_WERFJg4w8')">
+            <img src="https://img.youtube.com/vi/9_WERFJg4w8/mqdefault.jpg" alt="Showcase 2"><div class="thumb-play">&#9654;</div>
+          </div>
+          <div class="product-thumb" onclick="setGallerySketchfab(this,'f9ae37650a9a40d88b38071ae9523c71')">
+            <img src="/projects/f1_SF25/images/F1_Rendered.png" alt="3D"><div class="thumb-play thumb-3d">3D</div>
+          </div>
+          <div class="product-thumb" onclick="setGalleryImg(this,'/projects/f1_SF25/images/F1_Rendered.png')">
+            <img src="/projects/f1_SF25/images/F1_Rendered.png" alt="Rendered">
+          </div>
+          <div class="product-thumb" onclick="setGalleryImg(this,'/projects/f1_SF25/images/F1_Rig.png')">
             <img src="/projects/f1_SF25/images/F1_Rig.png" alt="Rig">
-            <div class="pb-img-caption">// Rig View</div>
           </div>
-          <div class="pb-img-frame pb-carousel-slide">
+          <div class="product-thumb" onclick="setGalleryImg(this,'/projects/f1_SF25/images/F1_Picker.png')">
             <img src="/projects/f1_SF25/images/F1_Picker.png" alt="Picker">
-            <div class="pb-img-caption">// AnimSchool Picker</div>
           </div>
-          <div class="pb-img-frame pb-carousel-slide">
+          <div class="product-thumb" onclick="setGalleryImg(this,'/projects/f1_SF25/images/F1_FBX.png')">
             <img src="/projects/f1_SF25/images/F1_FBX.png" alt="FBX">
-            <div class="pb-img-caption">// FBX Model</div>
           </div>
-          <div class="pb-img-frame pb-carousel-slide">
+          <div class="product-thumb" onclick="setGalleryImg(this,'/projects/f1_SF25/images/F1_Blender.png')">
             <img src="/projects/f1_SF25/images/F1_Blender.png" alt="Blender">
-            <div class="pb-img-caption">// Blender Version</div>
           </div>
         </div>
-      </div>
-      <button class="pb-carousel-btn pb-carousel-next" onclick="carouselNext()">&#8594;</button>
-      <div class="pb-carousel-dots" id="pb-carousel-dots">
-        <span class="pb-dot active" onclick="carouselGoTo(0)"></span>
-        <span class="pb-dot" onclick="carouselGoTo(1)"></span>
-        <span class="pb-dot" onclick="carouselGoTo(2)"></span>
-        <span class="pb-dot" onclick="carouselGoTo(3)"></span>
+        <div class="product-gallery">
+          <div id="gallery-main-img" class="product-gallery-main-img">
+            <iframe src="https://www.youtube.com/embed/AbGyZreyAak?rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;height:100%;display:block;"></iframe>
+          </div>
+          <div class="product-gallery-label" id="gallery-label">F1 SF-25 · Maya Rig · Video</div>
+        </div>
       </div>
     </div>
 
-    <div class="pb-section-label">// Interactive 3D</div>
-    <div class="pb-img-frame pb-sketchfab">
-      <iframe src="https://sketchfab.com/models/f9ae37650a9a40d88b38071ae9523c71/embed?autostart=0&ui_theme=dark&ui_infos=0&ui_watermark=0" frameborder="0" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
-      <div class="pb-img-caption">// Interactive 3D Viewer — SF-25 Rig on Sketchfab</div>
+    <div class="product-includes-section">
+      <div class="eyebrow">What You Get</div>
+      <div class="section-h" style="margin-bottom:32px;">Included Files</div>
+      <div class="product-includes-grid">
+        <div class="product-include"><div class="pi-label">// 01</div><div class="pi-title">Maya File</div><div class="pi-desc">Fully rigged with picker support. Ready to animate out of the box.</div></div>
+        <div class="product-include"><div class="pi-label">// 02</div><div class="pi-title">FBX File</div><div class="pi-desc">Clean F1 model with no rig — ideal for re-rigging or rendering in other apps.</div></div>
+        <div class="product-include"><div class="pi-label">// 03</div><div class="pi-title">Blend File</div><div class="pi-desc">Unrigged version for Blender users. Rigged version available if requested.</div></div>
+        <div class="product-include"><div class="pi-label">// 04</div><div class="pi-title">Texture Pack</div><div class="pi-desc">4K, 2K, and 1K texture versions included for flexible render pipelines.</div></div>
+      </div>
     </div>
 
-    <div class="pb-section-label">// Technical Notes</div>
-    <div class="pb-notes-grid">
-      <div class="pb-note"><div class="pb-note-num">01</div><div class="pb-note-title">Auto Wheel Spin</div><div class="pb-note-desc">Wheels spin automatically based on world movement via expression — no manual keyframing needed. Override available for custom rotation.</div></div>
-      <div class="pb-note"><div class="pb-note-num">02</div><div class="pb-note-title">DRS System</div><div class="pb-note-desc">Rear wing elements are driven by a single DRS attribute. Open/close is fully animatable with clean deformation and no geometry intersection.</div></div>
-      <div class="pb-note"><div class="pb-note-num">03</div><div class="pb-note-title">Dual Livery</div><div class="pb-note-desc">Hamilton and Leclerc liveries switchable via a custom attribute on the main controller. No shader reassignment or manual toggling required.</div></div>
-      <div class="pb-note"><div class="pb-note-num">04</div><div class="pb-note-title">Hierarchy</div><div class="pb-note-desc">Fully organized outliner with logical grouping. Root_Scale at the top for global positioning. All controls follow AviaRigg naming conventions.</div></div>
-    </div>
-
-    <div class="pb-section-label">// Showcase Videos</div>
-    <div class="pb-videos">
-      <div class="pb-img-frame pb-video-frame">
-        <iframe src="https://www.youtube.com/embed/AbGyZreyAak?rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        <div class="pb-img-caption">// Rig Showcase</div>
+    <div class="product-cta">
+      <div class="product-cta-text">Ready to add this to your toolkit?</div>
+      <div class="product-buy-row" style="justify-content:center;">
+        <span class="product-price">&#8364;19.99+</span>
+        <a href="https://payhip.com/b/4akCM" class="product-buy-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/4akCM')">Buy Now &#8594;</a>
       </div>
-      <div class="pb-img-frame pb-video-frame">
-        <iframe src="https://www.youtube.com/embed/9_WERFJg4w8?rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        <div class="pb-img-caption">// Breakdown</div>
-      </div>
+      <div class="product-license">// Personal, educational &amp; portfolio use only. No redistribution or resale.</div>
     </div>
   </div>
 </div>
 <script>
 
-let carouselIndex = 0;
-const carouselTotal = 4;
-function carouselResize() {
-  const track = document.getElementById('pb-carousel-track');
-  const wrap = document.querySelector('.pb-carousel-track-wrap');
-  if (!track || !wrap) return;
-  const activeSlide = track.querySelectorAll('.pb-carousel-slide')[carouselIndex];
-  if (!activeSlide) return;
-  const img = activeSlide.querySelector('img');
-  if (!img) return;
-  if (img.complete && img.naturalHeight > 0) {
-    const ratio = img.naturalHeight / img.naturalWidth;
-    wrap.style.height = (wrap.offsetWidth * ratio) + 'px';
-  } else {
-    img.onload = () => {
-      const ratio = img.naturalHeight / img.naturalWidth;
-      wrap.style.height = (wrap.offsetWidth * ratio) + 'px';
-    };
-  }
+function openCheckout(url) {
+  const modal = document.getElementById('checkout-modal');
+  document.getElementById('checkout-iframe').src = url;
+  document.getElementById('checkout-fallback-btn').href = url;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
-function carouselUpdate() {
-  const track = document.getElementById('pb-carousel-track');
-  if (!track) return;
-  track.style.transform = `translateX(-${carouselIndex * 100}%)`;
-  document.querySelectorAll('.pb-dot').forEach((d, i) => d.classList.toggle('active', i === carouselIndex));
-  setTimeout(carouselResize, 50);
+function closeCheckout() {
+  document.getElementById('checkout-modal').style.display = 'none';
+  document.getElementById('checkout-iframe').src = '';
+  document.body.style.overflow = '';
 }
-function carouselNext() { carouselIndex = (carouselIndex + 1) % carouselTotal; carouselUpdate(); }
-function carouselPrev() { carouselIndex = (carouselIndex - 1 + carouselTotal) % carouselTotal; carouselUpdate(); }
-function carouselGoTo(i) { carouselIndex = i; carouselUpdate(); }
-window.addEventListener('resize', carouselResize);
-window.addEventListener('load', () => setTimeout(carouselResize, 100));
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('checkout-modal').addEventListener('click', function(e) { if (e.target === this) closeCheckout(); });
+});
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeCheckout(); });
+
+function setProductGallery(thumb, mainId, labelId, content, labelText) {
+  document.getElementById(mainId).innerHTML = content;
+  document.getElementById(labelId).textContent = labelText;
+  document.querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
+  thumb.classList.add('active');
+}
+function setGallerySketchfab(thumb, modelId) {
+  setProductGallery(thumb, 'gallery-main-img', 'gallery-label',
+    `<iframe src="https://sketchfab.com/models/${modelId}/embed?autostart=1&ui_theme=dark&ui_infos=0&ui_watermark=0" frameborder="0" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>`,
+    'F1 SF-25 · Maya Rig · 3D Viewer');
+}
+function setGalleryVideo(thumb, id) {
+  const ytId = id.replace('yt:', '');
+  setProductGallery(thumb, 'gallery-main-img', 'gallery-label',
+    `<iframe src="https://www.youtube.com/embed/${ytId}?rel=0&autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`,
+    'F1 SF-25 · Maya Rig · Video');
+}
+function setGalleryImg(thumb, src) {
+  setProductGallery(thumb, 'gallery-main-img', 'gallery-label', `<img src="${src}">`, 'F1 SF-25 · Maya Rig · Image');
+}
+function syncGallerySidebars() {
+  document.querySelectorAll('.product-gallery-wrap').forEach(wrap => {
+    const main = wrap.querySelector('.product-gallery-main-img');
+    const thumbs = wrap.querySelector('.product-gallery-thumbs');
+    if (main && thumbs) thumbs.style.maxHeight = main.offsetHeight + 'px';
+  });
+}
+window.addEventListener('resize', syncGallerySidebars);
+window.addEventListener('load', syncGallerySidebars);
+document.addEventListener('DOMContentLoaded', () => setTimeout(syncGallerySidebars, 100));
 </script>
 </body>
 </html>
