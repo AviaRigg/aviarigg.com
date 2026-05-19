@@ -3634,6 +3634,9 @@ body::before {
 .work-card:hover .wcg-contact-ring { border-color: rgba(176,110,245,0.4); }
 .work-card:hover .wcg-contact-ring--3 { border-color: rgba(176,110,245,0.7); }
 /* Mobile drawer — auth container */
+#nav-auth-container { visibility: hidden; }
+#nav-auth-container.ready { visibility: visible; }
+
 #nav-auth-container-mobile {
   display: flex;
   flex-direction: column;
