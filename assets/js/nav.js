@@ -1,13 +1,10 @@
 // ══════════════════════════════════════════
 //  AviaRigg — Shared Nav Injector
-//  Injects topnav + drawer into every page
-//  Add <div id="nav-root"></div> at top of body
-//  and <script src="/assets/js/nav.js"></script>
 // ══════════════════════════════════════════
 
-document.addEventListener("DOMContentLoaded", async function() {(function() {
-  // Detect active page from pathname
+document.addEventListener('DOMContentLoaded', async function() {
   const path = window.location.pathname;
+
   function isActive(href) {
     if (href === '/' && path === '/') return true;
     if (href !== '/' && path.startsWith(href)) return true;
@@ -31,8 +28,7 @@ document.addEventListener("DOMContentLoaded", async function() {(function() {
     `<a class="nav-link${isActive(l.href) ? ' active' : ''}" href="${l.href}">${l.label}</a>`
   ).join('\n  ');
 
-  const NAV_HTML = `
-<nav class="topnav">
+  const NAV_HTML = `<nav class="topnav">
   <a class="nav-logo" href="/"><img src="/assets/icons/SiteIcon.png" alt="AviaRigg Logo" style="height:clamp(24px,2.2vw,36px);width:auto;display:inline-block;vertical-align:middle;margin-right:clamp(8px,0.8vw,14px);"><span style="display:inline-block;width:1px;height:clamp(18px,1.6vw,26px);background:rgba(139,79,200,0.4);vertical-align:middle;margin-right:clamp(8px,0.8vw,14px);"></span>Avia<span>Rigg</span></a>
   <div class="nav-links">
     ${navLinks}
@@ -48,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async function() {(function() {
   <a class="nav-badge" href="/pages/contact">&#9679; Open to Work</a>
 </div>`;
 
-  // Inject into #nav-root or prepend to body
+  // Inject nav
   const root = document.getElementById('nav-root');
   if (root) {
     root.outerHTML = NAV_HTML;
@@ -56,9 +52,11 @@ document.addEventListener("DOMContentLoaded", async function() {(function() {
     document.body.insertAdjacentHTML('afterbegin', NAV_HTML);
   }
 
-  // Apply status AFTER nav is injected so .nav-badge exists in DOM
-  if (typeof loadAndApplySettings === 'function') await loadAndApplySettings();
-})();});
+  // Apply site settings AFTER nav is in DOM so .nav-badge exists
+  if (typeof loadAndApplySettings === 'function') {
+    await loadAndApplySettings();
+  }
+});
 
 function toggleMobileNav() {
   const drawer = document.getElementById('nav-drawer');
