@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Paul Chedozeau — AviaRigg</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="/style.css">
 <style>
   .page { display: block !important; }
   .nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
@@ -32,6 +32,94 @@
   #lib-mobile-toast.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+  }
+
+  /* ── MOBILE: full-screen no-scroll homepage ── */
+  @media (max-width: 768px) {
+    html, body {
+      height: 100%; overflow: hidden;
+    }
+    #page-home {
+      height: calc(100vh - 56px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .hero-pf {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: clamp(12px, 3vw, 20px) clamp(16px, 4vw, 24px);
+      gap: 12px;
+    }
+    .pf-top {
+      flex-shrink: 0;
+    }
+    .pf-tagline-block {
+      margin-bottom: 8px;
+    }
+    .pf-tagline {
+      font-size: clamp(32px, 10vw, 48px) !important;
+      line-height: 1.05 !important;
+    }
+    .pf-kicker {
+      font-size: clamp(9px, 2.5vw, 11px) !important;
+      margin-bottom: 4px !important;
+    }
+    .pf-top-right {
+      display: none;
+    }
+    .pf-works-wrap {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .pf-works {
+      flex: 1;
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      grid-template-rows: 1fr 1fr !important;
+      gap: 8px !important;
+      overflow: hidden;
+    }
+    .work-card {
+      min-height: 0 !important;
+      overflow: hidden;
+    }
+    .work-card-graphic {
+      display: none !important;
+    }
+    .work-bottom {
+      padding: 10px 12px !important;
+    }
+    .work-title {
+      font-size: clamp(13px, 3.5vw, 16px) !important;
+    }
+    .work-sub {
+      font-size: clamp(8px, 2vw, 10px) !important;
+    }
+    .work-bar-wrap {
+      display: none;
+    }
+    .hero-bar {
+      flex-shrink: 0;
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      overflow-x: auto;
+      gap: 8px;
+      padding: 8px 0 4px;
+      font-size: clamp(8px, 2vw, 10px) !important;
+      scrollbar-width: none;
+    }
+    .hero-bar::-webkit-scrollbar { display: none; }
+    .hero-bar-item {
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-size: clamp(8px, 2vw, 10px) !important;
+      padding: 4px 10px !important;
+    }
   }
 </style>
   <!-- Google tag (gtag.js) -->
