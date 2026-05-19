@@ -680,17 +680,17 @@
             placeholder="e.g. New rig pack just dropped">
         </div>
         <div>
-          <div class="field-label">Body (plain text or HTML)</div>
+          <div class="field-label">Body — supports HTML</div>
           <textarea class="admin-input" id="email-body" rows="7"
-            placeholder="Write your email content here..."></textarea>
+            placeholder="Write your message here...&#10;&#10;Supports HTML tags:&#10;&lt;b&gt;bold&lt;/b&gt;  &lt;em&gt;italic&lt;/em&gt;  &lt;a href=&quot;...&quot;&gt;link&lt;/a&gt;  &lt;br&gt; for new lines&#10;&lt;h2&gt;Heading&lt;/h2&gt;"></textarea>
         </div>
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
           <button class="admin-btn admin-btn-primary" onclick="sendMassEmail()">Send Email</button>
           <span id="email-status" class="admin-hint" style="color:var(--text-dim);"></span>
         </div>
         <div class="admin-hint admin-hint-box">
-          // This sends to all profiles in Supabase via the <strong style="color:var(--accent2);">send-mass-email</strong> edge function.<br>
-          // Make sure RESEND_API_KEY is set in your Supabase project secrets.
+          // Emails are sent from <strong style="color:var(--accent2);">contact@aviarigg.com</strong> with your branded template + signature.<br>
+          // Body supports HTML: &lt;b&gt; &lt;em&gt; &lt;a&gt; &lt;br&gt; &lt;h2&gt; &lt;p&gt; — sent to all registered users.
         </div>
       </div>
     </div>
