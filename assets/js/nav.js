@@ -5,7 +5,7 @@
 //  and <script src="/assets/js/nav.js"></script>
 // ══════════════════════════════════════════
 
-(function() {
+document.addEventListener("DOMContentLoaded", function() {(function() {
   // Detect active page from pathname
   const path = window.location.pathname;
   function isActive(href) {
@@ -55,7 +55,7 @@
   } else {
     document.body.insertAdjacentHTML('afterbegin', NAV_HTML);
   }
-})();
+})();});
 
 function toggleMobileNav() {
   const drawer = document.getElementById('nav-drawer');
