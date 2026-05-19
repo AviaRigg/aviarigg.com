@@ -33,55 +33,6 @@
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
-
-  /* ══════════════════════════════════════════
-     2560px — cap hero so cards don't stretch
-  ══════════════════════════════════════════ */
-  @media (min-width: 2560px) {
-    .hero-pf {
-      height: auto;
-      max-height: calc(100vh - var(--nav-h));
-      min-height: 0;
-    }
-    .pf-works {
-      max-height: 480px;
-    }
-    .pf-top {
-      padding-top: clamp(28px, 2.5vw, 48px);
-      padding-bottom: clamp(20px, 1.5vw, 32px);
-    }
-    .pf-tagline {
-      font-size: clamp(44px, 4.5vw, 110px);
-    }
-    .work-card-graphic {
-      padding: clamp(12px, 1vw, 20px) 0;
-    }
-    .wcg-grid {
-      height: clamp(60px, 5vw, 100px);
-    }
-  }
-
-  /* ══════════════════════════════════════════
-     3840px (4K) — tighten further
-  ══════════════════════════════════════════ */
-  @media (min-width: 3840px) {
-    .pf-works {
-      max-height: 520px;
-    }
-    .pf-tagline {
-      font-size: clamp(44px, 3.5vw, 96px);
-    }
-    .pf-top {
-      padding-top: clamp(24px, 1.8vw, 40px);
-      padding-bottom: clamp(16px, 1.2vw, 28px);
-    }
-    .work-card-graphic {
-      padding: clamp(8px, 0.8vw, 16px) 0;
-    }
-    .wcg-grid {
-      height: clamp(60px, 4vw, 90px);
-    }
-  }
 </style>
   <script>
     // Prevent pinch-to-zoom on iOS Safari
