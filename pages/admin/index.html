@@ -455,16 +455,14 @@
 
       <!-- Quick links -->
       <div class="admin-panel">
-        <div class="admin-panel-title">Quick Links</div>
+        <div class="admin-panel-title">External Tools</div>
         <div class="quick-links">
-          <a class="quick-link" href="/"><span class="quick-link-name">Home</span><span class="quick-link-arrow">→</span></a>
-          <a class="quick-link" href="/pages/portfolio"><span class="quick-link-name">Portfolio</span><span class="quick-link-arrow">→</span></a>
-          <a class="quick-link" href="/pages/shop"><span class="quick-link-name">Shop</span><span class="quick-link-arrow">→</span></a>
-          <a class="quick-link" href="/pages/library"><span class="quick-link-name">Script Library</span><span class="quick-link-arrow">→</span></a>
-          <a class="quick-link" href="/pages/about"><span class="quick-link-name">About</span><span class="quick-link-arrow">→</span></a>
-          <a class="quick-link" href="/pages/contact"><span class="quick-link-name">Contact</span><span class="quick-link-arrow">→</span></a>
-          <a class="quick-link" href="https://app.supabase.com" target="_blank"><span class="quick-link-name">Supabase Dashboard ↗</span><span class="quick-link-arrow">→</span></a>
-          <a class="quick-link" href="https://github.com" target="_blank"><span class="quick-link-name">GitHub Repo ↗</span><span class="quick-link-arrow">→</span></a>
+          <a class="quick-link" href="https://app.supabase.com/project/bbyiezjvonacajigqoik" target="_blank"><span class="quick-link-name">Supabase ↗</span><span class="quick-link-arrow">→</span></a>
+          <a class="quick-link" href="https://github.com/AviaRigg/aviarigg.github.io/tree/main" target="_blank"><span class="quick-link-name">GitHub ↗</span><span class="quick-link-arrow">→</span></a>
+          <a class="quick-link" href="https://payhip.com/dashboard" target="_blank"><span class="quick-link-name">Payhip ↗</span><span class="quick-link-arrow">→</span></a>
+          <a class="quick-link" href="https://resend.com/emails" target="_blank"><span class="quick-link-name">Resend ↗</span><span class="quick-link-arrow">→</span></a>
+          <a class="quick-link" href="https://analytics.google.com/analytics/web/#/a393072192p535138037/reports/intelligenthome" target="_blank"><span class="quick-link-name">Analytics ↗</span><span class="quick-link-arrow">→</span></a>
+          <a class="quick-link" href="https://www.spaceship.com/application/advanced-dns-application/manage/aviarigg.com/" target="_blank"><span class="quick-link-name">Spaceship DNS ↗</span><span class="quick-link-arrow">→</span></a>
         </div>
       </div>
 
@@ -745,25 +743,40 @@
   // ── USERS ──
   async function loadUsers() {
     const sb = await _getAdminSb();
-    const { data } = await sb.from('profiles').select('id, username, role, created_at').order('created_at', { ascending: false });
-    const tbody = document.getElementById('user-table-body');
-    const countEl = document.getElementById('user-count-label');
+    // Try selecting all columns so we can see what's there
+    const { data, error } = await sb
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    const tbody    = document.getElementById('user-table-body');
+    const countEl  = document.getElementById('user-count-label');
+
+    if (error) {
+      console.error('loadUsers error:', error);
+      tbody.innerHTML = `<tr><td colspan="4" class="table-empty" style="color:#ff5050;">// DB error: ${error.message}</td></tr>`;
+      if (countEl) countEl.textContent = 'error';
+      return;
+    }
 
     if (!data?.length) {
-      tbody.innerHTML = '<tr><td colspan="4" class="table-empty">No users found.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="table-empty">No profiles found — check Supabase RLS policies on the profiles table.</td></tr>';
       if (countEl) countEl.textContent = '0 total';
       return;
     }
     if (countEl) countEl.textContent = data.length + ' total';
+    document.getElementById('stat-users').textContent = data.length;
 
     tbody.innerHTML = data.map(p => {
-      const date = p.created_at
+      const name = p.username || p.name || p.full_name || p.display_name || '—';
+      const email = p.email || '—';
+      const date  = p.created_at
         ? new Date(p.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'2-digit' })
         : '—';
       const roleClass = p.role === 'admin' ? 'role-admin' : 'role-user';
       const isMe = p.id === _adminUser?.id;
       return `<tr>
-        <td>${p.username || '—'}</td>
+        <td>${name}<br><span style="font-size:8px;color:var(--text-dim);letter-spacing:0.5px;">${email}</span></td>
         <td><span class="${roleClass}">${(p.role || 'user').toUpperCase()}</span></td>
         <td class="user-date">${date}</td>
         <td>${isMe
