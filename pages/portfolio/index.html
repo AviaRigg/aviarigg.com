@@ -61,6 +61,86 @@
     .port-grid { grid-template-columns: 1fr !important; }
     .port-card:first-child { grid-column: span 1; }
   }
+  /* ── ADMIN EDIT MODE ── */
+  #port-edit-btn {
+    display: none; position: fixed; bottom: 28px; right: 28px; z-index: 9000;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: #b06ef5; background: rgba(139,79,200,0.15);
+    border: 1px solid rgba(139,79,200,0.5);
+    padding: 10px 20px; cursor: pointer; transition: all 0.2s;
+  }
+  #port-edit-btn:hover { background: rgba(139,79,200,0.25); }
+  .admin-status-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 4px 10px; cursor: pointer; border: 1px solid;
+    pointer-events: auto !important; user-select: none;
+    display: inline-block; white-space: nowrap;
+  }
+  .admin-status-wrap {
+    position: absolute; top: 8px; right: 8px; z-index: 100;
+    display: none; flex-direction: column; align-items: flex-end;
+    pointer-events: auto !important;
+  }
+  body.port-edit-mode .port-card { overflow: visible !important; }
+  body.port-edit-mode .port-card::before { display: none; }
+  body.port-edit-mode .port-featured { overflow: visible !important; position: relative; }
+  .pc-thumb { position: relative; }
+  .admin-status-dropdown {
+    display: none; flex-direction: column;
+    background: var(--surface, #13121a);
+    border: 1px solid var(--border, rgba(255,255,255,0.1));
+    border-top: 2px solid var(--accent, #8b4fc8);
+    margin-top: 4px; min-width: 130px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    position: relative; z-index: 200;
+  }
+  body.port-edit-mode .admin-status-wrap { display: flex; }
+  .admin-status-wrap.open .admin-status-dropdown { display: flex; }
+  .admin-status-option {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 8px 12px; cursor: pointer; border: none; background: none;
+    text-align: left; transition: background 0.15s;
+    border-bottom: 1px solid rgba(255,255,255,0.05); white-space: nowrap;
+  }
+  .admin-status-option:last-child { border-bottom: none; }
+  .admin-status-option:hover { background: rgba(139,79,200,0.12); }
+  .opt-published { color: #00e87a; }
+  .opt-draft     { color: #f5a623; }
+  .opt-hidden    { color: #ff5050; }
+  .opt-featured  { color: #ffd700; }
+  .admin-status-option.active-opt { opacity: 0.4; cursor: default; pointer-events: none; }
+  .status-published { color: #00e87a; border-color: rgba(0,232,122,0.4); background: rgba(0,232,122,0.1); }
+  .status-draft     { color: #f5a623; border-color: rgba(245,166,35,0.4); background: rgba(245,166,35,0.1); }
+  .status-hidden    { color: #ff5050; border-color: rgba(255,80,80,0.4);  background: rgba(255,80,80,0.1); }
+  .status-featured  { color: #ffd700; border-color: rgba(255,215,0,0.4);  background: rgba(255,215,0,0.1); }
+  body.port-edit-mode .port-card     { outline: 1px dashed rgba(255,80,80,0.35); }
+  body.port-edit-mode .port-featured { outline: 1px dashed rgba(255,80,80,0.35); }
+  body.port-edit-mode::before {
+    content: ''; position: fixed; inset: 0; z-index: 8998; pointer-events: none;
+    background: rgba(255,40,40,0.04); border: 2px solid rgba(255,80,80,0.25);
+  }
+  body.port-edit-mode::after {
+    content: '// EDIT MODE ACTIVE';
+    position: fixed; top: 0; left: 0; right: 0; z-index: 8999;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+    color: rgba(255,80,80,0.7); background: rgba(255,40,40,0.08);
+    border-bottom: 1px solid rgba(255,80,80,0.2);
+    padding: 5px; text-align: center; pointer-events: none;
+  }
+  .port-card.port-draft { opacity: 0.35; }
+  .port-card.port-hidden { display: none; }
+  /* No-featured state */
+  .port-featured.no-featured { cursor: default; }
+  .port-featured-empty {
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Share Tech Mono', monospace; font-size: 11px;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: rgba(139,79,200,0.4); min-height: 200px;
+  }
   /* Glow on featured only */
   .port-featured {
     box-shadow: 0 0 60px rgba(139,79,200,0.18);
@@ -91,6 +171,148 @@
   <script src="/assets/js/nav.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/assets/js/nav-auth.js"></script>
+  <script>
+    const _portSb = supabase.createClient(
+      'https://bbyiezjvonacajigqoik.supabase.co',
+      'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb'
+    );
+    let portEditMode = false;
+    let portIsAdmin = false;
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      await new Promise(r => setTimeout(r, 350));
+      const { data: { session } } = await _portSb.auth.getSession();
+      if (session) {
+        const { data: profile } = await _portSb.from('profiles').select('role').eq('id', session.user.id).single();
+        portIsAdmin = profile?.role === 'admin';
+      }
+      if (portIsAdmin) document.getElementById('port-edit-btn').style.display = 'block';
+      await loadPortfolioStatuses();
+    });
+
+    async function loadPortfolioStatuses() {
+      const { data } = await _portSb.from('portfolio_projects').select('id, status');
+      if (!data) return;
+      let featuredId = null;
+      data.forEach(({ id, status }) => {
+        if (status === 'featured') featuredId = id;
+        const card = document.querySelector(`[data-port-id="${id}"]`);
+        if (card) applyPortStatus(id, status, card, false);
+      });
+      if (featuredId) {
+        const card = document.querySelector(`[data-port-id="${featuredId}"]`);
+        if (card) swapFeaturedCard(card);
+      } else {
+        showFeaturedEmpty();
+      }
+    }
+
+    function applyPortStatus(id, status, card, save) {
+      // Demote any other featured first
+      if (status === 'featured') {
+        document.querySelectorAll('[data-port-id][data-port-status="featured"]').forEach(other => {
+          if (other !== card) applyPortStatus(other.dataset.portId, 'published', other, save);
+        });
+      }
+      card.dataset.portStatus = status;
+      const badge = card.querySelector('.admin-status-badge');
+      if (badge) {
+        badge.className = `admin-status-badge status-${status}`;
+        badge.innerHTML = status.toUpperCase() + ' <span style="opacity:0.7;font-size:8px;">▾</span>';
+      }
+      card.querySelectorAll('.admin-status-option').forEach(opt => {
+        opt.classList.toggle('active-opt', opt.dataset.status === status);
+      });
+      // Featured: swap hero
+      if (status === 'featured') {
+        swapFeaturedCard(card);
+        card.classList.remove('port-draft', 'port-hidden');
+      } else if (status === 'hidden') {
+        if (portIsAdmin) { card.classList.add('port-draft'); card.classList.remove('port-hidden'); }
+        else { card.classList.add('port-hidden'); card.classList.remove('port-draft'); }
+      } else if (status === 'draft') {
+        if (portIsAdmin) { card.classList.add('port-draft'); card.classList.remove('port-hidden'); }
+        else { card.classList.add('port-hidden'); card.classList.remove('port-draft'); }
+        // If this was featured, clear hero
+        const featuredAny = document.querySelector('[data-port-id][data-port-status="featured"]');
+        if (!featuredAny) showFeaturedEmpty();
+      } else {
+        card.classList.remove('port-draft', 'port-hidden');
+      }
+      if (save) _portSb.from('portfolio_projects').upsert({ id, status, updated_at: new Date().toISOString() });
+    }
+
+    function swapFeaturedCard(cardEl) {
+      const featured = document.querySelector('.port-featured');
+      if (!featured) return;
+      featured.classList.remove('no-featured');
+      // Restore featured structure if it was empty
+      const img   = cardEl.dataset.img   || '';
+      const tag   = cardEl.dataset.tag   || '// Project';
+      const cat   = cardEl.dataset.cat   || '';
+      const title = cardEl.dataset.title || cardEl.querySelector('.pc-title')?.textContent || '';
+      const desc  = cardEl.dataset.desc  || cardEl.querySelector('.pc-desc')?.textContent  || '';
+      const href  = cardEl.dataset.href  || '#';
+      const year  = cardEl.dataset.year  || '';
+      const tags  = cardEl.dataset.tags  || '';
+
+      // Update featured image
+      const featImg = featured.querySelector('.port-featured-img img');
+      if (featImg && img) { featImg.src = img; featImg.alt = title; }
+
+      // Update featured overlay tag
+      const featTag = featured.querySelector('.port-featured-tag');
+      if (featTag) featTag.textContent = tag.replace('//', '').trim();
+
+      // Update featured body
+      const featBody = featured.querySelector('.port-featured-body');
+      if (featBody) {
+        featBody.innerHTML = `
+          <div class="port-featured-meta">
+            <div class="port-featured-cat">${cat}</div>
+            <div class="port-featured-year">${year}</div>
+          </div>
+          <div class="port-featured-title">${title}</div>
+          <div class="port-featured-desc">${desc}</div>
+          ${tags ? `<div style="display:flex;flex-wrap:wrap;gap:8px;">${tags.split(',').map(t=>`<span class="ptag">${t.trim()}</span>`).join('')}</div>` : ''}`;
+      }
+      featured.setAttribute('onclick', `window.location.href='${href}'`);
+    }
+
+    function showFeaturedEmpty() {
+      const featured = document.querySelector('.port-featured');
+      if (!featured) return;
+      if (portIsAdmin) {
+        featured.classList.add('no-featured');
+        featured.removeAttribute('onclick');
+        const body = featured.querySelector('.port-featured-body');
+        if (body) body.innerHTML = `<div class="port-featured-empty">// Select a project and set it to Featured</div>`;
+        const img = featured.querySelector('.port-featured-img img');
+        if (img) img.style.opacity = '0.1';
+      } else {
+        featured.style.display = 'none';
+      }
+    }
+
+    function togglePortEditMode() {
+      portEditMode = !portEditMode;
+      document.body.classList.toggle('port-edit-mode', portEditMode);
+      const btn = document.getElementById('port-edit-btn');
+      if (btn) {
+        btn.textContent = portEditMode ? '✓ Save' : '✎ Edit Mode';
+        btn.style.background = portEditMode ? 'rgba(255,80,80,0.2)' : 'rgba(139,79,200,0.15)';
+        btn.style.borderColor = portEditMode ? 'rgba(255,80,80,0.7)' : 'rgba(139,79,200,0.5)';
+        btn.style.color = portEditMode ? '#ff5050' : '#b06ef5';
+      }
+      document.querySelectorAll('.port-card').forEach(c => {
+        c.style.overflow = portEditMode ? 'visible' : '';
+      });
+    }
+
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.admin-status-wrap.open').forEach(w => w.classList.remove('open'));
+    });
+  </script>
 </head>
 <body>
 
@@ -112,7 +334,8 @@
     </div>
 
     <div class="center-wrap">
-      <div class="port-featured" onclick="window.location.href='/pages/portfolio-f1'">
+      <div class="port-featured" data-port-id="f1-sf25" data-port-status="featured" data-href="/pages/portfolio-f1" data-img="/projects/f1_SF25/images/F1_Rendered.png" data-tag="// Hard Surface" data-cat="// Maya Rig" data-title="Formula 1 SF-25 Livery" data-desc="Production-ready F1 car rig — DRS system, dual livery switching between Hamilton and Leclerc, auto wheel spin, full AnimSchool Picker support." data-year="2025" data-tags="Maya 2022+,DRS System,Dual Livery,AnimSchool Picker" onclick="window.location.href='/pages/portfolio-f1'">
+      <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')"><span class="admin-status-badge status-featured">FEATURED <span style="opacity:0.7;font-size:8px;">▾</span></span><div class="admin-status-dropdown"><button class="admin-status-option opt-published " data-status="published" onclick="event.stopPropagation();applyPortStatus('f1-sf25','published',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">PUBLISHED</button><button class="admin-status-option opt-draft " data-status="draft" onclick="event.stopPropagation();applyPortStatus('f1-sf25','draft',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button><button class="admin-status-option opt-hidden " data-status="hidden" onclick="event.stopPropagation();applyPortStatus('f1-sf25','hidden',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button><button class="admin-status-option opt-featured active-opt" data-status="featured" onclick="event.stopPropagation();applyPortStatus('f1-sf25','featured',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button></div></div>
         <div class="port-featured-img">
           <img src="/projects/f1_SF25/images/F1_Rendered.png" alt="Formula 1 SF-25">
           <div class="port-featured-overlay">
@@ -168,7 +391,8 @@
       <div class="port-grid">
 
         <!-- 01 — spans 2 cols -->
-        <div class="port-card" style="opacity:1;cursor:pointer;" onclick="window.location.href='/pages/portfolio-f1'">
+        <div class="port-card" data-port-id="f1-sf25" data-port-status="featured" data-href="/pages/portfolio-f1" data-img="/projects/f1_SF25/images/F1_Rendered.png" data-tag="// Hard Surface" data-cat="Maya Rig · 2025" data-title="Formula 1 SF-25 Rig" data-desc="Production-ready F1 car rig — DRS system, dual livery, auto wheel spin, AnimSchool picker." data-year="2025" style="opacity:1;cursor:pointer;" onclick="window.location.href='/pages/portfolio-f1'">
+          <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')"><span class="admin-status-badge status-featured">FEATURED <span style="opacity:0.7;font-size:8px;">▾</span></span><div class="admin-status-dropdown"><button class="admin-status-option opt-published " data-status="published" onclick="event.stopPropagation();applyPortStatus('f1-sf25','published',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">PUBLISHED</button><button class="admin-status-option opt-draft " data-status="draft" onclick="event.stopPropagation();applyPortStatus('f1-sf25','draft',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button><button class="admin-status-option opt-hidden " data-status="hidden" onclick="event.stopPropagation();applyPortStatus('f1-sf25','hidden',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button><button class="admin-status-option opt-featured active-opt" data-status="featured" onclick="event.stopPropagation();applyPortStatus('f1-sf25','featured',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button></div></div>
           <div class="pc-thumb" style="padding:0;overflow:hidden;position:relative;">
             <img src="/projects/f1_SF25/images/F1_Rendered.png" alt="F1 SF-25" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s ease;">
             <div style="position:absolute;top:8px;left:8px;font-family:'Share Tech Mono',monospace;font-size:clamp(8px,0.65vw,10px);letter-spacing:2px;color:var(--text-bright);background:rgba(139,79,200,0.7);padding:3px 8px;text-transform:uppercase;">Hard Surface</div>
@@ -181,7 +405,8 @@
         </div>
 
         <!-- 02 -->
-        <div class="port-card placeholder">
+        <div class="port-card placeholder" data-port-id="nordic-bandit" data-port-status="draft" data-href="/pages/portfolio" data-img="" data-tag="// Character Rig" data-cat="Character Rig" data-title="Nordic Bandit" data-desc="Full character rig breakdown — uploading soon." data-tags="">
+          <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')"><span class="admin-status-badge status-draft">DRAFT <span style="opacity:0.7;font-size:8px;">▾</span></span><div class="admin-status-dropdown"><button class="admin-status-option opt-published " data-status="published" onclick="event.stopPropagation();applyPortStatus('nordic-bandit','published',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">PUBLISHED</button><button class="admin-status-option opt-draft active-opt" data-status="draft" onclick="event.stopPropagation();applyPortStatus('nordic-bandit','draft',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button><button class="admin-status-option opt-hidden " data-status="hidden" onclick="event.stopPropagation();applyPortStatus('nordic-bandit','hidden',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button><button class="admin-status-option opt-featured " data-status="featured" onclick="event.stopPropagation();applyPortStatus('nordic-bandit','featured',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button></div></div>
           <div class="pc-thumb">// Coming Soon</div>
           <div class="pc-body">
             <div class="pc-cat">Character Rig</div>
@@ -191,7 +416,8 @@
         </div>
 
         <!-- 03 -->
-        <div class="port-card placeholder">
+        <div class="port-card placeholder" data-port-id="placeholder-3" data-port-status="draft" data-href="#" data-img="" data-tag="// Coming Soon" data-cat="Coming Soon" data-title="Coming Soon" data-desc="Coming Soon" data-tags="">
+          <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')"><span class="admin-status-badge status-draft">DRAFT <span style="opacity:0.7;font-size:8px;">▾</span></span><div class="admin-status-dropdown"><button class="admin-status-option opt-published " data-status="published" onclick="event.stopPropagation();applyPortStatus('placeholder-3','published',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">PUBLISHED</button><button class="admin-status-option opt-draft active-opt" data-status="draft" onclick="event.stopPropagation();applyPortStatus('placeholder-3','draft',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button><button class="admin-status-option opt-hidden " data-status="hidden" onclick="event.stopPropagation();applyPortStatus('placeholder-3','hidden',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button><button class="admin-status-option opt-featured " data-status="featured" onclick="event.stopPropagation();applyPortStatus('placeholder-3','featured',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button></div></div>
           <div class="pc-thumb">// Coming Soon</div>
           <div class="pc-body">
             <div class="pc-cat">Coming Soon</div>
@@ -201,7 +427,8 @@
         </div>
 
         <!-- 04 -->
-        <div class="port-card placeholder">
+        <div class="port-card placeholder" data-port-id="placeholder-4" data-port-status="draft" data-href="#" data-img="" data-tag="// Coming Soon" data-cat="Coming Soon" data-title="Coming Soon" data-desc="Coming Soon" data-tags="">
+          <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')"><span class="admin-status-badge status-draft">DRAFT <span style="opacity:0.7;font-size:8px;">▾</span></span><div class="admin-status-dropdown"><button class="admin-status-option opt-published " data-status="published" onclick="event.stopPropagation();applyPortStatus('placeholder-4','published',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">PUBLISHED</button><button class="admin-status-option opt-draft active-opt" data-status="draft" onclick="event.stopPropagation();applyPortStatus('placeholder-4','draft',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button><button class="admin-status-option opt-hidden " data-status="hidden" onclick="event.stopPropagation();applyPortStatus('placeholder-4','hidden',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button><button class="admin-status-option opt-featured " data-status="featured" onclick="event.stopPropagation();applyPortStatus('placeholder-4','featured',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button></div></div>
           <div class="pc-thumb">// Coming Soon</div>
           <div class="pc-body">
             <div class="pc-cat">Coming Soon</div>
@@ -211,7 +438,8 @@
         </div>
 
         <!-- 05 -->
-        <div class="port-card placeholder">
+        <div class="port-card placeholder" data-port-id="placeholder-5" data-port-status="draft" data-href="#" data-img="" data-tag="// Coming Soon" data-cat="Coming Soon" data-title="Coming Soon" data-desc="Coming Soon" data-tags="">
+          <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')"><span class="admin-status-badge status-draft">DRAFT <span style="opacity:0.7;font-size:8px;">▾</span></span><div class="admin-status-dropdown"><button class="admin-status-option opt-published " data-status="published" onclick="event.stopPropagation();applyPortStatus('placeholder-5','published',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">PUBLISHED</button><button class="admin-status-option opt-draft active-opt" data-status="draft" onclick="event.stopPropagation();applyPortStatus('placeholder-5','draft',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button><button class="admin-status-option opt-hidden " data-status="hidden" onclick="event.stopPropagation();applyPortStatus('placeholder-5','hidden',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button><button class="admin-status-option opt-featured " data-status="featured" onclick="event.stopPropagation();applyPortStatus('placeholder-5','featured',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button></div></div>
           <div class="pc-thumb">// Coming Soon</div>
           <div class="pc-body">
             <div class="pc-cat">Coming Soon</div>
@@ -221,7 +449,8 @@
         </div>
 
         <!-- 06 -->
-        <div class="port-card placeholder">
+        <div class="port-card placeholder" data-port-id="placeholder-6" data-port-status="draft" data-href="#" data-img="" data-tag="// Coming Soon" data-cat="Coming Soon" data-title="Coming Soon" data-desc="Coming Soon" data-tags="">
+          <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')"><span class="admin-status-badge status-draft">DRAFT <span style="opacity:0.7;font-size:8px;">▾</span></span><div class="admin-status-dropdown"><button class="admin-status-option opt-published " data-status="published" onclick="event.stopPropagation();applyPortStatus('placeholder-6','published',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">PUBLISHED</button><button class="admin-status-option opt-draft active-opt" data-status="draft" onclick="event.stopPropagation();applyPortStatus('placeholder-6','draft',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button><button class="admin-status-option opt-hidden " data-status="hidden" onclick="event.stopPropagation();applyPortStatus('placeholder-6','hidden',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button><button class="admin-status-option opt-featured " data-status="featured" onclick="event.stopPropagation();applyPortStatus('placeholder-6','featured',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button></div></div>
           <div class="pc-thumb">// Coming Soon</div>
           <div class="pc-body">
             <div class="pc-cat">Coming Soon</div>
@@ -235,6 +464,9 @@
 
   </div>
 </div>
+
+
+<button id="port-edit-btn" onclick="togglePortEditMode()">✎ Edit Mode</button>
 
 </body>
 </html>
