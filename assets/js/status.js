@@ -34,8 +34,8 @@ async function loadAndApplySettings() {
 }
 
 function applyWorkStatus(val) {
-  if (val) return; // visible by default, nothing to do
-  document.querySelectorAll('.nav-badge').forEach(el => el.style.display = 'none');
+  // Always explicitly set — badge starts hidden via CSS, we show it only if on
+  document.querySelectorAll('.nav-badge').forEach(el => el.style.display = val ? '' : 'none');
   document.querySelectorAll('.hero-bar-item').forEach(el => {
     if (el.textContent.includes('Available for Work') || el.textContent.includes('Open to Work'))
       el.style.display = 'none';
