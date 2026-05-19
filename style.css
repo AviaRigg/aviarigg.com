@@ -9,9 +9,9 @@
   --accent: #8b4fc8;
   --accent2: #b06ef5;
   --accent3: #d4a8ff;
-  --text: #c0b8d8;
+  --text: #ffffff;
   --text-dim: #6a6088;
-  --text-bright: #ede8ff;
+  --text-bright: #ffffff;
   --green: #00e87a;
   --nav-h: 68px;
 }
@@ -1160,7 +1160,7 @@ body::before {
     --accent: #9b59d0;
     --accent2: #c084fc;
     --accent3: #e040fb;
-    --text: #c4b8d8;
+    --text: #ffffff;
     --text-dim: #5a4f72;
     --text-bright: #f0eaff;
     --green: #a855f7;
