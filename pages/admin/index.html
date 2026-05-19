@@ -347,11 +347,30 @@
 
   .admin-gap { height: 40px; }
 
+  /* ── HINT TEXT ── */
+  .admin-hint {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 1.5px;
+    color: var(--text-dim); line-height: 1.8;
+  }
+  .admin-hint-box {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-left: 2px solid rgba(139,79,200,0.5);
+    background: rgba(139,79,200,0.03);
+  }
+
+  /* ── USER EMAIL SUB-LINE ── */
+  .user-email-sub {
+    font-size: 8px; color: var(--text-dim); letter-spacing: 0.5px;
+    display: block; margin-top: 2px;
+  }
+
   /* ══════════════════════════════════════════
-     2560px (2K / QHD) — scale up
+     2560px (QHD) — scale up
   ══════════════════════════════════════════ */
   @media (min-width: 2560px) {
-    .admin-wrap { width: min(75vw, 2400px); }
+    .admin-wrap           { width: min(75vw, 2400px); }
 
     .gate-label           { font-size: 14px; letter-spacing: 5px; }
     .admin-last-updated   { font-size: 13px; letter-spacing: 3px; }
@@ -368,7 +387,7 @@
 
     .toggle-row           { padding: 20px 0; }
     .toggle-row-name      { font-size: 22px; }
-    .toggle-row-desc      { font-size: 12px; letter-spacing: 2px; }
+    .toggle-row-desc      { font-size: 13px; letter-spacing: 2px; }
     .toggle-switch        { width: 60px; height: 32px; }
     .toggle-track::before { width: 22px; height: 22px; left: 4px; top: 4px; }
     .toggle-switch input:checked + .toggle-track::before { transform: translateX(27px); }
@@ -386,6 +405,7 @@
 
     .user-table th        { font-size: 12px; letter-spacing: 4px; padding: 12px 16px; }
     .user-table td        { font-size: 13px; letter-spacing: 1.5px; padding: 15px 16px; }
+    .user-email-sub       { font-size: 11px; letter-spacing: 1px; margin-top: 4px; }
     .role-admin,
     .role-user            { font-size: 11px; letter-spacing: 3px; padding: 3px 12px; }
     .user-del-btn         { font-size: 11px; letter-spacing: 2px; padding: 5px 14px; }
@@ -395,15 +415,17 @@
     .admin-input          { font-size: 14px; letter-spacing: 1.5px; padding: 14px 18px; }
     .field-label          { font-size: 12px; letter-spacing: 4px; margin-bottom: 10px; }
     .admin-btn            { font-size: 13px; letter-spacing: 4px; padding: 12px 28px; }
+    .admin-hint           { font-size: 12px; letter-spacing: 2px; }
+    .admin-hint-box       { padding: 14px 20px; }
+    #email-status         { font-size: 12px !important; letter-spacing: 2px !important; }
 
     .table-empty          { font-size: 13px; letter-spacing: 3px; padding: 32px; }
     .admin-gap            { height: 64px; }
-
     #admin-toast          { font-size: 13px; letter-spacing: 4px; padding: 16px 32px; }
   }
 
   /* ══════════════════════════════════════════
-     3840px (4K / UHD) — another ~25% bump
+     3840px (4K UHD) — another ~25% bump
   ══════════════════════════════════════════ */
   @media (min-width: 3840px) {
     .admin-wrap           { width: min(78vw, 3600px); }
@@ -418,7 +440,7 @@
     .stat-dot             { width: 10px; height: 10px; }
 
     .toggle-row-name      { font-size: 28px; }
-    .toggle-row-desc      { font-size: 15px; }
+    .toggle-row-desc      { font-size: 16px; letter-spacing: 2px; }
     .toggle-switch        { width: 76px; height: 40px; }
     .toggle-track::before { width: 28px; height: 28px; left: 5px; top: 5px; }
     .toggle-switch input:checked + .toggle-track::before { transform: translateX(35px); }
@@ -434,12 +456,17 @@
 
     .user-table th        { font-size: 15px; letter-spacing: 5px; padding: 16px 20px; }
     .user-table td        { font-size: 16px; padding: 20px; }
+    .user-email-sub       { font-size: 14px; letter-spacing: 1px; margin-top: 6px; }
     .user-del-btn         { font-size: 14px; padding: 7px 18px; }
 
     .announcement-preview { font-size: 18px; }
     .admin-input          { font-size: 17px; padding: 18px 22px; }
     .field-label          { font-size: 15px; letter-spacing: 5px; }
     .admin-btn            { font-size: 16px; letter-spacing: 5px; padding: 16px 36px; }
+    .admin-hint           { font-size: 15px; letter-spacing: 2px; }
+    .admin-hint-box       { padding: 18px 24px; }
+    #email-status         { font-size: 15px !important; }
+
     .admin-gap            { height: 88px; }
   }
 </style>
@@ -659,9 +686,9 @@
         </div>
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
           <button class="admin-btn admin-btn-primary" onclick="sendMassEmail()">Send Email</button>
-          <span id="email-status" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim);"></span>
+          <span id="email-status" class="admin-hint" style="color:var(--text-dim);"></span>
         </div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--text-dim);padding:10px 14px;border:1px solid var(--border);border-left:2px solid rgba(139,79,200,0.5);background:rgba(139,79,200,0.03);line-height:1.8;">
+        <div class="admin-hint admin-hint-box">
           // This sends to all profiles in Supabase via the <strong style="color:var(--accent2);">send-mass-email</strong> edge function.<br>
           // Make sure RESEND_API_KEY is set in your Supabase project secrets.
         </div>
@@ -872,7 +899,7 @@
       const roleClass = p.role === 'admin' ? 'role-admin' : 'role-user';
       const isMe = p.id === _adminUser?.id;
       return `<tr>
-        <td>${name}<br><span style="font-size:8px;color:var(--text-dim);letter-spacing:0.5px;">${email}</span></td>
+        <td>${name}<span class="user-email-sub">${email}</span></td>
         <td><span class="${roleClass}">${(p.role || 'user').toUpperCase()}</span></td>
         <td class="user-date">${date}</td>
         <td>${isMe
