@@ -35,7 +35,7 @@ async function loadAndApplySettings() {
 
 function applyWorkStatus(val) {
   // Show/hide nav badge
-  document.querySelectorAll('.nav-badge').forEach(el => el.style.display = val ? '' : 'none');
+  document.querySelectorAll('.nav-badge').forEach(el => { el.classList.toggle('visible', val); el.style.display = val ? '' : 'none'; });
   // Show/hide hero bar "Available for Work" item
   document.querySelectorAll('.hero-bar-item').forEach(el => {
     if (el.textContent.includes('Available for Work') || el.textContent.includes('Open to Work'))
