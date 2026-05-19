@@ -879,265 +879,117 @@
   <link rel="apple-touch-icon" href="/assets/icons/SiteIcon.png">
   <script src="/assets/js/status.js"></script>
   <script src="/assets/js/nav.js"></script>
-  <style>
-    /* ── NAV AUTH DROPDOWN ── */
-    #nav-auth-container { display: flex; align-items: center; }
-    .nav-auth-link {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-      color: var(--accent2, #b06ef5); background: transparent;
-      border: 1px solid rgba(139,79,200,0.4); padding: 7px 16px;
-      cursor: pointer; transition: all 0.2s; white-space: nowrap; text-decoration: none;
-    }
-    .nav-auth-link:hover { border-color: var(--accent2, #b06ef5); }
-    .nav-user-wrap { position: relative; }
-    .nav-user-btn {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-      color: var(--accent2, #b06ef5); background: transparent;
-      border: 1px solid rgba(139,79,200,0.4); padding: 7px 14px;
-      cursor: pointer; transition: all 0.2s; white-space: nowrap;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .nav-user-btn:hover { border-color: var(--accent2, #b06ef5); background: rgba(139,79,200,0.08); }
-    .nav-user-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--green, #00e87a); flex-shrink: 0;
-      animation: blink 2.5s ease-in-out infinite;
-    }
-    .nav-user-caret { font-size: 9px; opacity: 0.6; }
-    .nav-user-dropdown {
-      display: none; position: absolute; top: calc(100% + 8px); right: 0;
-      min-width: 180px; background: var(--surface, #13121a);
-      border: 1px solid var(--border, rgba(255,255,255,0.08));
-      border-top: 2px solid var(--accent, #8b4fc8); z-index: 9999;
-      flex-direction: column;
-    }
-    .nav-user-dropdown.open { display: flex; }
-    .nav-user-email {
-      font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 1px;
-      color: var(--text-dim, #6a6a8a); padding: 10px 14px 8px;
-      border-bottom: 1px solid var(--border, rgba(255,255,255,0.08));
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .nav-dropdown-item {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-      color: var(--text, #ccc); background: none; border: none;
-      padding: 10px 14px; cursor: pointer; text-align: left;
-      text-decoration: none; display: block; transition: background 0.15s, color 0.15s;
-      border-bottom: 1px solid var(--border, rgba(255,255,255,0.05));
-    }
-    .nav-dropdown-item:last-child { border-bottom: none; }
-    .nav-dropdown-item:hover { background: rgba(139,79,200,0.08); color: var(--text-bright, #eeeef8); }
-    .nav-dropdown-danger { color: #ff5050 !important; }
-    .nav-dropdown-danger:hover { background: rgba(255,80,80,0.08) !important; }
-  </style>
-
-
-
-  <!-- ── SUPABASE AUTH ── -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/nav-auth.js"></script>
+  <script src="/assets/js/banner.js"></script>
   <script>
-    const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
-    const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // ── Shop page wires into nav-auth.js ──
+    // _navSb, _navUser, _navProfile are provided by nav-auth.js
+    // We expose thin helpers so the rest of the shop code keeps working.
 
-    let currentUser = null;
-    let currentProfile = null;
-    let isAdmin = false;
+    let isAdmin  = false;
     let editMode = false;
 
-    async function initAuth() {
-      const { data: { session } } = await _sb.auth.getSession();
-      if (session) {
-        await handleSession(session.user);
-      } else {
-        await loadProductStatuses();
-      }
-      loadSiteSettings(); // load open-to-work + commissions status
-      _sb.auth.onAuthStateChange(async (_event, session) => {
-        if (session) await handleSession(session.user);
-        else handleSignOut();
-      });
-    }
-
-    // ── SITE SETTINGS ──
+    // ── SITE SETTINGS (shop-specific: commissions badge + edit UI) ──
     let siteSettings = { open_to_work: true, commissions_open: true };
 
+    async function _getShopSb() {
+      let n = 0;
+      while (typeof _navSb === 'undefined' && n++ < 40) await new Promise(r => setTimeout(r, 50));
+      return _navSb;
+    }
+
     async function loadSiteSettings() {
-      const { data } = await _sb.from('site_settings').select('key, value');
+      const sb = await _getShopSb();
+      const { data } = await sb.from('site_settings').select('key, value');
       if (!data) return;
       data.forEach(({ key, value }) => { siteSettings[key] = value === 'true'; });
-      applyOpenToWork(siteSettings.open_to_work);
       applyCommissionsStatus(siteSettings.commissions_open);
       updateSettingsUI();
     }
 
-    async function toggleSetting(key) {
-      if (!isAdmin) return;
-      const newVal = !siteSettings[key];
-      siteSettings[key] = newVal;
-      await _sb.from('site_settings').upsert({ key, value: String(newVal) });
-      if (key === 'open_to_work') applyOpenToWork(newVal);
-      if (key === 'commissions_open') applyCommissionsStatus(newVal);
-      updateSettingsUI();
-    }
-
-    function applyOpenToWork(val) {
-      document.querySelectorAll('.nav-badge').forEach(el => el.style.display = val ? '' : 'none');
-    }
-
     function applyCommissionsStatus(val) {
-      const avail = document.querySelector('.comm-avail-badge');
+      const avail   = document.querySelector('.comm-avail-badge');
       const unavail = document.querySelector('.comm-unavail-badge');
-      if (avail) avail.style.display = val ? 'inline-flex' : 'none';
+      if (avail)   avail.style.display   = val ? 'inline-flex' : 'none';
       if (unavail) unavail.style.display = val ? 'none' : 'inline-flex';
-      // Disable ALL commission buttons if closed (everyone including admin sees this)
       document.querySelectorAll('.comm-btn-primary, .comm-btn-outline').forEach(btn => {
-        if (!val) {
-          btn.style.opacity = '0.4';
-          btn.style.pointerEvents = 'none';
-          btn.style.cursor = 'not-allowed';
-        } else {
-          btn.style.opacity = '';
-          btn.style.pointerEvents = '';
-          btn.style.cursor = '';
-        }
+        btn.style.opacity       = val ? '' : '0.4';
+        btn.style.pointerEvents = val ? '' : 'none';
+        btn.style.cursor        = val ? '' : 'not-allowed';
       });
-      // Update commissions tab pill
       const tabBtn = document.getElementById('tab-btn-commissions');
       if (tabBtn) {
         const pill = tabBtn.querySelector('.comm-tab-pill');
         if (pill) {
-          pill.textContent = val ? 'Open' : 'Closed';
-          pill.style.color = val ? '#00e87a' : '#ff5050';
+          pill.textContent  = val ? 'Open' : 'Closed';
+          pill.style.color  = val ? '#00e87a' : '#ff5050';
           pill.style.borderColor = val ? 'rgba(0,232,122,0.4)' : 'rgba(255,80,80,0.4)';
         }
       }
     }
 
     function updateSettingsUI() {
-      // Update admin nav dropdown toggles
-      const otwBtn = document.getElementById('admin-toggle-otw');
-      const commBtn = document.getElementById('admin-toggle-comm');
-      if (otwBtn) {
-        const on = siteSettings.open_to_work;
-        otwBtn.textContent = 'Work Status: ' + (on ? 'OPEN ✓' : 'CLOSED ✗');
-        otwBtn.style.color = on ? '#00e87a' : '#ff5050';
-      }
-      if (commBtn) {
-        const on = siteSettings.commissions_open;
-        commBtn.textContent = 'Commissions: ' + (on ? 'OPEN ✓' : 'CLOSED ✗');
-        commBtn.style.color = on ? '#00e87a' : '#ff5050';
-      }
-      // Update commissions edit-mode toggle button
       const commEditBtn = document.getElementById('comm-edit-toggle');
       if (commEditBtn) {
         const on = siteSettings.commissions_open;
-        commEditBtn.textContent = on ? '● Open — Click to Close' : '● Closed — Click to Open';
+        commEditBtn.textContent   = on ? '● Open — Click to Close' : '● Closed — Click to Open';
         commEditBtn.style.borderColor = on ? 'rgba(0,232,122,0.5)' : 'rgba(255,80,80,0.5)';
-        commEditBtn.style.color = on ? '#00e87a' : '#ff5050';
-        commEditBtn.style.background = on ? 'rgba(0,232,122,0.08)' : 'rgba(255,80,80,0.08)';
+        commEditBtn.style.color   = on ? '#00e87a' : '#ff5050';
+        commEditBtn.style.background  = on ? 'rgba(0,232,122,0.08)' : 'rgba(255,80,80,0.08)';
       }
     }
-
-    async function handleSession(user) {
-      currentUser = user;
-      const { data: profile } = await _sb.from('profiles').select('role, username').eq('id', user.id).single();
-      currentProfile = profile;
-      isAdmin = profile?.role === 'admin';
-      updateAuthUI();
-      // Load statuses AFTER we know if user is admin
-      await loadProductStatuses();
-    }
-
-    function handleSignOut() {
-      currentUser = null;
-      currentProfile = null;
-      isAdmin = false;
-      editMode = false;
-      updateAuthUI();
-      loadProductStatuses();
-    }
-
-    function updateAuthUI() {
-      const authContainer = document.getElementById('nav-auth-container');
-      if (!authContainer) return;
-      authContainer.classList.add('ready');
-      if (currentUser) {
-        const displayName = currentProfile?.username || currentUser.email.split('@')[0];
-        authContainer.innerHTML = `
-          <div class="nav-user-wrap">
-            <button class="nav-user-btn" onclick="toggleUserMenu(event)">
-              <span class="nav-user-dot"></span>
-              ${displayName}
-              <span class="nav-user-caret">&#9660;</span>
-            </button>
-            <div class="nav-user-dropdown" id="nav-user-dropdown">
-              <div class="nav-user-email">${currentUser.email}</div>
-              <a class="nav-dropdown-item" href="#">My Profile</a>
-              ${isAdmin ? `
-              <div style="height:1px;background:rgba(139,79,200,0.2);margin:4px 0;"></div>
-              <button class="nav-dropdown-item" id="admin-toggle-otw" onclick="toggleSetting('open_to_work')" style="font-size:9px;">Work Status: OPEN ✓</button>
-              <div style="height:1px;background:rgba(139,79,200,0.2);margin:4px 0;"></div>
-              ` : ''}
-              <button class="nav-dropdown-item" onclick="handleLogout()">Log Out</button>
-              <button class="nav-dropdown-item nav-dropdown-danger" onclick="handleDeleteAccount()">Delete Account</button>
-            </div>
-          </div>`;
-      } else {
-        authContainer.innerHTML = '<a class="nav-auth-link" href="/pages/login">Log In</a>';
-      }
-      const editToggle = document.getElementById('admin-edit-toggle');
-      if (editToggle) editToggle.style.display = isAdmin ? 'flex' : 'none';
-    }
-
-    function toggleUserMenu(e) {
-      e.stopPropagation();
-      const dd = document.getElementById('nav-user-dropdown');
-      if (dd) dd.classList.toggle('open');
-    }
-    document.addEventListener('click', () => {
-      const dd = document.getElementById('nav-user-dropdown');
-      if (dd) dd.classList.remove('open');
-      // Close any open status dropdowns
-      document.querySelectorAll('.admin-status-wrap.open').forEach(w => w.classList.remove('open'));
-    });
 
     function toggleEditMode() {
       editMode = !editMode;
       document.body.classList.toggle('edit-mode', editMode);
       const btn = document.getElementById('edit-mode-btn');
       if (btn) {
-        btn.textContent = editMode ? '✓ Save' : '✎ Edit Mode';
-        btn.style.background = editMode ? 'rgba(255,80,80,0.2)' : 'rgba(139,79,200,0.15)';
-        btn.style.borderColor = editMode ? 'rgba(255,80,80,0.7)' : 'rgba(139,79,200,0.5)';
-        btn.style.color = editMode ? '#ff5050' : '#b06ef5';
+        btn.textContent   = editMode ? '✓ Save' : '✎ Edit Mode';
+        btn.style.background  = editMode ? 'rgba(255,80,80,0.2)'  : 'rgba(139,79,200,0.15)';
+        btn.style.borderColor = editMode ? 'rgba(255,80,80,0.7)'  : 'rgba(139,79,200,0.5)';
+        btn.style.color       = editMode ? '#ff5050' : '#b06ef5';
       }
-      // Force overflow visible on all cards so badges show
       document.querySelectorAll('.product-card').forEach(c => {
         c.style.overflow = editMode ? 'visible' : '';
       });
-      // Show/hide commissions admin toggle
       const commAdminToggle = document.getElementById('comm-admin-toggle');
       if (commAdminToggle) commAdminToggle.style.display = (isAdmin && editMode) ? 'block' : 'none';
       if (editMode) updateSettingsUI();
     }
 
-    async function handleLogout() {
-      await _sb.auth.signOut();
-      window.location.href = '/';
-    }
+    // ── Bootstrap: wait for nav-auth, then load shop data ──
+    document.addEventListener('DOMContentLoaded', async () => {
+      const sb = await _getShopSb();
 
-    async function handleDeleteAccount() {
-      if (!confirm('Delete your account? This cannot be undone.')) return;
-      await _sb.from('profiles').delete().eq('id', currentUser.id);
-      await _sb.auth.signOut();
-      window.location.href = '/';
-    }
+      // Wait for nav-auth session to resolve (it fires onAuthStateChange)
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+        isAdmin = profile?.role === 'admin';
+      }
 
-    document.addEventListener('DOMContentLoaded', initAuth);
+      const editToggle = document.getElementById('admin-edit-toggle');
+      if (editToggle) editToggle.style.display = isAdmin ? 'flex' : 'none';
+
+      await loadProductStatuses();
+      await loadSiteSettings();
+
+      // Re-check on auth state changes (login/logout while page is open)
+      sb.auth.onAuthStateChange(async (_e, session) => {
+        if (session) {
+          const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+          isAdmin = profile?.role === 'admin';
+        } else {
+          isAdmin  = false;
+          editMode = false;
+          document.body.classList.remove('edit-mode');
+        }
+        const editToggle = document.getElementById('admin-edit-toggle');
+        if (editToggle) editToggle.style.display = isAdmin ? 'flex' : 'none';
+        await loadProductStatuses();
+      });
+    });
   </script>
 </head>
 <body>
@@ -1816,7 +1668,8 @@ function updateScanHeights() {
 }
 window.addEventListener('resize', updateScanHeights);
 async function loadProductStatuses() {
-  const { data: products } = await _sb.from('shop_products').select('id, status');
+  const sb = await _getShopSb();
+  const { data: products } = await sb.from('shop_products').select('id, status');
   if (!products) return;
 
   let featuredId = null;
@@ -1845,9 +1698,11 @@ async function loadProductStatuses() {
 
 function applyStatusToCard(productId, newStatus, cardEl, save = true) {
   if (save) {
-    _sb.from('shop_products')
-      .upsert({ id: productId, status: newStatus, updated_at: new Date().toISOString() })
-      .then(({ error }) => { if (error) console.error('Save error:', error); });
+    _getShopSb().then(sb => {
+      sb.from('shop_products')
+        .upsert({ id: productId, status: newStatus, updated_at: new Date().toISOString() })
+        .then(({ error }) => { if (error) console.error('Save error:', error); });
+    });
   }
 
   cardEl.dataset.status = newStatus;
@@ -1969,7 +1824,6 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
 
 document.addEventListener('DOMContentLoaded', () => {
   updateScanHeights();
-  // loadProductStatuses is called after auth resolves in handleSession/handleSignOut
   if (window.location.hash === '#commissions') {
     switchTab('commissions', document.getElementById('tab-btn-commissions'));
   }
