@@ -878,6 +878,7 @@
   <link rel="shortcut icon" href="/assets/icons/SiteIcon.png">
   <link rel="apple-touch-icon" href="/assets/icons/SiteIcon.png">
   <script src="/assets/js/status.js"></script>
+  <script src="/assets/js/nav.js"></script>
   <style>
     /* ── NAV AUTH DROPDOWN ── */
     #nav-auth-container { display: flex; align-items: center; }
@@ -1063,6 +1064,7 @@
     function updateAuthUI() {
       const authContainer = document.getElementById('nav-auth-container');
       if (!authContainer) return;
+      authContainer.classList.add('ready');
       if (currentUser) {
         const displayName = currentProfile?.username || currentUser.email.split('@')[0];
         authContainer.innerHTML = `
@@ -1140,30 +1142,7 @@
 </head>
 <body>
 
-<nav class="topnav">
-  <a class="nav-logo" href="/"><img src="/assets/icons/SiteIcon.png" alt="AviaRigg Logo" style="height:clamp(24px,2.2vw,36px);width:auto;display:inline-block;vertical-align:middle;margin-right:clamp(8px,0.8vw,14px);"><span style="display:inline-block;width:1px;height:clamp(18px,1.6vw,26px);background:rgba(139,79,200,0.4);vertical-align:middle;margin-right:clamp(8px,0.8vw,14px);"></span>Avia<span>Rigg</span></a>
-  <div class="nav-links">
-    <a class="nav-link" href="/">Home</a>
-    <a class="nav-link" href="/pages/portfolio">Portfolio</a>
-    <a class="nav-link" href="/pages/library">Script Library</a>
-    <a class="nav-link active" href="/pages/shop">Shop</a>
-    <a class="nav-link" href="/pages/about">About</a>
-    <a class="nav-link" href="/pages/contact">Contact</a>
-    <a class="nav-badge" href="/pages/contact">&#9679; Open to Work</a>
-    <div id="nav-auth-container"><a class="nav-auth-link" href="/pages/login">Log In</a></div>
-  </div>
-  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu" onclick="toggleMobileNav()">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
-<div class="nav-drawer" id="nav-drawer">
-  <a class="nav-link" href="/">Home</a>
-  <a class="nav-link" href="/pages/portfolio">Portfolio</a>
-  <a class="nav-link" href="/pages/shop">Shop</a>
-  <a class="nav-link" href="/pages/about">About</a>
-  <a class="nav-link" href="/pages/contact">Contact</a>
-  <a class="nav-badge" href="/pages/contact">&#9679; Open to Work</a>
-</div>
+<div id="nav-root"></div>
 
 <!-- CHECKOUT MODAL -->
 <div id="checkout-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
@@ -1664,13 +1643,6 @@
 </div>
 
 <script>
-function toggleMobileNav() {
-  const drawer = document.getElementById('nav-drawer');
-  const btn = document.getElementById('nav-hamburger');
-  const isOpen = drawer.classList.contains('open');
-  drawer.classList.toggle('open', !isOpen);
-  btn.classList.toggle('open', !isOpen);
-}
 
 function showHeroEmpty() {
   const hero = document.querySelector('.hero-card');

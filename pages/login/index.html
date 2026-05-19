@@ -311,6 +311,7 @@
   function updateNavAuth(user, profile) {
     const c = document.getElementById('nav-auth-container');
     if (!c) return;
+    c.classList.add('ready');
     if (user) {
       const name = profile?.username || user.email.split('@')[0];
       c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="toggleUserMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${user.email}</div><a class="nav-dropdown-item" href="#">My Profile</a><button class="nav-dropdown-item" onclick="handleLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="handleDeleteAccount()">Delete Account</button></div></div>`;
@@ -325,28 +326,7 @@
 <div class="login-bg"></div>
 <div class="login-bg-orb"></div>
 
-<nav class="topnav">
-  <a class="nav-logo" href="/"><img src="/assets/icons/SiteIcon.png" alt="AviaRigg Logo" style="height:clamp(24px,2.2vw,36px);width:auto;display:inline-block;vertical-align:middle;margin-right:clamp(8px,0.8vw,14px);"><span style="display:inline-block;width:1px;height:clamp(18px,1.6vw,26px);background:rgba(139,79,200,0.4);vertical-align:middle;margin-right:clamp(8px,0.8vw,14px);"></span>Avia<span>Rigg</span></a>
-  <div class="nav-links">
-    <a class="nav-link" href="/">Home</a>
-    <a class="nav-link" href="/pages/portfolio">Portfolio</a>
-    <a class="nav-link" href="/pages/library">Script Library</a>
-    <a class="nav-link" href="/pages/shop">Shop</a>
-    <a class="nav-link" href="/pages/about">About</a>
-    <a class="nav-link" href="/pages/contact">Contact</a>
-    <div id="nav-auth-container"><a class="nav-auth-link" href="/pages/login">Log In</a></div>
-  </div>
-  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu" onclick="toggleMobileNav()">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
-<div class="nav-drawer" id="nav-drawer">
-  <a class="nav-link" href="/">Home</a>
-  <a class="nav-link" href="/pages/portfolio">Portfolio</a>
-  <a class="nav-link" href="/pages/shop">Shop</a>
-  <a class="nav-link" href="/pages/about">About</a>
-  <a class="nav-link" href="/pages/contact">Contact</a>
-</div>
+<div id="nav-root"></div>
 
 <div class="login-wrap">
   <div class="login-panel">
@@ -378,14 +358,7 @@
   </div>
 </div>
 
-<script>
-function toggleMobileNav() {
-  const drawer = document.getElementById('nav-drawer');
-  const btn = document.getElementById('nav-hamburger');
-  const isOpen = drawer.classList.contains('open');
-  drawer.classList.toggle('open', !isOpen);
-  btn.classList.toggle('open', !isOpen);
-}
-</script>
+<script src="/assets/js/nav.js"></script>
+
 </body>
 </html>
