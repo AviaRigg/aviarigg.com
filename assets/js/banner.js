@@ -14,31 +14,26 @@
       top: var(--nav-h, 68px);
       left: 0; right: 0;
       z-index: 498;
+      height: clamp(32px, 2.8vw, 52px);
       align-items: center;
       justify-content: center;
-      gap: 0;
-      height: 36px;
       background: linear-gradient(90deg,
-        rgba(139,79,200,0.0) 0%,
-        rgba(139,79,200,0.18) 20%,
-        rgba(139,79,200,0.18) 80%,
+        rgba(139,79,200,0.0)   0%,
+        rgba(139,79,200,0.16) 15%,
+        rgba(139,79,200,0.16) 85%,
         rgba(139,79,200,0.0) 100%
       );
       border-bottom: 1px solid rgba(139,79,200,0.35);
       overflow: hidden;
     }
 
-    /* Subtle animated scan line */
+    /* Scan line sweep */
     #site-banner::before {
       content: '';
       position: absolute;
-      top: 0; left: -100%;
-      width: 60%;
-      height: 100%;
+      top: 0; left: -60%; width: 60%; height: 100%;
       background: linear-gradient(90deg,
-        transparent 0%,
-        rgba(176,110,245,0.06) 50%,
-        transparent 100%
+        transparent 0%, rgba(176,110,245,0.07) 50%, transparent 100%
       );
       animation: banner-scan 4s ease-in-out infinite;
       pointer-events: none;
@@ -48,42 +43,47 @@
       100% { left: 140%; }
     }
 
-    /* Left accent line */
+    /* Left + right accent lines */
     #site-banner::after {
       content: '';
       position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 2px;
-      background: linear-gradient(to bottom, transparent, var(--accent, #8b4fc8), transparent);
+      left: 0; top: 0; bottom: 0; width: 2px;
+      background: linear-gradient(to bottom,
+        transparent, var(--accent, #8b4fc8), transparent
+      );
     }
 
     #site-banner.banner-visible { display: flex; }
 
+    /* Inner row — truly centered, full width */
     #site-banner-inner {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: center;
+      gap: clamp(8px, 0.8vw, 16px);
+      width: 100%;
+      padding: 0 clamp(16px, 3vw, 60px);
       position: relative;
       z-index: 1;
-      max-width: min(72vw, 1400px);
-      width: 100%;
     }
 
     #site-banner-tag {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 8px;
-      letter-spacing: 3px;
+      font-size: clamp(8px, 0.6vw, 12px);
+      letter-spacing: clamp(2px, 0.25vw, 4px);
       text-transform: uppercase;
       color: var(--accent2, #b06ef5);
       background: rgba(139,79,200,0.2);
       border: 1px solid rgba(139,79,200,0.4);
-      padding: 2px 8px;
+      padding: clamp(2px, 0.15vw, 4px) clamp(6px, 0.5vw, 12px);
       flex-shrink: 0;
       white-space: nowrap;
+      line-height: 1.4;
     }
 
     #site-banner-dot {
-      width: 4px; height: 4px;
+      width: clamp(4px, 0.3vw, 6px);
+      height: clamp(4px, 0.3vw, 6px);
       border-radius: 50%;
       background: var(--accent2, #b06ef5);
       flex-shrink: 0;
@@ -92,36 +92,43 @@
 
     #site-banner-text {
       font-family: 'Share Tech Mono', monospace;
-      font-size: clamp(9px, 0.8vw, 11px);
-      letter-spacing: 2.5px;
+      font-size: clamp(9px, 0.75vw, 14px);
+      letter-spacing: clamp(2px, 0.2vw, 4px);
       text-transform: uppercase;
       color: rgba(255,255,255,0.85);
-      flex: 1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      /* Don't let it stretch — keep text centered in the row */
+      flex: 0 1 auto;
+      max-width: 70%;
+      text-align: center;
     }
 
     #site-banner-close {
+      position: absolute;
+      right: clamp(12px, 1.5vw, 32px);
+      top: 50%;
+      transform: translateY(-50%);
       background: none;
-      border: 1px solid rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.25);
-      font-size: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.3);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(9px, 0.6vw, 12px);
+      letter-spacing: 1px;
       cursor: pointer;
-      padding: 2px 7px;
+      padding: clamp(2px, 0.15vw, 4px) clamp(6px, 0.4vw, 10px);
       line-height: 1.4;
       flex-shrink: 0;
-      font-family: 'Share Tech Mono', monospace;
-      letter-spacing: 1px;
       transition: color 0.15s, border-color 0.15s;
     }
     #site-banner-close:hover {
-      color: rgba(255,255,255,0.7);
-      border-color: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.75);
+      border-color: rgba(255,255,255,0.25);
     }
 
     body.has-banner .page {
-      padding-top: calc(var(--nav-h, 68px) + 36px);
+      padding-top: calc(var(--nav-h, 68px) + clamp(32px, 2.8vw, 52px));
     }
   `;
   document.head.appendChild(style);
@@ -132,19 +139,16 @@ document.addEventListener('DOMContentLoaded', async function initBanner() {
   if (!document.getElementById('site-banner')) {
     const banner = document.createElement('div');
     banner.id = 'site-banner';
-    banner.innerHTML = `
-      <div id="site-banner-inner">
-        <span id="site-banner-tag">// News</span>
-        <span id="site-banner-dot"></span>
-        <span id="site-banner-text"></span>
-        <button id="site-banner-close" onclick="dismissBanner()" title="Dismiss">&#10005;</button>
-      </div>`;
+    banner.innerHTML =
+      '<div id="site-banner-inner">' +
+        '<span id="site-banner-tag">// News</span>' +
+        '<span id="site-banner-dot"></span>' +
+        '<span id="site-banner-text"></span>' +
+      '</div>' +
+      '<button id="site-banner-close" onclick="dismissBanner()" title="Dismiss">&#10005;</button>';
     const navRoot = document.getElementById('nav-root');
-    if (navRoot) {
-      navRoot.insertAdjacentElement('afterend', banner);
-    } else {
-      document.body.prepend(banner);
-    }
+    if (navRoot) navRoot.insertAdjacentElement('afterend', banner);
+    else document.body.prepend(banner);
   }
 
   async function getSb() {
@@ -171,9 +175,9 @@ document.addEventListener('DOMContentLoaded', async function initBanner() {
     if (!enabled || !text) return;
     if (sessionStorage.getItem('banner_dismissed') === text) return;
 
-    const banner  = document.getElementById('site-banner');
-    const textEl  = document.getElementById('site-banner-text');
-    const tagEl   = document.getElementById('site-banner-tag');
+    const banner = document.getElementById('site-banner');
+    const textEl = document.getElementById('site-banner-text');
+    const tagEl  = document.getElementById('site-banner-tag');
     if (!banner || !textEl) return;
 
     textEl.textContent = text;
