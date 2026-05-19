@@ -145,10 +145,12 @@ document.addEventListener('DOMContentLoaded', async function initBanner() {
         '<span id="site-banner-dot"></span>' +
         '<span id="site-banner-text"></span>' +
       '</div>' +
-      '<button id="site-banner-close" onclick="dismissBanner()" title="Dismiss">&#10005;</button>';
+      '<button id="site-banner-close" title="Dismiss">&#10005;</button>';
     const navRoot = document.getElementById('nav-root');
     if (navRoot) navRoot.insertAdjacentElement('afterend', banner);
     else document.body.prepend(banner);
+
+    document.getElementById('site-banner-close').addEventListener('click', dismissBanner);
   }
 
   async function getSb() {
