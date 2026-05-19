@@ -313,21 +313,30 @@
     }
 
     // ── Insert profile row ──
-    if (authData.user) {
-      await _sb.from('profiles').upsert({
-        id:       authData.user.id,
+    // Works whether email confirmation is on or off
+    // Uses the user id from authData even before confirmation
+    const userId = authData.user?.id;
+    if (userId) {
+      const { error: profileError } = await _sb.from('profiles').upsert({
+        id:       userId,
         email:    email,
         username: username,
         role:     'customer',
       });
+      if (profileError) console.warn('Profile insert error:', profileError);
     }
 
     // ── Success ──
     btn.textContent = 'ACCOUNT CREATED ✓';
-    sucEl.textContent = 'Account created! Check your email to confirm, then log in.';
-    sucEl.style.display = 'block';
 
-    // Auto-redirect to login after 3s
+    // Check if email confirmation is required
+    const needsConfirm = !authData.session;
+    if (needsConfirm) {
+      sucEl.textContent = 'Account created! Check your email to confirm your address, then log in.';
+    } else {
+      sucEl.textContent = 'Account created! Redirecting to login...';
+    }
+    sucEl.style.display = 'block';
     setTimeout(() => window.location.href = '/pages/login', 3000);
   }
 
