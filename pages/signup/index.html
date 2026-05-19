@@ -3,57 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login — AviaRigg</title>
+<title>Sign Up — AviaRigg</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
 <link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
 <link rel="shortcut icon" href="/assets/icons/SiteIcon.png">
 <link rel="apple-touch-icon" href="/assets/icons/SiteIcon.png">
-<style>
-  #nav-auth-container { display: flex; align-items: center; }
-  .nav-auth-link {
-    font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--accent2, #b06ef5); background: transparent;
-    border: 1px solid rgba(139,79,200,0.4); padding: 7px 16px;
-    cursor: pointer; transition: all 0.2s; text-decoration: none;
-  }
-  .nav-auth-link:hover { border-color: var(--accent2, #b06ef5); }
-  .nav-user-wrap { position: relative; }
-  .nav-user-btn {
-    font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--accent2, #b06ef5); background: transparent;
-    border: 1px solid rgba(139,79,200,0.4); padding: 7px 14px;
-    cursor: pointer; display: flex; align-items: center; gap: 8px;
-  }
-  .nav-user-btn:hover { border-color: var(--accent2, #b06ef5); background: rgba(139,79,200,0.08); }
-  .nav-user-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green, #00e87a); flex-shrink: 0; animation: blink 2.5s ease-in-out infinite; }
-  .nav-user-caret { font-size: 9px; opacity: 0.6; }
-  .nav-user-dropdown {
-    display: none; position: absolute; top: calc(100% + 8px); right: 0; min-width: 180px;
-    background: var(--surface, #13121a); border: 1px solid var(--border, rgba(255,255,255,0.08));
-    border-top: 2px solid var(--accent, #8b4fc8); z-index: 9999; flex-direction: column;
-  }
-  .nav-user-dropdown.open { display: flex; }
-  .nav-user-email {
-    font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 1px;
-    color: var(--text-dim, #6a6a8a); padding: 10px 14px 8px;
-    border-bottom: 1px solid var(--border, rgba(255,255,255,0.08));
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .nav-dropdown-item {
-    font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--text, #ccc); background: none; border: none; padding: 10px 14px;
-    cursor: pointer; text-align: left; text-decoration: none; display: block;
-    border-bottom: 1px solid var(--border, rgba(255,255,255,0.05)); transition: background 0.15s, color 0.15s;
-  }
-  .nav-dropdown-item:last-child { border-bottom: none; }
-  .nav-dropdown-item:hover { background: rgba(139,79,200,0.08); color: var(--text-bright, #eeeef8); }
-  .nav-dropdown-danger { color: #ff5050 !important; }
-  .nav-dropdown-danger:hover { background: rgba(255,80,80,0.08) !important; }
-</style>
 
-<!-- Supabase -->
-
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-RYTKYEPJG2');
+</script>
 
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -67,7 +30,6 @@
     background: var(--bg, #0c0b10);
   }
 
-  /* ── GRID BACKGROUND ── */
   .login-bg {
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
     background-image:
@@ -82,7 +44,6 @@
     top: -200px; left: 50%; transform: translateX(-50%);
   }
 
-  /* ── MAIN LAYOUT ── */
   .login-wrap {
     position: relative; z-index: 1;
     flex: 1;
@@ -107,11 +68,9 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* ── HEADER ── */
   .login-eyebrow {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 10px; letter-spacing: 4px;
-    text-transform: uppercase;
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
     color: var(--accent2, #b06ef5);
     margin-bottom: 10px;
     display: flex; align-items: center; gap: 10px;
@@ -132,14 +91,10 @@
   .login-sub {
     font-size: 13px; font-weight: 300;
     color: var(--text-dim, #6a6a8a);
-    margin-bottom: 36px;
-    line-height: 1.5;
+    margin-bottom: 36px; line-height: 1.5;
   }
 
-  /* ── FORM ── */
-  .login-field {
-    margin-bottom: 20px;
-  }
+  .login-field { margin-bottom: 20px; }
 
   .login-label {
     font-family: 'Share Tech Mono', monospace;
@@ -160,14 +115,29 @@
     transition: border-color 0.2s;
     -webkit-appearance: none;
   }
-  .login-input:focus {
-    border-color: var(--accent, #8b4fc8);
-  }
-  .login-input::placeholder {
-    color: rgba(106,106,138,0.5);
+  .login-input:focus { border-color: var(--accent, #8b4fc8); }
+  .login-input::placeholder { color: rgba(106,106,138,0.5); }
+  .login-input.input-error { border-color: rgba(255,80,80,0.5); }
+
+  /* Field hint */
+  .login-hint {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px; letter-spacing: 1.5px;
+    color: var(--text-dim, #6a6a8a);
+    margin-top: 5px;
   }
 
-  /* ── ERROR ── */
+  /* Password strength bar */
+  .pw-strength-bar {
+    height: 2px; width: 100%; margin-top: 6px;
+    background: var(--border, rgba(255,255,255,0.08));
+    position: relative; overflow: hidden;
+  }
+  .pw-strength-fill {
+    height: 100%; width: 0%;
+    transition: width 0.3s ease, background 0.3s ease;
+  }
+
   #auth-error {
     font-family: 'Share Tech Mono', monospace;
     font-size: 10px; letter-spacing: 2px;
@@ -178,12 +148,22 @@
     padding: 10px 14px;
     margin-bottom: 20px;
     display: block;
-    min-height: 0;
     transition: all 0.2s;
   }
   #auth-error:empty { display: none; }
 
-  /* ── SUBMIT ── */
+  #auth-success {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 2px;
+    color: var(--green, #00e87a);
+    background: rgba(0,232,122,0.06);
+    border: 1px solid rgba(0,232,122,0.2);
+    border-left: 2px solid var(--green, #00e87a);
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    display: none;
+  }
+
   .login-submit {
     width: 100%;
     font-family: 'Share Tech Mono', monospace;
@@ -200,11 +180,8 @@
     background: var(--accent2, #b06ef5);
     border-color: var(--accent2, #b06ef5);
   }
-  .login-submit:disabled {
-    opacity: 0.6; cursor: not-allowed;
-  }
+  .login-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
-  /* ── FOOTER LINKS ── */
   .login-footer {
     margin-top: 28px;
     padding-top: 24px;
@@ -212,8 +189,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
+    flex-wrap: wrap; gap: 10px;
   }
   .login-footer-text {
     font-family: 'Share Tech Mono', monospace;
@@ -225,101 +201,137 @@
     font-family: 'Share Tech Mono', monospace;
     font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
     color: var(--accent2, #b06ef5);
-    text-decoration: none;
-    transition: color 0.2s;
+    text-decoration: none; transition: color 0.2s;
   }
   .login-footer a:hover { color: var(--text-bright, #eeeef8); }
 
-  /* ── BACK LINK ── */
   .login-back {
     display: inline-flex; align-items: center; gap: 8px;
     font-family: 'Share Tech Mono', monospace;
     font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
     color: var(--text-dim, #6a6a8a);
     text-decoration: none;
-    margin-bottom: 32px;
-    transition: color 0.2s;
+    margin-bottom: 32px; transition: color 0.2s;
   }
   .login-back:hover { color: var(--text-bright, #eeeef8); }
   .login-back::before { content: '←'; }
+
+  /* Terms */
+  .login-terms {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px; letter-spacing: 1.5px;
+    color: var(--text-dim, #6a6a8a);
+    margin-top: 16px; line-height: 1.7; text-align: center;
+  }
 </style>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
   const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  // Redirect if already logged in
   async function checkSession() {
     const { data: { session } } = await _sb.auth.getSession();
     if (session) window.location.href = '/';
-    else updateNavAuth(null, null);
   }
 
-  async function handleLogin(e) {
+  // Password strength indicator
+  function checkPasswordStrength(pw) {
+    const fill = document.getElementById('pw-fill');
+    if (!fill) return;
+    let score = 0;
+    if (pw.length >= 8)  score++;
+    if (pw.length >= 12) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    const pct   = (score / 5) * 100;
+    const color = score <= 1 ? '#ff5050' : score <= 3 ? '#f5a623' : '#00e87a';
+    fill.style.width = pct + '%';
+    fill.style.background = color;
+  }
+
+  async function handleSignup(e) {
     e.preventDefault();
-    let identifier = document.getElementById('email').value.trim();
+
+    const email    = document.getElementById('email').value.trim();
+    const username = document.getElementById('username').value.trim().toLowerCase();
     const password = document.getElementById('password').value;
-    const errEl = document.getElementById('auth-error');
-    const btn = document.getElementById('submit-btn');
+    const confirm  = document.getElementById('confirm').value;
+
+    const errEl  = document.getElementById('auth-error');
+    const sucEl  = document.getElementById('auth-success');
+    const btn    = document.getElementById('submit-btn');
+
     errEl.textContent = '';
-    btn.textContent = 'AUTHENTICATING...';
+    sucEl.style.display = 'none';
+
+    // ── Client-side validation ──
+    if (username.length < 3) {
+      errEl.textContent = 'Username must be at least 3 characters.'; return;
+    }
+    if (!/^[a-z0-9_]+$/.test(username)) {
+      errEl.textContent = 'Username can only contain letters, numbers and underscores.'; return;
+    }
+    if (password.length < 8) {
+      errEl.textContent = 'Password must be at least 8 characters.'; return;
+    }
+    if (password !== confirm) {
+      errEl.textContent = 'Passwords do not match.'; return;
+    }
+
+    btn.textContent = 'CREATING ACCOUNT...';
     btn.disabled = true;
 
-    let email = identifier;
-    if (!identifier.includes('@')) {
-      const { data: profile } = await _sb.from('profiles').select('email').eq('username', identifier).single();
-      if (!profile) {
-        errEl.textContent = 'Username not found.';
-        btn.textContent = 'Log In'; btn.disabled = false; return;
-      }
-      email = profile.email;
+    // ── Check username not taken ──
+    const { data: existing } = await _sb
+      .from('profiles')
+      .select('id')
+      .eq('username', username)
+      .maybeSingle();
+
+    if (existing) {
+      errEl.textContent = 'Username already taken. Please choose another.';
+      btn.textContent = 'Create Account →'; btn.disabled = false; return;
     }
 
-    const { error } = await _sb.auth.signInWithPassword({ email, password });
-    if (error) {
-      errEl.textContent = error.message;
-      btn.textContent = 'Log In'; btn.disabled = false;
-    } else {
-      btn.textContent = 'ACCESS GRANTED ✓';
-      const redirect = new URLSearchParams(window.location.search).get('redirect') || '/';
-      setTimeout(() => window.location.href = redirect, 600);
+    // ── Create auth user ──
+    const { data: authData, error: signupError } = await _sb.auth.signUp({
+      email,
+      password,
+      options: { data: { username } }
+    });
+
+    if (signupError) {
+      errEl.textContent = signupError.message;
+      btn.textContent = 'Create Account →'; btn.disabled = false; return;
     }
+
+    // ── Insert profile row ──
+    if (authData.user) {
+      await _sb.from('profiles').upsert({
+        id:       authData.user.id,
+        email:    email,
+        username: username,
+        role:     'customer',
+      });
+    }
+
+    // ── Success ──
+    btn.textContent = 'ACCOUNT CREATED ✓';
+    sucEl.textContent = 'Account created! Check your email to confirm, then log in.';
+    sucEl.style.display = 'block';
+
+    // Auto-redirect to login after 3s
+    setTimeout(() => window.location.href = '/pages/login', 3000);
   }
 
   document.addEventListener('DOMContentLoaded', checkSession);
 </script>
-<script>
-  function toggleUserMenu(e) {
-    e.stopPropagation();
-    const dd = document.getElementById('nav-user-dropdown');
-    if (dd) dd.classList.toggle('open');
-  }
-  document.addEventListener('click', () => {
-    const dd = document.getElementById('nav-user-dropdown');
-    if (dd) dd.classList.remove('open');
-  });
-  async function handleLogout() {
-    await _sb.auth.signOut();
-    window.location.href = '/';
-  }
-  async function handleDeleteAccount() {
-    if (!confirm('Delete your account? This cannot be undone.')) return;
-    await _sb.from('profiles').delete().eq('id', (await _sb.auth.getUser()).data.user.id);
-    await _sb.auth.signOut();
-    window.location.href = '/';
-  }
-  function updateNavAuth(user, profile) {
-    const c = document.getElementById('nav-auth-container');
-    if (!c) return;
-    c.classList.add('ready');
-    if (user) {
-      const name = profile?.username || user.email.split('@')[0];
-      c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="toggleUserMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${user.email}</div><a class="nav-dropdown-item" href="#">My Profile</a><button class="nav-dropdown-item" onclick="handleLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="handleDeleteAccount()">Delete Account</button></div></div>`;
-    } else {
-      c.innerHTML = '<a class="nav-auth-link" href="/pages/login">Log In</a>';
-    }
-  }
-</script>
+<script src="/assets/js/nav.js"></script>
+<script src="/assets/js/nav-auth.js"></script>
 </head>
 <body>
 
@@ -330,35 +342,58 @@
 
 <div class="login-wrap">
   <div class="login-panel">
-    <a class="login-back" href="/">Back to site</a>
+    <a class="login-back" href="/pages/login">Back to Log In</a>
 
-    <div class="login-eyebrow">Access Portal</div>
-    <div class="login-title">Log In</div>
-    <div class="login-sub">Script Library access and commission tracking for registered users.</div>
+    <div class="login-eyebrow">New Account</div>
+    <div class="login-title">Sign Up</div>
+    <div class="login-sub">Create a free account for Script Library access and commission tracking.</div>
 
     <span id="auth-error"></span>
+    <div id="auth-success"></div>
 
-    <form onsubmit="handleLogin(event)">
+    <form onsubmit="handleSignup(event)">
       <div class="login-field">
-        <label class="login-label" for="email">Email or Username</label>
-        <input class="login-input" type="email" id="email" placeholder="you@example.com or username" required autocomplete="username">
+        <label class="login-label" for="email">Email</label>
+        <input class="login-input" type="email" id="email"
+          placeholder="you@example.com" required autocomplete="email">
       </div>
+
+      <div class="login-field">
+        <label class="login-label" for="username">Username</label>
+        <input class="login-input" type="text" id="username"
+          placeholder="yourhandle" required autocomplete="username"
+          maxlength="32" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
+        <div class="login-hint">Letters, numbers and underscores only</div>
+      </div>
+
       <div class="login-field">
         <label class="login-label" for="password">Password</label>
-        <input class="login-input" type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+        <input class="login-input" type="password" id="password"
+          placeholder="••••••••" required autocomplete="new-password"
+          oninput="checkPasswordStrength(this.value)">
+        <div class="pw-strength-bar"><div class="pw-strength-fill" id="pw-fill"></div></div>
       </div>
 
-      <button class="login-submit" type="submit" id="submit-btn">Log In →</button>
+      <div class="login-field">
+        <label class="login-label" for="confirm">Confirm Password</label>
+        <input class="login-input" type="password" id="confirm"
+          placeholder="••••••••" required autocomplete="new-password">
+      </div>
+
+      <button class="login-submit" type="submit" id="submit-btn">Create Account →</button>
+
+      <div class="login-terms">
+        By creating an account you agree to our terms of service.<br>
+        Your email is used for login only and never shared.
+      </div>
     </form>
 
     <div class="login-footer">
-      <span class="login-footer-text">No account?</span>
-      <a href="/pages/signup">Create free account →</a>
+      <span class="login-footer-text">Already have an account?</span>
+      <a href="/pages/login">Log In →</a>
     </div>
   </div>
 </div>
-
-<script src="/assets/js/nav.js"></script>
 
 </body>
 </html>
