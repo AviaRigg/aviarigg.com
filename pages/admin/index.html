@@ -701,7 +701,8 @@
     const { data } = await sb.from('shop_products').select('id, status').order('id');
     const el = document.getElementById('product-list');
     if (!data?.length) { el.innerHTML = '<div class="table-empty">No products found.</div>'; return; }
-    el.innerHTML = data.map(({ id, status }, i) => {
+    const rows = data.filter(({ id }) => id !== 'hero-featured');
+    el.innerHTML = rows.map(({ id, status }, i) => {
       const m = PRODUCT_META[id] || { name: id, cat: '—', href: '#' };
       return `<div class="item-row">
         <span class="item-num">${String(i+1).padStart(2,'0')}</span>
@@ -743,14 +744,12 @@
   // ── USERS ──
   async function loadUsers() {
     const sb = await _getAdminSb();
-    // Try selecting all columns so we can see what's there
     const { data, error } = await sb
       .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select('*');
 
-    const tbody    = document.getElementById('user-table-body');
-    const countEl  = document.getElementById('user-count-label');
+    const tbody   = document.getElementById('user-table-body');
+    const countEl = document.getElementById('user-count-label');
 
     if (error) {
       console.error('loadUsers error:', error);
@@ -768,10 +767,11 @@
     document.getElementById('stat-users').textContent = data.length;
 
     tbody.innerHTML = data.map(p => {
-      const name = p.username || p.name || p.full_name || p.display_name || '—';
+      const name  = p.username || p.name || p.full_name || p.display_name || '—';
       const email = p.email || '—';
-      const date  = p.created_at
-        ? new Date(p.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'2-digit' })
+      const dateRaw = p.created_at || p.inserted_at || p.updated_at || null;
+      const date  = dateRaw
+        ? new Date(dateRaw).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'2-digit' })
         : '—';
       const roleClass = p.role === 'admin' ? 'role-admin' : 'role-user';
       const isMe = p.id === _adminUser?.id;
