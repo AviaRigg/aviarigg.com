@@ -172,18 +172,25 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/assets/js/nav-auth.js"></script>
   <script>
-    const _portSb = supabase.createClient(
-      'https://bbyiezjvonacajigqoik.supabase.co',
-      'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb'
-    );
+    // Reuse _navSb from nav-auth.js — no duplicate client
     let portEditMode = false;
     let portIsAdmin = false;
 
+    // Wait for nav-auth to initialize, then piggyback on its session
+    async function _getPortSb() {
+      // Wait until _navSb is defined (nav-auth.js loaded)
+      let attempts = 0;
+      while (typeof _navSb === 'undefined' && attempts++ < 20) {
+        await new Promise(r => setTimeout(r, 50));
+      }
+      return _navSb;
+    }
+
     document.addEventListener('DOMContentLoaded', async function() {
-      await new Promise(r => setTimeout(r, 350));
-      const { data: { session } } = await _portSb.auth.getSession();
+      const sb = await _getPortSb();
+      const { data: { session } } = await sb.auth.getSession();
       if (session) {
-        const { data: profile } = await _portSb.from('profiles').select('role').eq('id', session.user.id).single();
+        const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
         portIsAdmin = profile?.role === 'admin';
       }
       if (portIsAdmin) document.getElementById('port-edit-btn').style.display = 'block';
@@ -191,7 +198,8 @@
     });
 
     async function loadPortfolioStatuses() {
-      const { data } = await _portSb.from('portfolio_projects').select('id, status');
+      const sb = await _getPortSb();
+      const { data } = await sb.from('portfolio_projects').select('id, status');
       if (!data) return;
       let featuredId = null;
       data.forEach(({ id, status }) => {
@@ -239,7 +247,7 @@
       } else {
         card.classList.remove('port-draft', 'port-hidden');
       }
-      if (save) _portSb.from('portfolio_projects').upsert({ id, status, updated_at: new Date().toISOString() });
+      if (save) _getPortSb().then(sb => sb.from('portfolio_projects').upsert({ id, status, updated_at: new Date().toISOString() }));
     }
 
     function swapFeaturedCard(cardEl) {
