@@ -5,7 +5,7 @@
 //  and <script src="/assets/js/nav.js"></script>
 // ══════════════════════════════════════════
 
-document.addEventListener("DOMContentLoaded", function() {(function() {
+document.addEventListener("DOMContentLoaded", async function() {(function() {
   // Detect active page from pathname
   const path = window.location.pathname;
   function isActive(href) {
@@ -56,8 +56,8 @@ document.addEventListener("DOMContentLoaded", function() {(function() {
     document.body.insertAdjacentHTML('afterbegin', NAV_HTML);
   }
 
-  // Apply status AFTER nav is injected so .nav-badge exists
-  if (typeof loadAndApplySettings === 'function') loadAndApplySettings();
+  // Apply status AFTER nav is injected so .nav-badge exists in DOM
+  if (typeof loadAndApplySettings === 'function') await loadAndApplySettings();
 })();});
 
 function toggleMobileNav() {

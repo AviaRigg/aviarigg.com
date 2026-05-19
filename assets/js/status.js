@@ -8,7 +8,6 @@ const _STATUS_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
 const _STATUS_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
 
 async function loadAndApplySettings() {
-  window._statusApplied = true;
   let openToWork = true;
   let commissionsOpen = true;
 
@@ -35,19 +34,23 @@ async function loadAndApplySettings() {
 }
 
 function applyWorkStatus(val) {
-  // Always explicitly set — badge starts hidden via CSS, we show it only if on
+  // Show/hide nav badge
   document.querySelectorAll('.nav-badge').forEach(el => el.style.display = val ? '' : 'none');
+  // Show/hide hero bar "Available for Work" item
   document.querySelectorAll('.hero-bar-item').forEach(el => {
     if (el.textContent.includes('Available for Work') || el.textContent.includes('Open to Work'))
-      el.style.display = 'none';
+      el.style.display = val ? '' : 'none';
   });
+  // Show/hide "Open to Work" chip
   document.querySelectorAll('.chip').forEach(el => {
-    if (el.textContent.trim() === 'Open to Work') el.style.display = 'none';
+    if (el.textContent.trim() === 'Open to Work') el.style.display = val ? '' : 'none';
   });
+  // Show/hide contact panel
   const contactPanel = document.querySelector('.contact-panel');
-  if (contactPanel) contactPanel.style.display = 'none';
+  if (contactPanel) contactPanel.style.display = val ? '' : 'none';
+  // Show/hide open-to-work note block
   const otwnBlock = document.querySelector('.open-to-work-note');
-  if (otwnBlock) otwnBlock.style.display = 'none';
+  if (otwnBlock) otwnBlock.style.display = val ? '' : 'none';
 }
 
 function applyCommissionsStatus(val) {
@@ -89,7 +92,4 @@ function applyCommissionsStatus(val) {
   }
 }
 
-// Called by nav.js after nav is injected, or directly if nav.js not present
-document.addEventListener('DOMContentLoaded', () => {
-  if (typeof loadAndApplySettings === 'function' && !window._statusApplied) loadAndApplySettings();
-});
+document.addEventListener('DOMContentLoaded', loadAndApplySettings);
