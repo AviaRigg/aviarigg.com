@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset Password — AviaRigg</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
+<link rel="shortcut icon" href="/assets/icons/SiteIcon.png">
+<link rel="apple-touch-icon" href="/assets/icons/SiteIcon.png">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .page { display: block !important; }
+  :root { --text: #ffffff; }
+  .nav-logo, .nav-link, .nav-badge, .nav-drawer a,
+  .topnav a, .nav-links a { text-decoration: none; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg, #0c0b10);
+    padding-top: var(--nav-h, 68px);
+  }
+
+  .login-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(139,79,200,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139,79,200,0.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .login-bg-orb {
+    position: fixed; z-index: 0; pointer-events: none;
+    width: 700px; height: 700px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(139,79,200,0.08) 0%, transparent 70%);
+    top: -200px; left: 50%; transform: translateX(-50%);
+  }
+
+  .login-wrap {
+    position: relative; z-index: 1;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .login-panel {
+    width: 100%;
+    max-width: 420px;
+    background: var(--surface, #13121a);
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    border-top: 2px solid var(--accent, #8b4fc8);
+    padding: 48px 40px 40px;
+    animation: pgIn 0.35s ease;
+  }
+
+  @keyframes pgIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .login-eyebrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--accent2, #b06ef5);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .login-eyebrow::before {
+    content: ''; display: block;
+    width: 20px; height: 1px;
+    background: var(--accent, #8b4fc8);
+  }
+
+  .login-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 32px; font-weight: 700; letter-spacing: 1px;
+    color: var(--text-bright, #eeeef8);
+    margin-bottom: 6px;
+  }
+
+  .login-sub {
+    font-size: 13px; font-weight: 300;
+    color: var(--text-dim, #6a6a8a);
+    margin-bottom: 36px;
+    line-height: 1.5;
+  }
+
+  .login-field { margin-bottom: 20px; }
+
+  .login-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-dim, #6a6a8a);
+    display: block; margin-bottom: 8px;
+  }
+
+  .login-input {
+    width: 100%;
+    background: var(--bg, #0c0b10);
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    color: var(--text-bright, #eeeef8);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px; letter-spacing: 1px;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .login-input:focus { border-color: var(--accent, #8b4fc8); }
+  .login-input::placeholder { color: rgba(106,106,138,0.5); }
+
+  /* strength bar */
+  .pw-strength {
+    margin-top: 8px;
+    height: 2px;
+    background: var(--border, rgba(255,255,255,0.08));
+    position: relative;
+    overflow: hidden;
+  }
+  .pw-strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s, background 0.3s;
+  }
+  .pw-strength-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-dim, #6a6a8a);
+    margin-top: 5px;
+  }
+
+  #auth-error {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 2px;
+    color: #ff5050;
+    background: rgba(255,80,80,0.07);
+    border: 1px solid rgba(255,80,80,0.2);
+    border-left: 2px solid #ff5050;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    display: block;
+    transition: all 0.2s;
+  }
+  #auth-error:empty { display: none; }
+
+  .reset-success {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 2px;
+    color: #4fc88b;
+    background: rgba(79,200,139,0.07);
+    border: 1px solid rgba(79,200,139,0.2);
+    border-left: 2px solid #4fc88b;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    display: none;
+    line-height: 1.6;
+  }
+
+  /* invalid token state */
+  .invalid-token {
+    text-align: center;
+    padding: 20px 0;
+    display: none;
+  }
+  .invalid-token .icon { font-size: 32px; margin-bottom: 16px; }
+  .invalid-token p {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-dim, #6a6a8a);
+    line-height: 1.8;
+  }
+
+  .login-submit {
+    width: 100%;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    color: #fff;
+    background: var(--accent, #8b4fc8);
+    border: 1px solid var(--accent, #8b4fc8);
+    padding: 14px;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+    margin-top: 8px;
+  }
+  .login-submit:hover:not(:disabled) {
+    background: var(--accent2, #b06ef5);
+    border-color: var(--accent2, #b06ef5);
+  }
+  .login-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .login-footer {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border, rgba(255,255,255,0.08));
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .login-footer a {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent2, #b06ef5);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .login-footer a:hover { color: var(--text-bright, #eeeef8); }
+
+  #form-area { display: none; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
+  const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Supabase puts the token in the URL hash as #access_token=...&type=recovery
+  async function initReset() {
+    const hash = window.location.hash;
+    const params = new URLSearchParams(hash.replace('#', ''));
+    const type = params.get('type');
+    const accessToken = params.get('access_token');
+    const refreshToken = params.get('refresh_token');
+
+    if (type === 'recovery' && accessToken) {
+      // Set the session from the recovery tokens
+      const { error } = await _sb.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+      if (error) {
+        showInvalid();
+      } else {
+        document.getElementById('form-area').style.display = 'block';
+      }
+    } else {
+      showInvalid();
+    }
+  }
+
+  function showInvalid() {
+    document.getElementById('invalid-state').style.display = 'block';
+  }
+
+  function checkStrength(pw) {
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (pw.length >= 12) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    return score;
+  }
+
+  function updateStrength() {
+    const pw = document.getElementById('password').value;
+    const bar = document.getElementById('pw-bar');
+    const label = document.getElementById('pw-label');
+    const score = checkStrength(pw);
+    const pct = (score / 5) * 100;
+    const colors = ['#ff5050','#ff8c42','#f5c518','#4fc88b','#4fc88b'];
+    const labels = ['WEAK','WEAK','FAIR','STRONG','STRONG'];
+    bar.style.width = pct + '%';
+    bar.style.background = pw.length ? colors[score - 1] || '#ff5050' : 'transparent';
+    label.textContent = pw.length ? labels[score - 1] || 'WEAK' : '';
+  }
+
+  async function handleReset(e) {
+    e.preventDefault();
+    const pw = document.getElementById('password').value;
+    const pw2 = document.getElementById('password2').value;
+    const errEl = document.getElementById('auth-error');
+    const successEl = document.getElementById('reset-success');
+    const btn = document.getElementById('submit-btn');
+
+    errEl.textContent = '';
+
+    if (pw !== pw2) {
+      errEl.textContent = 'Passwords do not match.';
+      return;
+    }
+    if (checkStrength(pw) < 2) {
+      errEl.textContent = 'Password too weak. Use at least 8 characters.';
+      return;
+    }
+
+    btn.textContent = 'UPDATING...';
+    btn.disabled = true;
+
+    const { error } = await _sb.auth.updateUser({ password: pw });
+
+    if (error) {
+      errEl.textContent = error.message;
+      btn.textContent = 'Set New Password →';
+      btn.disabled = false;
+    } else {
+      successEl.style.display = 'block';
+      document.getElementById('form-area').style.display = 'none';
+      // Sign out so user logs in fresh with new password
+      await _sb.auth.signOut();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initReset);
+</script>
+<script src="/assets/js/status.js"></script>
+<script src="/assets/js/nav.js"></script>
+<script src="/assets/js/nav-auth.js"></script>
+</head>
+<body>
+
+<div class="login-bg"></div>
+<div class="login-bg-orb"></div>
+
+<div id="nav-root"></div>
+
+<div class="login-wrap">
+  <div class="login-panel">
+
+    <div class="login-eyebrow">Password Reset</div>
+    <div class="login-title">New Password</div>
+    <div class="login-sub">Choose a new password for your account.</div>
+
+    <!-- invalid/expired token -->
+    <div class="invalid-token" id="invalid-state">
+      <div class="icon">⚠</div>
+      <p>This reset link is invalid or has expired.<br><br>
+      Reset links are single-use and expire after 1 hour.</p>
+    </div>
+
+    <!-- success state -->
+    <div class="reset-success" id="reset-success">
+      Password updated successfully.<br>You can now log in with your new password.
+    </div>
+
+    <!-- form -->
+    <div id="form-area">
+      <span id="auth-error"></span>
+
+      <form onsubmit="handleReset(event)">
+        <div class="login-field">
+          <label class="login-label" for="password">New Password</label>
+          <input class="login-input" type="password" id="password"
+            placeholder="••••••••" required autocomplete="new-password"
+            oninput="updateStrength()">
+          <div class="pw-strength">
+            <div class="pw-strength-bar" id="pw-bar"></div>
+          </div>
+          <div class="pw-strength-label" id="pw-label"></div>
+        </div>
+
+        <div class="login-field">
+          <label class="login-label" for="password2">Confirm Password</label>
+          <input class="login-input" type="password" id="password2"
+            placeholder="••••••••" required autocomplete="new-password">
+        </div>
+
+        <button class="login-submit" type="submit" id="submit-btn">Set New Password →</button>
+      </form>
+    </div>
+
+    <div class="login-footer">
+      <a href="/pages/login">← Back to login</a>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

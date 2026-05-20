@@ -139,6 +139,7 @@
     transition: all 0.2s;
   }
   #auth-error:empty { display: none; }
+  #forgot-error:empty { display: none; }
 
   /* ── SUBMIT ── */
   .login-submit {
@@ -199,6 +200,31 @@
   }
   .login-back:hover { color: var(--text-bright, #eeeef8); }
   .login-back::before { content: '←'; }
+
+  /* ── SUCCESS MSG ── */
+  .reset-success {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 2px;
+    color: #4fc88b;
+    background: rgba(79,200,139,0.07);
+    border: 1px solid rgba(79,200,139,0.2);
+    border-left: 2px solid #4fc88b;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    display: none;
+    line-height: 1.6;
+  }
+
+  /* ── VIEW TOGGLE ── */
+  #forgot-view { display: none; }
+  .view-link {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent2, #b06ef5);
+    background: none; border: none; cursor: pointer;
+    padding: 0; transition: color 0.2s;
+  }
+  .view-link:hover { color: var(--text-bright, #eeeef8); }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -244,6 +270,42 @@
     }
   }
 
+  async function handleForgot(e) {
+    e.preventDefault();
+    const emailVal = document.getElementById('forgot-email').value.trim();
+    const errEl = document.getElementById('forgot-error');
+    const successEl = document.getElementById('forgot-success');
+    const btn = document.getElementById('forgot-btn');
+    errEl.textContent = '';
+    successEl.style.display = 'none';
+    btn.textContent = 'SENDING...';
+    btn.disabled = true;
+
+    const { error } = await _sb.auth.resetPasswordForEmail(emailVal, {
+      redirectTo: window.location.origin + '/pages/reset-password'
+    });
+
+    if (error) {
+      errEl.textContent = error.message;
+      btn.textContent = 'Send Reset Link →';
+      btn.disabled = false;
+    } else {
+      successEl.style.display = 'block';
+      btn.textContent = 'Send Reset Link →';
+      btn.disabled = false;
+    }
+  }
+
+  function showForgot() {
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('forgot-view').style.display = 'block';
+  }
+
+  function showLogin() {
+    document.getElementById('forgot-view').style.display = 'none';
+    document.getElementById('login-view').style.display = 'block';
+  }
+
   document.addEventListener('DOMContentLoaded', checkSession);
 </script>
 <script src="/assets/js/status.js"></script>
@@ -261,28 +323,59 @@
   <div class="login-panel">
     <a class="login-back" href="/">Back to site</a>
 
-    <div class="login-eyebrow">Access Portal</div>
-    <div class="login-title">Log In</div>
-    <div class="login-sub">Script Library access and commission tracking for registered users.</div>
+    <!-- LOGIN VIEW -->
+    <div id="login-view">
+      <div class="login-eyebrow">Access Portal</div>
+      <div class="login-title">Log In</div>
+      <div class="login-sub">Script Library access and commission tracking for registered users.</div>
 
-    <span id="auth-error"></span>
+      <span id="auth-error"></span>
 
-    <form onsubmit="handleLogin(event)">
-      <div class="login-field">
-        <label class="login-label" for="email">Email or Username</label>
-        <input class="login-input" type="text" id="email" placeholder="you@example.com or username" required autocomplete="username">
+      <form onsubmit="handleLogin(event)">
+        <div class="login-field">
+          <label class="login-label" for="email">Email or Username</label>
+          <input class="login-input" type="text" id="email" placeholder="you@example.com or username" required autocomplete="username">
+        </div>
+        <div class="login-field">
+          <label class="login-label" for="password">Password</label>
+          <input class="login-input" type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+
+        <button class="login-submit" type="submit" id="submit-btn">Log In →</button>
+      </form>
+
+      <div class="login-footer">
+        <span class="login-footer-text">No account?</span>
+        <a href="/pages/signup">Create free account →</a>
       </div>
-      <div class="login-field">
-        <label class="login-label" for="password">Password</label>
-        <input class="login-input" type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+      <div class="login-footer" style="margin-top: 12px; padding-top: 12px; border-top: none;">
+        <span class="login-footer-text">Forgot password?</span>
+        <button class="view-link" onclick="showForgot()">Reset via email →</button>
       </div>
+    </div>
 
-      <button class="login-submit" type="submit" id="submit-btn">Log In →</button>
-    </form>
+    <!-- FORGOT PASSWORD VIEW -->
+    <div id="forgot-view">
+      <div class="login-eyebrow">Password Reset</div>
+      <div class="login-title">Reset</div>
+      <div class="login-sub">Enter your email and we'll send you a reset link.</div>
 
-    <div class="login-footer">
-      <span class="login-footer-text">No account?</span>
-      <a href="/pages/signup">Create free account →</a>
+      <div class="reset-success" id="forgot-success">
+        Reset link sent — check your inbox.<br>The link expires after 1 hour.
+      </div>
+      <span id="forgot-error" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:#ff5050;background:rgba(255,80,80,0.07);border:1px solid rgba(255,80,80,0.2);border-left:2px solid #ff5050;padding:10px 14px;margin-bottom:20px;display:block;transition:all 0.2s;"></span>
+
+      <form onsubmit="handleForgot(event)">
+        <div class="login-field">
+          <label class="login-label" for="forgot-email">Email Address</label>
+          <input class="login-input" type="email" id="forgot-email" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <button class="login-submit" type="submit" id="forgot-btn">Send Reset Link →</button>
+      </form>
+
+      <div class="login-footer">
+        <button class="view-link" onclick="showLogin()">← Back to login</button>
+      </div>
     </div>
   </div>
 </div>
