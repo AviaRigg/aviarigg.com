@@ -1060,9 +1060,11 @@
       <!-- Filter row -->
       <div class="filter-row">
         <button class="filter-btn active" onclick="filterProducts('all',this)">All <span class="filter-count">4</span></button>
-        <button class="filter-btn" onclick="filterProducts('tool',this)">Tools <span class="filter-count">1</span></button>
-        <button class="filter-btn" onclick="filterProducts('rig',this)">Rigs <span class="filter-count">1</span></button>
-        <button class="filter-btn" onclick="filterProducts('soon',this)">Coming Soon <span class="filter-count">2</span></button>
+        <button class="filter-btn" onclick="filterProducts('rig',this)">Rigs <span class="filter-count">0</span></button>
+        <button class="filter-btn" onclick="filterProducts('tool',this)">Tools <span class="filter-count">0</span></button>
+        <button class="filter-btn" onclick="filterProducts('tutorial',this)">Tutorials <span class="filter-count">0</span></button>
+        <button class="filter-btn" onclick="filterProducts('model',this)">3D Models <span class="filter-count">0</span></button>
+        <button class="filter-btn" onclick="filterProducts('soon',this)">Coming Soon <span class="filter-count">0</span></button>
       </div>
 
       <!-- Product grid -->
@@ -1624,7 +1626,7 @@ function filterProducts(cat, btn) {
 
 function updateFilterCounts() {
   const cards = document.querySelectorAll('.product-card');
-  const counts = { all: 0, rig: 0, tool: 0, soon: 0 };
+  const counts = { all: 0, rig: 0, tool: 0, tutorial: 0, model: 0, soon: 0 };
   cards.forEach(card => {
     const isHidden = card.dataset.status === 'hidden' && !isAdmin;
     if (isHidden) return;
@@ -1669,16 +1671,33 @@ function updateScanHeights() {
 window.addEventListener('resize', updateScanHeights);
 async function loadProductStatuses() {
   const sb = await _getShopSb();
-  const { data: products } = await sb.from('shop_products').select('id, status, position').order('position', { ascending: true, nullsFirst: false }).order('id');
+  const { data: products } = await sb.from('shop_products').select('id, status, position, cat').order('position', { ascending: true, nullsFirst: false }).order('id');
   if (!products) return;
 
-  // Reorder DOM cards to match position from Supabase
+  // Reorder DOM cards and update category from Supabase
   const grid = document.getElementById('product-grid');
+  // Map cat text → filter slug
+  const catSlugMap = {
+    'Maya Rig': 'rig', 'Blender Rig': 'rig',
+    'Script': 'tool', 'Tutorial': 'tutorial',
+    '3D Model': 'model'
+  };
   if (grid) {
-    products.forEach(({ id }) => {
+    products.forEach(({ id, cat, status }) => {
       if (id === 'hero-featured') return;
       const card = document.querySelector(`[data-product-id="${id}"]`);
-      if (card) grid.appendChild(card); // moves to end in order
+      if (!card) return;
+      grid.appendChild(card);
+      // Update display category and filter slug from Supabase
+      if (cat) {
+        const catEl = card.querySelector('.pc-cat');
+        if (catEl) catEl.textContent = cat;
+        const slug = catSlugMap[cat] || 'tool';
+        if (status !== 'draft') {
+          card.dataset.cat = slug;
+          if (!card.dataset.originalCat) card.dataset.originalCat = slug;
+        }
+      }
     });
   }
 
