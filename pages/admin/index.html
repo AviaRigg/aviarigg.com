@@ -226,6 +226,37 @@
   .item-row.dragging { opacity: 0.4; }
   .item-row.drag-over { border-top: 2px solid var(--accent) !important; }
 
+  /* Inline editable pills */
+  .pill-wrap { position: relative; display: inline-flex; }
+  .pill-dropdown {
+    display: none; position: absolute; top: calc(100% + 4px); right: 0; z-index: 200;
+    background: var(--surface2,#0f0e1f); border: 1px solid var(--border);
+    min-width: 140px; flex-direction: column;
+  }
+  .pill-wrap.open .pill-dropdown { display: flex; }
+  .pill-opt {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; padding: 8px 12px; cursor: pointer; color: var(--text-dim);
+    border: none; background: none; text-align: left; transition: background .15s, color .15s;
+  }
+  .pill-opt:hover { background: rgba(139,79,200,.12); color: var(--text-bright); }
+  .pill-opt.active { color: var(--accent2); }
+
+  .cat-wrap { position: relative; display: inline-flex; }
+  .cat-dropdown {
+    display: none; position: absolute; top: calc(100% + 4px); left: 0; z-index: 200;
+    background: var(--surface2,#0f0e1f); border: 1px solid var(--border);
+    min-width: 160px; flex-direction: column;
+  }
+  .cat-wrap.open .cat-dropdown { display: flex; }
+  .cat-opt {
+    font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; padding: 8px 12px; cursor: pointer; color: var(--text-dim);
+    border: none; background: none; text-align: left; transition: background .15s, color .15s;
+  }
+  .cat-opt:hover { background: rgba(139,79,200,.12); color: var(--text-bright); }
+  .cat-opt.active { color: var(--accent2); }
+
   .item-row {
     display: flex; align-items: center;
     gap: 14px; padding: 12px 14px;
@@ -832,18 +863,34 @@
 
   async function loadProducts() {
     const sb = await _getAdminSb();
-    const { data } = await sb.from('shop_products').select('id, status, position').order('position', { ascending: true, nullsFirst: false }).order('id');
+    const { data } = await sb.from('shop_products').select('id, status, position, cat').order('position', { ascending: true, nullsFirst: false }).order('id');
     const el = document.getElementById('product-list');
     if (!data?.length) { el.innerHTML = '<div class="table-empty">No products found.</div>'; return; }
     const rows = data.filter(({ id }) => id !== 'hero-featured');
-    el.innerHTML = rows.map(({ id, status }, i) => {
+    el.innerHTML = rows.map(({ id, status, cat }, i) => {
       const m = PRODUCT_META[id] || { name: id, cat: '—', href: '#' };
+      const displayCat = cat || m.cat;
+      const shopStatusOpts = `<button class='pill-opt' onclick='saveStatus(this,"live","shop_products")'>LIVE</button>
+<button class='pill-opt' onclick='saveStatus(this,"draft","shop_products")'>DRAFT</button>
+<button class='pill-opt' onclick='saveStatus(this,"hidden","shop_products")'>HIDDEN</button>
+<button class='pill-opt' onclick='saveStatus(this,"featured","shop_products")'>FEATURED</button>`;
+      const shopCatOpts = `<button class='cat-opt' onclick='saveCat(this,"Maya Rig","shop_products")'>MAYA RIG</button>
+<button class='cat-opt' onclick='saveCat(this,"Blender Rig","shop_products")'>BLENDER RIG</button>
+<button class='cat-opt' onclick='saveCat(this,"Script","shop_products")'>SCRIPT</button>
+<button class='cat-opt' onclick='saveCat(this,"Tutorial","shop_products")'>TUTORIAL</button>
+<button class='cat-opt' onclick='saveCat(this,"3D Model","shop_products")'>3D MODEL</button>`;
       return `<div class="item-row" draggable="true" data-id="${id}" data-list="shop">
         <span class="drag-handle" title="Drag to reorder">⠿</span>
         <span class="item-num">${String(i+1).padStart(2,'0')}</span>
-        <span class="item-cat">${m.cat}</span>
+        <span class="cat-wrap" onclick="event.stopPropagation();toggleWrap(this)">
+          <span class="item-cat">${displayCat} ▾</span>
+          <div class="cat-dropdown">${shopCatOpts}</div>
+        </span>
         <span class="item-name">${m.name}</span>
-        <span class="status-pill pill-${status}">${status.toUpperCase()}</span>
+        <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
+          <span class="status-pill pill-${status}">${status.toUpperCase()} ▾</span>
+          <div class="pill-dropdown">${shopStatusOpts}</div>
+        </span>
         <a class="item-link" href="${m.href}">→</a>
       </div>`;
     }).join('');
@@ -863,21 +910,83 @@
 
   async function loadPortfolio() {
     const sb = await _getAdminSb();
-    const { data } = await sb.from('portfolio_projects').select('id, status, position').order('position', { ascending: true, nullsFirst: false }).order('id');
+    const { data } = await sb.from('portfolio_projects').select('id, status, position, cat').order('position', { ascending: true, nullsFirst: false }).order('id');
     const el = document.getElementById('port-list');
     if (!data?.length) { el.innerHTML = '<div class="table-empty">No projects found.</div>'; return; }
-    el.innerHTML = data.map(({ id, status }, i) => {
+    el.innerHTML = data.map(({ id, status, cat }, i) => {
       const m = PORT_META[id] || { name: id, cat: '—', href: '#' };
+      const displayCat = cat || m.cat;
+      const portStatusOpts = `<button class='pill-opt' onclick='saveStatus(this,"published","portfolio_projects")'>PUBLISHED</button>
+<button class='pill-opt' onclick='saveStatus(this,"draft","portfolio_projects")'>DRAFT</button>
+<button class='pill-opt' onclick='saveStatus(this,"hidden","portfolio_projects")'>HIDDEN</button>
+<button class='pill-opt' onclick='saveStatus(this,"featured","portfolio_projects")'>FEATURED</button>`;
+      const portCatOpts = `<button class='cat-opt' onclick='saveCat(this,"Hard Surface","portfolio_projects")'>HARD SURFACE</button>
+<button class='cat-opt' onclick='saveCat(this,"Character Rig","portfolio_projects")'>CHARACTER RIG</button>
+<button class='cat-opt' onclick='saveCat(this,"Creature Rig","portfolio_projects")'>CREATURE RIG</button>
+<button class='cat-opt' onclick='saveCat(this,"Vehicle Rig","portfolio_projects")'>VEHICLE RIG</button>
+<button class='cat-opt' onclick='saveCat(this,"Environment Rig","portfolio_projects")'>ENVIRONMENT RIG</button>
+<button class='cat-opt' onclick='saveCat(this,"Pipeline Tool","portfolio_projects")'>PIPELINE TOOL</button>
+<button class='cat-opt' onclick='saveCat(this,"Prop Rig","portfolio_projects")'>PROP RIG</button>`;
       return `<div class="item-row" draggable="true" data-id="${id}" data-list="portfolio">
         <span class="drag-handle" title="Drag to reorder">⠿</span>
         <span class="item-num">${String(i+1).padStart(2,'0')}</span>
-        <span class="item-cat">${m.cat}</span>
+        <span class="cat-wrap" onclick="event.stopPropagation();toggleWrap(this)">
+          <span class="item-cat">${displayCat} ▾</span>
+          <div class="cat-dropdown">${portCatOpts}</div>
+        </span>
         <span class="item-name">${m.name || id}</span>
-        <span class="status-pill pill-${status}">${status.toUpperCase()}</span>
+        <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
+          <span class="status-pill pill-${status}">${status.toUpperCase()} ▾</span>
+          <div class="pill-dropdown">${portStatusOpts}</div>
+        </span>
         <a class="item-link" href="${m.href}">→</a>
       </div>`;
     }).join('');
     initDrag(el, 'portfolio_projects');
+  }
+
+  // ── TOGGLE DROPDOWNS ──
+  function toggleWrap(el) {
+    const isOpen = el.classList.contains('open');
+    // Close all open wraps
+    document.querySelectorAll('.pill-wrap.open, .cat-wrap.open').forEach(w => w.classList.remove('open'));
+    if (!isOpen) el.classList.add('open');
+  }
+  // Close on outside click
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.pill-wrap.open, .cat-wrap.open').forEach(w => w.classList.remove('open'));
+  });
+
+  // ── SAVE STATUS ──
+  async function saveStatus(btn, newStatus, table) {
+    const row = btn.closest('.item-row');
+    const id = row.dataset.id;
+    const sb = await _getAdminSb();
+    const { error } = await sb.from(table).update({ status: newStatus, updated_at: new Date().toISOString() }).eq('id', id);
+    if (error) { console.error('Status save error:', error); return; }
+    // Update pill UI
+    const pill = row.querySelector('.status-pill');
+    pill.className = 'status-pill pill-' + newStatus;
+    pill.textContent = newStatus.toUpperCase() + ' ▾';
+    // Close dropdown
+    btn.closest('.pill-wrap').classList.remove('open');
+    // Highlight active
+    btn.closest('.pill-dropdown').querySelectorAll('.pill-opt').forEach(o => o.classList.toggle('active', o === btn));
+  }
+
+  // ── SAVE CAT ──
+  async function saveCat(btn, newCat, table) {
+    const row = btn.closest('.item-row');
+    const id = row.dataset.id;
+    const sb = await _getAdminSb();
+    const { error } = await sb.from(table).update({ cat: newCat, updated_at: new Date().toISOString() }).eq('id', id);
+    if (error) { console.error('Cat save error:', error); return; }
+    // Update cat UI
+    const catEl = row.querySelector('.item-cat');
+    catEl.textContent = newCat + ' ▾';
+    // Close dropdown
+    btn.closest('.cat-wrap').classList.remove('open');
+    btn.closest('.cat-dropdown').querySelectorAll('.cat-opt').forEach(o => o.classList.toggle('active', o === btn));
   }
 
   // ── DRAG TO REORDER ──
