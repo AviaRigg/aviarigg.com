@@ -18,6 +18,12 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 /* NAV — handled by nav.js + style.css */
 
+/* PAGE HEADER — match portfolio style */
+.port-header{padding:clamp(32px,4vw,56px) 0 0;}
+.eyebrow{font-family:'Share Tech Mono',monospace;font-size:clamp(9px,.8vw,11px);letter-spacing:4px;text-transform:uppercase;color:var(--txd);display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.eyebrow::before{content:'—';color:var(--ac);}
+.section-h{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,4vw,56px);font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--txb);line-height:1;margin-bottom:0;}
+
 /* TOC */
 .toc{position:fixed;right:24px;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:8px;}
 @media(max-width:1200px){.toc{display:none;}}
@@ -173,6 +179,12 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 <script src="/assets/js/nav-auth.js"></script>
 
 <div class="wrap">
+
+<!-- ─── PAGE HEADER ─── -->
+<div class="port-header" style="margin-bottom:clamp(32px,4vw,56px);">
+  <div class="eyebrow">Portfolio</div>
+  <div class="section-h">SF-26 Breakdown</div>
+</div>
 
 <!-- ─── HERO ─── -->
 <div id="s-hero" class="hero">
