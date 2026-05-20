@@ -3734,7 +3734,7 @@ body::before {
 .rig-ey::before{content:'';width:32px;height:1px;background:var(--accent);}
 
 /* Page header */
-.rig-page-header{margin-bottom:clamp(32px,4vw,56px);padding-bottom:clamp(24px,3vw,40px);border-bottom:1px solid var(--border);}
+.rig-page-header{padding:clamp(32px,5vw,64px) clamp(20px,5vw,80px) clamp(24px,3vw,40px);border-bottom:1px solid var(--border);}
 .rig-page-eyebrow{font-family:'Share Tech Mono',monospace;font-size:clamp(9px,.8vw,11px);letter-spacing:4px;text-transform:uppercase;color:var(--text-dim);display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .rig-page-eyebrow::before{content:'—';color:var(--accent);}
 .rig-page-title{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,4vw,72px);font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-bright);line-height:1;}
