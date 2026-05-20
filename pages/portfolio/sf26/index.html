@@ -29,8 +29,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .rig-ik  { color: var(--tx) !important; font-size: clamp(10px, 0.9vw, 13px) !important; }
 .rig-iv  { font-size: clamp(16px, 1.4vw, 22px) !important; }
 .rig-ey  { color: var(--ac2) !important; font-size: clamp(11px, 1vw, 15px) !important; }
-.rig-swn { font-size: clamp(12px, 1vw, 16px) !important; }
+.rig-swn { font-size: clamp(13px, 1.1vw, 18px) !important; letter-spacing: 2px !important; }
 .rig-swd { color: var(--tx) !important; font-size: clamp(12px, 1vw, 16px) !important; }
+.rig-swb { width: clamp(28px, 2vw, 40px) !important; height: clamp(28px, 2vw, 40px) !important; flex-shrink: 0 !important; }
 .rig-tab { font-size: clamp(10px, 0.9vw, 14px) !important; color: var(--tx) !important; }
 .rig-badge { font-size: clamp(10px, 0.9vw, 14px) !important; }
 
@@ -167,7 +168,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       </div>
       <!-- BEFORE — clipped on top, fills from left, shows when slider is right -->
       <div class="rig-cb" id="rig-cb">
-        <div class="rig-cbi" id="rig-cbi" style="background:#110920;">
+        <div class="rig-cbi" id="rig-cbi" style="background:#110920;position:absolute;top:0;left:0;right:0;bottom:0;width:auto;min-width:unset;">
           <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice"><rect width="800" height="450" fill="#110920"/><rect width="800" height="450" fill="url(#g4)" opacity=".4"/></svg>
           <div style="position:absolute;bottom:14px;left:16px;z-index:1;"></div>
         </div>
@@ -175,7 +176,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <div class="rig-cl" id="rig-cl"></div>
       <div class="rig-ch2" id="rig-ch2"><svg width="20" height="14" viewBox="0 0 20 14" fill="none"><path d="M6 1L1 7L6 13" stroke="rgba(255,255,255,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 1L19 7L14 13" stroke="rgba(255,255,255,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
-    <div class="rig-cap"><span id="cmp-caption">// Shoulder — 90° raise</span><span>Drag ◁▷</span></div>
+    <div class="rig-cap"><span id="cmp-caption">// Shoulder — 90° raise</span><span style="display:flex;gap:16px;align-items:center;"><span id="before-label" style="font-size:10px;opacity:.5;"></span><span id="after-label" style="font-size:10px;opacity:.5;"></span><span>Drag ◁▷</span></span></div>
   </div>
   <div class="rig-g4" style="margin-top:2px;">
     <div class="rig-note rig-corr-card active-card" data-n="A" data-joint="shoulder" data-label="// Shoulder — 90° raise" onclick="switchCorr(this)" style="cursor:pointer;border-color:rgba(139,79,200,.5);">
@@ -285,11 +286,11 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="rig-card">
       <div class="rig-ch"><span class="rig-ct">// Color Coding</span></div>
       <div class="rig-sw-list">
-        <div class="rig-sw"><div class="rig-swb" style="background:rgba(139,79,200,.5);border:1px solid rgba(139,79,200,.8);"></div><div><div class="rig-swn">Purple — Centre</div><div class="rig-swd">Spine, head, jaw, root</div></div></div>
-        <div class="rig-sw"><div class="rig-swb" style="background:rgba(30,80,200,.5);border:1px solid rgba(80,140,255,.8);"></div><div><div class="rig-swn">Blue — Left side</div><div class="rig-swd">L arm, L leg, L foot, L hand</div></div></div>
-        <div class="rig-sw"><div class="rig-swb" style="background:rgba(200,100,20,.5);border:1px solid rgba(255,140,40,.8);"></div><div><div class="rig-swn">Orange — Right side</div><div class="rig-swd">R arm, R leg, R foot, R hand</div></div></div>
-        <div class="rig-sw"><div class="rig-swb" style="background:rgba(0,232,122,.15);border:1px solid rgba(0,232,122,.6);"></div><div><div class="rig-swn">Green — IK targets</div><div class="rig-swd">IK handles, pole vectors</div></div></div>
-        <div class="rig-sw"><div class="rig-swb" style="background:rgba(255,77,106,.15);border:1px solid rgba(255,77,106,.6);"></div><div><div class="rig-swn">Red — Global / Root</div><div class="rig-swd">World offset, global scale</div></div></div>
+        <div class="rig-sw"><div class="rig-swb" style="width:32px;height:32px;flex-shrink:0;" style="background:rgba(139,79,200,.5);border:1px solid rgba(139,79,200,.8);"></div><div><div class="rig-swn">Purple — Centre</div><div class="rig-swd">Spine, head, jaw, root</div></div></div>
+        <div class="rig-sw"><div class="rig-swb" style="width:32px;height:32px;flex-shrink:0;" style="background:rgba(30,80,200,.5);border:1px solid rgba(80,140,255,.8);"></div><div><div class="rig-swn">Blue — Left side</div><div class="rig-swd">L arm, L leg, L foot, L hand</div></div></div>
+        <div class="rig-sw"><div class="rig-swb" style="width:32px;height:32px;flex-shrink:0;" style="background:rgba(200,100,20,.5);border:1px solid rgba(255,140,40,.8);"></div><div><div class="rig-swn">Orange — Right side</div><div class="rig-swd">R arm, R leg, R foot, R hand</div></div></div>
+        <div class="rig-sw"><div class="rig-swb" style="width:32px;height:32px;flex-shrink:0;" style="background:rgba(0,232,122,.15);border:1px solid rgba(0,232,122,.6);"></div><div><div class="rig-swn">Green — IK targets</div><div class="rig-swd">IK handles, pole vectors</div></div></div>
+        <div class="rig-sw"><div class="rig-swb" style="width:32px;height:32px;flex-shrink:0;" style="background:rgba(255,77,106,.15);border:1px solid rgba(255,77,106,.6);"></div><div><div class="rig-swn">Red — Global / Root</div><div class="rig-swd">World offset, global scale</div></div></div>
       </div>
       <div class="rig-cap" style="border-top:1px solid var(--bor);">// Built with AviaRigg Controller Shape Menu</div>
     </div>
@@ -308,14 +309,14 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 </div><!-- .rig-wrap -->
 
 <script>
-// TAB SWITCHER
+// ── TAB SWITCHER ──
 function st(group, id, btn) {
   document.querySelectorAll('[id^="'+group+'-"]').forEach(p => p.classList.toggle('active', p.id === group+'-'+id));
   btn.closest('.rig-tb').querySelectorAll('.rig-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
 }
 
-// BLEND SHAPES
+// ── BLEND SHAPES ──
 const BS = {
   brow:  ['browInnerUp_L','browInnerUp_R','browDown_L','browDown_R','browOuter_L','browOuter_R','browFurrow','browRaise_L','browRaise_R','browSquint_L','browSquint_R','browPinch'],
   eye:   ['eyeBlink_L','eyeBlink_R','eyeWide_L','eyeWide_R','eyeSquint_L','eyeSquint_R','eyeLookUp_L','eyeLookUp_R','eyeLookDown_L','eyeLookDown_R','eyeLookIn_L','eyeLookOut_R','eyeWink_L','eyeWink_R'],
@@ -330,102 +331,110 @@ function bs(cat, btn) {
   const shapes = BS[cat];
   document.getElementById('bs-label').textContent = '// '+BN[cat]+' — '+shapes.length+' shapes';
   document.getElementById('bs-content').innerHTML =
-    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1px;background:var(--bor);">'+
-    shapes.map(s=>'<div style="background:var(--sur);padding:10px 12px;font-family:\'Share Tech Mono\',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--txd);cursor:pointer;transition:background .15s;" onmouseenter="this.style.background=\'rgba(139,79,200,.08)\'" onmouseleave="this.style.background=\'var(--sur)\'">'+s+'</div>').join('')+'</div>';
+    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1px;background:var(--bor);">'+
+    shapes.map(s=>'<div style="background:var(--sur);padding:12px 14px;font-family:\'Share Tech Mono\',monospace;font-size:clamp(10px,0.9vw,13px);letter-spacing:1px;text-transform:uppercase;color:var(--tx);cursor:pointer;transition:background .15s;" onmouseenter="this.style.background=\'rgba(139,79,200,.1)\'" onmouseleave="this.style.background=\'var(--sur)\'">'+s+'</div>').join('')+'</div>';
   btn.closest('.rig-tb').querySelectorAll('.rig-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
 }
-bs('brow', document.querySelector('#s-bs .tab'));
+document.addEventListener('DOMContentLoaded', () => {
+  const firstTab = document.querySelector('#s-bs .rig-tab');
+  if (firstTab) bs('brow', firstTab);
+});
 
-// CORRECTIVE SELECTOR
+// ── CORRECTIVE SELECTOR ──
 const CORR = {
-  shoulder: { label:'// Shoulder — 90° raise',   before:'sf26-deform-before.jpg', after:'sf26-deform-after.jpg' },
-  elbow:    { label:'// Elbow — full flex',       before:'sf26-elbow-before.jpg',    after:'sf26-elbow-after.jpg'    },
-  knee:     { label:'// Knee — deep bend',        before:'sf26-knee-before.jpg',     after:'sf26-knee-after.jpg'     },
-  wrist:    { label:'// Wrist — extreme flex',    before:'sf26-wrist-before.jpg',    after:'sf26-wrist-after.jpg'    }
+  shoulder: { label:'// Shoulder — 90° raise',  before:'sf26-deform-before.jpg', after:'sf26-deform-after.jpg' },
+  elbow:    { label:'// Elbow — full flex',      before:'sf26-elbow-before.jpg',  after:'sf26-elbow-after.jpg'  },
+  knee:     { label:'// Knee — deep bend',       before:'sf26-knee-before.jpg',   after:'sf26-knee-after.jpg'   },
+  wrist:    { label:'// Wrist — extreme flex',   before:'sf26-wrist-before.jpg',  after:'sf26-wrist-after.jpg'  }
 };
 function switchCorr(card) {
-  document.querySelectorAll('.rig-corr-card').forEach(c => {
-    c.classList.remove('active-card');
-    c.style.borderColor = '';
-  });
+  document.querySelectorAll('.rig-corr-card').forEach(c => { c.classList.remove('active-card'); c.style.borderColor = ''; });
   card.classList.add('active-card');
   card.style.borderColor = 'rgba(139,79,200,.5)';
-  const joint = card.dataset.joint;
-  const d = CORR[joint];
-  document.getElementById('cmp-caption').textContent = d.label;
-  document.getElementById('after-label').textContent  = d.after;
-  document.getElementById('before-label').textContent = d.before;
+  const d = CORR[card.dataset.joint];
+  if (!d) return;
+  const cap = document.getElementById('cmp-caption');
+  const al  = document.getElementById('after-label');
+  const bl  = document.getElementById('before-label');
+  if (cap) cap.textContent = d.label;
+  if (al)  al.textContent  = d.after;
+  if (bl)  bl.textContent  = d.before;
   if (window._sliderReset) window._sliderReset();
 }
 
+// ── COMPARE SLIDER ──
 (function(){
-  const w=document.getElementById('rig-cmp');
-  const b=document.getElementById('rig-cb');
-  const l=document.getElementById('rig-cl');
-  const h=document.getElementById('rig-ch2');
-  if(!w||!b||!l||!h) return;
-  let drag=false;
-  function pos(x){
-    const r=w.getBoundingClientRect();
-    const p=Math.max(0,Math.min(1,(x-r.left)/r.width));
-    const s=(p*100)+'%';
-    b.style.width=s; l.style.left=s; h.style.left=s;
+  const w  = document.getElementById('rig-cmp');
+  const b  = document.getElementById('rig-cb');
+  const l  = document.getElementById('rig-cl');
+  const hh = document.getElementById('rig-ch2');
+  if (!w||!b||!l||!hh) { console.warn('Slider elements missing'); return; }
+  let drag = false;
+  function setPos(x) {
+    const r = w.getBoundingClientRect();
+    const p = Math.max(0, Math.min(1, (x - r.left) / r.width));
+    const s = (p * 100) + '%';
+    b.style.width = s; l.style.left = s; hh.style.left = s;
   }
-  w.addEventListener('mousedown',e=>{drag=true;pos(e.clientX);e.preventDefault();});
-  window.addEventListener('mousemove',e=>{if(drag)pos(e.clientX);});
-  window.addEventListener('mouseup',()=>{drag=false;});
-  w.addEventListener('touchstart',e=>{drag=true;pos(e.touches[0].clientX);e.preventDefault();},{passive:false});
-  window.addEventListener('touchmove',e=>{if(drag)pos(e.touches[0].clientX);},{passive:true});
-  window.addEventListener('touchend',()=>{drag=false;});
-  window._sliderReset=function(){b.style.width='50%';l.style.left='50%';h.style.left='50%';};
-  // init at 50%
-  requestAnimationFrame(()=>window._sliderReset());
+  w.addEventListener('mousedown', e => { drag=true; setPos(e.clientX); e.preventDefault(); });
+  window.addEventListener('mousemove', e => { if (drag) setPos(e.clientX); });
+  window.addEventListener('mouseup', () => { drag=false; });
+  w.addEventListener('touchstart', e => { drag=true; setPos(e.touches[0].clientX); e.preventDefault(); }, {passive:false});
+  window.addEventListener('touchmove', e => { if (drag) setPos(e.touches[0].clientX); }, {passive:true});
+  window.addEventListener('touchend', () => { drag=false; });
+  function reset() { b.style.width='50%'; l.style.left='50%'; hh.style.left='50%'; }
+  window._sliderReset = reset;
+  requestAnimationFrame(() => requestAnimationFrame(reset));
 })();
 
-// TOC — scroll through dots on wheel/drag
-function g(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});}
-const IDS=['s-hero','s-video','s-wire','s-topo','s-deform','s-facial','s-bs','s-uv','s-tex','s-ctrl'];
-const dots=document.querySelectorAll('.td');
+// ── TOC ──
+function g(id) { document.getElementById(id)?.scrollIntoView({behavior:'smooth', block:'start'}); }
+const IDS  = ['s-hero','s-video','s-wire','s-topo','s-deform','s-facial','s-bs','s-uv','s-tex','s-ctrl'];
+const dots = Array.from(document.querySelectorAll('.td'));
 
-// Highlight active dot on scroll
-IDS.forEach(id=>{
-  const el=document.getElementById(id);
-  if(!el)return;
-  new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        const i=IDS.indexOf(id);
-        dots.forEach(d=>d.classList.remove('active'));
-        dots[i]?.classList.add('active');
-      }
-    });
-  },{threshold:0.3}).observe(el);
-});
+function setActiveDot(idx) {
+  dots.forEach(d => d.classList.remove('active'));
+  if (dots[idx]) dots[idx].classList.add('active');
+}
 
-// Scroll through sections by wheeling over TOC
-const toc=document.getElementById('toc');
-if(toc){
-  toc.addEventListener('wheel',e=>{
-    e.preventDefault();
-    const active=Array.from(dots).findIndex(d=>d.classList.contains('active'));
-    const next=e.deltaY>0?Math.min(active+1,IDS.length-1):Math.max(active-1,0);
-    g(IDS[next]);
-  },{passive:false});
-  // Drag through dots
-  let tocDrag=false, tocY=0;
-  toc.addEventListener('mousedown',e=>{tocDrag=true;tocY=e.clientY;e.preventDefault();});
-  window.addEventListener('mousemove',e=>{
-    if(!tocDrag)return;
-    const dy=e.clientY-tocY;
-    if(Math.abs(dy)>20){
-      const active=Array.from(dots).findIndex(d=>d.classList.contains('active'));
-      const next=dy>0?Math.min(active+1,IDS.length-1):Math.max(active-1,0);
-      g(IDS[next]);
-      tocY=e.clientY;
-    }
+// Track active section by scroll position (reliable across all layouts)
+function updateTOC() {
+  const mid = window.scrollY + window.innerHeight * 0.4;
+  let active = 0;
+  IDS.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top + window.scrollY <= mid) active = i;
   });
-  window.addEventListener('mouseup',()=>{tocDrag=false;});
+  setActiveDot(active);
+}
+window.addEventListener('scroll', updateTOC, {passive:true});
+updateTOC();
+
+// Wheel over TOC = scroll sections
+const toc = document.getElementById('toc');
+if (toc) {
+  toc.addEventListener('wheel', e => {
+    e.preventDefault();
+    const cur  = dots.findIndex(d => d.classList.contains('active'));
+    const next = e.deltaY > 0 ? Math.min(cur+1, IDS.length-1) : Math.max(cur-1, 0);
+    g(IDS[next]);
+  }, {passive:false});
+
+  // Drag vertically over TOC = navigate
+  let tocDrag=false, tocStartY=0, tocStartIdx=0;
+  toc.addEventListener('mousedown', e => {
+    tocDrag=true; tocStartY=e.clientY;
+    tocStartIdx=dots.findIndex(d=>d.classList.contains('active'));
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', e => {
+    if (!tocDrag) return;
+    const step = Math.round((tocStartY - e.clientY) / 24);
+    const next = Math.max(0, Math.min(IDS.length-1, tocStartIdx - step));
+    g(IDS[next]);
+  });
+  window.addEventListener('mouseup', () => { tocDrag=false; });
 }
 </script>
 </body>
