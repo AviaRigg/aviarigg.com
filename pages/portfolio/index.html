@@ -324,21 +324,24 @@
             if (ph) ph.remove();
           }
         } else {
-          // Customer: visible but dim, unclickable, no thumbnail
+          // Customer: visible but dim, unclickable
           card.classList.add('dim');
           card.dataset.onclickDisabled = card.getAttribute('onclick') || '';
           card.removeAttribute('onclick');
-          // Hide thumbnail, show Coming Soon
-          const thumb = card.querySelector('.pc-thumb');
-          if (thumb) {
-            const img = thumb.querySelector('img');
-            if (img) { img.dataset.realSrc = img.dataset.realSrc || img.src; img.style.display = 'none'; }
-            if (!thumb.querySelector('.admin-placeholder')) {
-              const ph = document.createElement('div');
-              ph.className = 'admin-placeholder';
-              ph.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;font-family:"Share Tech Mono",monospace;font-size:clamp(11px,1vw,14px);letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);';
-              ph.textContent = '// Coming Soon';
-              thumb.appendChild(ph);
+          // Only hide thumbnail and show Coming Soon if card has no real image
+          const hasRealImg = card.dataset.img && card.dataset.img.trim() !== '';
+          if (!hasRealImg) {
+            const thumb = card.querySelector('.pc-thumb');
+            if (thumb) {
+              const img = thumb.querySelector('img');
+              if (img) { img.dataset.realSrc = img.dataset.realSrc || img.src; img.style.display = 'none'; }
+              if (!thumb.querySelector('.admin-placeholder')) {
+                const ph = document.createElement('div');
+                ph.className = 'admin-placeholder';
+                ph.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;font-family:"Share Tech Mono",monospace;font-size:clamp(11px,1vw,14px);letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);';
+                ph.textContent = '// Coming Soon';
+                thumb.appendChild(ph);
+              }
             }
           }
         }
