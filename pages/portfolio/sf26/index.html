@@ -37,7 +37,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 /* ── TOC DOTS — bigger, scrollable ── */
 .rig-toc { gap: clamp(4px, 0.6vw, 10px) !important; cursor: ns-resize; }
-.toc-hit { display:flex; align-items:center; justify-content:center; width:28px; height:28px; cursor:pointer; position:relative; }
+.toc-hit { display:flex; align-items:center; justify-content:center; width:44px; height:44px; cursor:pointer; position:relative; margin:-8px 0; }
 .toc-hit .td::after { right: 28px; }
 .td { width: clamp(7px, 0.7vw, 12px) !important; height: clamp(7px, 0.7vw, 12px) !important; }
 .td::after { font-size: clamp(9px, 0.8vw, 12px) !important; }
@@ -396,7 +396,7 @@ function g(id) {
   const el = document.getElementById(id);
   if (!el) return;
   const navH = 64;
-  const top = el.getBoundingClientRect().top + window.scrollY - navH - 8;
+  const top = el.getBoundingClientRect().top + window.scrollY - navH - 32;
   window.scrollTo({top, behavior: 'smooth'});
 }
 const IDS  = ['s-hero','s-video','s-wire','s-topo','s-deform','s-facial','s-bs','s-uv','s-tex','s-ctrl'];
