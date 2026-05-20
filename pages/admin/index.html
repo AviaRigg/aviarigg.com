@@ -868,7 +868,7 @@
   async function loadUsers() {
     const sb = await _getAdminSb();
     const { data, error } = await sb
-      .from('profiles')
+      .from('profiles_with_created_at')
       .select('*');
 
     const tbody   = document.getElementById('user-table-body');
