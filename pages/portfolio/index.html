@@ -218,7 +218,7 @@
         });
       }
       const sb = await _getPortSb();
-      const { data } = await sb.from('portfolio_projects').select('id, status');
+      const { data } = await sb.from('portfolio_projects').select('id, status, position').order('position', { ascending: true, nullsFirst: false }).order('id');
       if (!data) return;
 
       let featuredId = null;

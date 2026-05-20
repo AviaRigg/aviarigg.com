@@ -1669,7 +1669,7 @@ function updateScanHeights() {
 window.addEventListener('resize', updateScanHeights);
 async function loadProductStatuses() {
   const sb = await _getShopSb();
-  const { data: products } = await sb.from('shop_products').select('id, status');
+  const { data: products } = await sb.from('shop_products').select('id, status, position').order('position', { ascending: true, nullsFirst: false }).order('id');
   if (!products) return;
 
   let featuredId = null;
