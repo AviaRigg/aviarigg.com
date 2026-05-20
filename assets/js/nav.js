@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 <div class="nav-drawer" id="nav-drawer">
   ${drawerLinks}
   <a class="nav-badge" href="/pages/contact">&#9679; Open to Work</a>
+  <div id="nav-auth-container-mobile" style="padding:16px 0 8px;border-top:1px solid rgba(255,255,255,0.06);margin-top:8px;"><a class="nav-auth-link" href="/pages/login">Log In</a></div>
 </div>`;
 
   // Inject nav

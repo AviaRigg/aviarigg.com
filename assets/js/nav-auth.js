@@ -27,16 +27,20 @@ async function _handleNavSession(user) {
 
 function _updateNavAuth() {
   const c = document.getElementById('nav-auth-container');
+  const cm = document.getElementById('nav-auth-container-mobile');
   if (!c) return;
   c.classList.add('ready');
+  let html;
   if (_navUser) {
     const name = _navProfile?.username || _navUser.email.split('@')[0];
     const isAdmin = _navProfile?.role === 'admin';
-    c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="_toggleNavMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${_navUser.email}</div>${isAdmin ? '<a class="nav-dropdown-item nav-dropdown-admin" href="/pages/admin">Admin Panel</a><div class="nav-dropdown-divider"></div><button class="nav-dropdown-item" id="admin-toggle-otw" onclick="_navToggleOTW()">Work Status: ...</button><div class="nav-dropdown-divider"></div>' : ''}<button class="nav-dropdown-item" onclick="_navLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="_navDeleteAccount()">Delete Account</button></div></div>`;
+    html = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="_toggleNavMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${_navUser.email}</div>${isAdmin ? '<a class="nav-dropdown-item nav-dropdown-admin" href="/pages/admin">Admin Panel</a><div class="nav-dropdown-divider"></div><button class="nav-dropdown-item" id="admin-toggle-otw" onclick="_navToggleOTW()">Work Status: ...</button><div class="nav-dropdown-divider"></div>' : ''}<button class="nav-dropdown-item" onclick="_navLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="_navDeleteAccount()">Delete Account</button></div></div>`;
     if (isAdmin) _navLoadOTW();
   } else {
-    c.innerHTML = '<a class="nav-auth-link" href="/pages/login">Log In</a>';
+    html = '<a class="nav-auth-link" href="/pages/login">Log In</a>';
   }
+  c.innerHTML = html;
+  if (cm) cm.innerHTML = html;
 }
 
 function _toggleNavMenu(e) {
