@@ -11,6 +11,36 @@
 <style>
 :root{--bg:#06060f;--sur:#0b0a18;--bor:#1a1830;--ac:#8b4fc8;--ac2:#b06ef5;--tx:#c0b8d8;--txd:#6a6088;--txb:#ede8ff;--gr:#00e87a;--rd:#ff4d6a;--ye:#f5c518;}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(139,79,200,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(139,79,200,.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+
+/* ── TEXT READABILITY OVERRIDES ── */
+/* captions, section labels, small text — much brighter */
+.rig-cap { color: var(--txb) !important; font-size: clamp(10px, 0.9vw, 14px) !important; }
+.rig-ph-label { color: var(--tx) !important; font-size: clamp(10px, 0.9vw, 13px) !important; }
+.rig-ph-label b { color: var(--ac2) !important; font-size: clamp(11px, 1vw, 15px) !important; }
+.rig-sl { color: var(--tx) !important; font-size: clamp(11px, 1vw, 15px) !important; }
+.rig-sk { color: var(--tx) !important; font-size: clamp(10px, 0.9vw, 13px) !important; }
+.rig-sv { font-size: clamp(15px, 1.4vw, 22px) !important; }
+.rig-ct { color: var(--tx) !important; font-size: clamp(11px, 1vw, 15px) !important; }
+.rig-nn { color: var(--ac2) !important; font-size: clamp(10px, 0.9vw, 14px) !important; }
+.rig-nt { font-size: clamp(16px, 1.5vw, 22px) !important; }
+.rig-nd { color: var(--tx) !important; font-size: clamp(13px, 1.1vw, 17px) !important; }
+.rig-fct { color: var(--ac2) !important; font-size: clamp(10px, 0.9vw, 13px) !important; }
+.rig-fr  { color: var(--tx) !important; font-size: clamp(11px, 1vw, 15px) !important; }
+.rig-ik  { color: var(--tx) !important; font-size: clamp(10px, 0.9vw, 13px) !important; }
+.rig-iv  { font-size: clamp(16px, 1.4vw, 22px) !important; }
+.rig-ey  { color: var(--ac2) !important; font-size: clamp(11px, 1vw, 15px) !important; }
+.rig-swn { font-size: clamp(12px, 1vw, 16px) !important; }
+.rig-swd { color: var(--tx) !important; font-size: clamp(12px, 1vw, 16px) !important; }
+.rig-tab { font-size: clamp(10px, 0.9vw, 14px) !important; color: var(--tx) !important; }
+.rig-badge { font-size: clamp(10px, 0.9vw, 14px) !important; }
+
+/* ── TOC DOTS — bigger, scrollable ── */
+.rig-toc { gap: clamp(10px, 1.2vw, 18px) !important; cursor: ns-resize; }
+.td { width: clamp(7px, 0.7vw, 12px) !important; height: clamp(7px, 0.7vw, 12px) !important; }
+.td::after { font-size: clamp(9px, 0.8vw, 12px) !important; }
+
+/* ── SLIDER FIX ── */
+.rig-cbi { position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: auto !important; min-width: unset !important; }
 </style>
 </head>
 <body>
@@ -101,7 +131,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 <div id="s-wire" class="rig-sec">
   <div class="rig-sl">// Wireframe &amp; Skeleton</div>
   <div class="rig-g2" style="margin-bottom:2px;">
-    <div class="card s2"><div class="rig-ph r219"><svg class="bg" viewBox="0 0 900 385" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g2" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0L0 0 0 30" class="rig-ph-grid-bg"/></pattern></defs><rect width="900" height="385" fill="url(#g2)"/><line x1="300" y1="10" x2="300" y2="375" stroke="#1a1830" stroke-width="1"/><line x1="600" y1="10" x2="600" y2="375" stroke="#1a1830" stroke-width="1"/><text x="150" y="22" fill="#6a6088" font-family="monospace" font-size="9" text-anchor="middle" letter-spacing="2">FRONT VIEW</text><text x="450" y="22" fill="#6a6088" font-family="monospace" font-size="9" text-anchor="middle" letter-spacing="2">SIDE VIEW</text><text x="750" y="22" fill="#6a6088" font-family="monospace" font-size="9" text-anchor="middle" letter-spacing="2">BACK VIEW</text></svg><div class="rig-ph-label"><b>sf26-skeleton-3view.jpg</b>Skeleton — front / side / back</div></div><div class="rig-cap"><span>// 214-joint skeleton · 3 views</span><span>/projects/f1_SF26/images/</span></div></div>
+    <div class="rig-card rig-s2"><div class="rig-ph r219"><svg class="bg" viewBox="0 0 900 385" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g2" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0L0 0 0 30" class="rig-ph-grid-bg"/></pattern></defs><rect width="900" height="385" fill="url(#g2)"/><line x1="300" y1="10" x2="300" y2="375" stroke="#1a1830" stroke-width="1"/><line x1="600" y1="10" x2="600" y2="375" stroke="#1a1830" stroke-width="1"/><text x="150" y="22" fill="#6a6088" font-family="monospace" font-size="9" text-anchor="middle" letter-spacing="2">FRONT VIEW</text><text x="450" y="22" fill="#6a6088" font-family="monospace" font-size="9" text-anchor="middle" letter-spacing="2">SIDE VIEW</text><text x="750" y="22" fill="#6a6088" font-family="monospace" font-size="9" text-anchor="middle" letter-spacing="2">BACK VIEW</text></svg><div class="rig-ph-label"><b>sf26-skeleton-3view.jpg</b>Skeleton — front / side / back</div></div><div class="rig-cap"><span>// 214-joint skeleton · 3 views</span><span>/projects/f1_SF26/images/</span></div></div>
     <div class="rig-card"><div class="rig-ph r43"><svg class="bg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g2b" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" class="rig-ph-grid-bg"/></pattern></defs><rect width="400" height="300" fill="url(#g2b)"/></svg><div class="rig-ph-label"><b>sf26-wireframe-body.jpg</b>Wireframe mesh — body</div></div><div class="rig-cap"><span>// Body wireframe</span><span>~38k tris</span></div></div>
     <div class="rig-card"><div class="rig-ph r43"><svg class="bg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g2c" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" class="rig-ph-grid-bg"/></pattern></defs><rect width="400" height="300" fill="url(#g2c)"/></svg><div class="rig-ph-label"><b>sf26-outliner.jpg</b>Joint hierarchy · Maya outliner</div></div><div class="rig-cap"><span>// Outliner · hierarchy</span><span>214 joints</span></div></div>
   </div>
@@ -148,16 +178,16 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="rig-cap"><span id="cmp-caption">// Shoulder — 90° raise</span><span>Drag ◁▷</span></div>
   </div>
   <div class="rig-g4" style="margin-top:2px;">
-    <div class="rig-note corr-card active-card" data-n="A" data-joint="shoulder" data-label="// Shoulder — 90° raise" onclick="switchCorr(this)" style="cursor:pointer;border-color:rgba(139,79,200,.5);">
+    <div class="rig-note rig-corr-card active-card" data-n="A" data-joint="shoulder" data-label="// Shoulder — 90° raise" onclick="switchCorr(this)" style="cursor:pointer;border-color:rgba(139,79,200,.5);">
       <div class="rig-nn">// Shoulder</div><div class="rig-nt" style="font-size:14px;">90° Raise</div><div class="rig-nd">[ Description of shoulder corrective ]</div>
     </div>
-    <div class="rig-note corr-card" data-n="B" data-joint="elbow" data-label="// Elbow — full flex" onclick="switchCorr(this)" style="cursor:pointer;">
+    <div class="rig-note rig-corr-card" data-n="B" data-joint="elbow" data-label="// Elbow — full flex" onclick="switchCorr(this)" style="cursor:pointer;">
       <div class="rig-nn">// Elbow</div><div class="rig-nt" style="font-size:14px;">Full Flex</div><div class="rig-nd">[ Description of elbow corrective ]</div>
     </div>
-    <div class="rig-note corr-card" data-n="C" data-joint="knee" data-label="// Knee — deep bend" onclick="switchCorr(this)" style="cursor:pointer;">
+    <div class="rig-note rig-corr-card" data-n="C" data-joint="knee" data-label="// Knee — deep bend" onclick="switchCorr(this)" style="cursor:pointer;">
       <div class="rig-nn">// Knee</div><div class="rig-nt" style="font-size:14px;">Deep Bend</div><div class="rig-nd">[ Description of knee corrective ]</div>
     </div>
-    <div class="rig-note corr-card" data-n="D" data-joint="wrist" data-label="// Wrist — extreme flex" onclick="switchCorr(this)" style="cursor:pointer;">
+    <div class="rig-note rig-corr-card" data-n="D" data-joint="wrist" data-label="// Wrist — extreme flex" onclick="switchCorr(this)" style="cursor:pointer;">
       <div class="rig-nn">// Wrist</div><div class="rig-nt" style="font-size:14px;">Extreme Flex</div><div class="rig-nd">[ Description of wrist corrective ]</div>
     </div>
   </div>
@@ -281,7 +311,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 // TAB SWITCHER
 function st(group, id, btn) {
   document.querySelectorAll('[id^="'+group+'-"]').forEach(p => p.classList.toggle('active', p.id === group+'-'+id));
-  btn.closest('.tb').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.closest('.rig-tb').querySelectorAll('.rig-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
 }
 
@@ -302,7 +332,7 @@ function bs(cat, btn) {
   document.getElementById('bs-content').innerHTML =
     '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1px;background:var(--bor);">'+
     shapes.map(s=>'<div style="background:var(--sur);padding:10px 12px;font-family:\'Share Tech Mono\',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--txd);cursor:pointer;transition:background .15s;" onmouseenter="this.style.background=\'rgba(139,79,200,.08)\'" onmouseleave="this.style.background=\'var(--sur)\'">'+s+'</div>').join('')+'</div>';
-  btn.closest('.tb').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.closest('.rig-tb').querySelectorAll('.rig-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
 }
 bs('brow', document.querySelector('#s-bs .tab'));
@@ -315,7 +345,7 @@ const CORR = {
   wrist:    { label:'// Wrist — extreme flex',    before:'sf26-wrist-before.jpg',    after:'sf26-wrist-after.jpg'    }
 };
 function switchCorr(card) {
-  document.querySelectorAll('.corr-card').forEach(c => {
+  document.querySelectorAll('.rig-corr-card').forEach(c => {
     c.classList.remove('active-card');
     c.style.borderColor = '';
   });
@@ -330,35 +360,73 @@ function switchCorr(card) {
 }
 
 (function(){
-  const w=document.getElementById('rig-cmp'),b=document.getElementById('rig-cb'),l=document.getElementById('rig-cl'),h=document.getElementById('rig-ch2');
+  const w=document.getElementById('rig-cmp');
+  const b=document.getElementById('rig-cb');
+  const l=document.getElementById('rig-cl');
+  const h=document.getElementById('rig-ch2');
+  if(!w||!b||!l||!h) return;
   let drag=false;
-  function pos(x){const r=w.getBoundingClientRect(),p=Math.max(0,Math.min(1,(x-r.left)/r.width)),s=(p*100)+'%';b.style.width=s;l.style.left=s;h.style.left=s;}
+  function pos(x){
+    const r=w.getBoundingClientRect();
+    const p=Math.max(0,Math.min(1,(x-r.left)/r.width));
+    const s=(p*100)+'%';
+    b.style.width=s; l.style.left=s; h.style.left=s;
+  }
   w.addEventListener('mousedown',e=>{drag=true;pos(e.clientX);e.preventDefault();});
   window.addEventListener('mousemove',e=>{if(drag)pos(e.clientX);});
   window.addEventListener('mouseup',()=>{drag=false;});
   w.addEventListener('touchstart',e=>{drag=true;pos(e.touches[0].clientX);e.preventDefault();},{passive:false});
   window.addEventListener('touchmove',e=>{if(drag)pos(e.touches[0].clientX);},{passive:true});
   window.addEventListener('touchend',()=>{drag=false;});
-  // Run sync after layout is ready
-  requestAnimationFrame(()=>{ });
-  window.addEventListener('resize',()=>{});
-
-  window._sliderReset = function() {
-    b.style.width='50%'; l.style.left='50%'; h.style.left='50%';
-  };
+  window._sliderReset=function(){b.style.width='50%';l.style.left='50%';h.style.left='50%';};
+  // init at 50%
+  requestAnimationFrame(()=>window._sliderReset());
 })();
 
-// TOC
+// TOC — scroll through dots on wheel/drag
 function g(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});}
 const IDS=['s-hero','s-video','s-wire','s-topo','s-deform','s-facial','s-bs','s-uv','s-tex','s-ctrl'];
 const dots=document.querySelectorAll('.td');
+
+// Highlight active dot on scroll
 IDS.forEach(id=>{
   const el=document.getElementById(id);
   if(!el)return;
   new IntersectionObserver(entries=>{
-    entries.forEach(e=>{if(e.isIntersecting){const i=IDS.indexOf(id);dots.forEach(d=>d.classList.remove('active'));dots[i]?.classList.add('active');}});
-  },{threshold:.3}).observe(el);
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const i=IDS.indexOf(id);
+        dots.forEach(d=>d.classList.remove('active'));
+        dots[i]?.classList.add('active');
+      }
+    });
+  },{threshold:0.3}).observe(el);
 });
+
+// Scroll through sections by wheeling over TOC
+const toc=document.getElementById('toc');
+if(toc){
+  toc.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const active=Array.from(dots).findIndex(d=>d.classList.contains('active'));
+    const next=e.deltaY>0?Math.min(active+1,IDS.length-1):Math.max(active-1,0);
+    g(IDS[next]);
+  },{passive:false});
+  // Drag through dots
+  let tocDrag=false, tocY=0;
+  toc.addEventListener('mousedown',e=>{tocDrag=true;tocY=e.clientY;e.preventDefault();});
+  window.addEventListener('mousemove',e=>{
+    if(!tocDrag)return;
+    const dy=e.clientY-tocY;
+    if(Math.abs(dy)>20){
+      const active=Array.from(dots).findIndex(d=>d.classList.contains('active'));
+      const next=dy>0?Math.min(active+1,IDS.length-1):Math.max(active-1,0);
+      g(IDS[next]);
+      tocY=e.clientY;
+    }
+  });
+  window.addEventListener('mouseup',()=>{tocDrag=false;});
+}
 </script>
 </body>
 </html>
