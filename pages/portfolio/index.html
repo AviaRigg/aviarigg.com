@@ -131,6 +131,10 @@
     border-bottom: 1px solid rgba(255,80,80,0.2);
     padding: 5px; text-align: center; pointer-events: none;
   }
+  /* Loading flash prevention */
+  body.port-loading .port-card,
+  body.port-loading .port-featured { visibility: hidden; }
+
   .port-card.port-draft { opacity: 0.35; }
   .port-card.port-hidden { display: none; }
   /* Non-admin draft: visible but dimmed and unclickable */
@@ -238,6 +242,7 @@
       } else {
         showFeaturedEmpty();
       }
+      document.body.classList.remove('port-loading');
     }
 
     function applyPortStatus(id, status, card, save) {
@@ -433,7 +438,7 @@
     });
   </script>
 </head>
-<body>
+<body class="port-loading">
 
 <div id="nav-root"></div>
 
