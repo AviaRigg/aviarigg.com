@@ -215,6 +215,17 @@
 
   /* ── ITEM ROWS (products / portfolio) ── */
   .item-list { display: flex; flex-direction: column; gap: 1px; }
+  /* ── DRAG HANDLE ── */
+  .drag-handle {
+    cursor: grab; color: var(--text-dim); font-size: 14px;
+    padding: 0 6px; user-select: none; flex-shrink: 0;
+    transition: color 0.2s;
+  }
+  .drag-handle:hover { color: var(--accent2); }
+  .drag-handle:active { cursor: grabbing; }
+  .item-row.dragging { opacity: 0.4; }
+  .item-row.drag-over { border-top: 2px solid var(--accent) !important; }
+
   .item-row {
     display: flex; align-items: center;
     gap: 14px; padding: 12px 14px;
@@ -821,13 +832,14 @@
 
   async function loadProducts() {
     const sb = await _getAdminSb();
-    const { data } = await sb.from('shop_products').select('id, status').order('id');
+    const { data } = await sb.from('shop_products').select('id, status, position').order('position', { ascending: true, nullsFirst: false }).order('id');
     const el = document.getElementById('product-list');
     if (!data?.length) { el.innerHTML = '<div class="table-empty">No products found.</div>'; return; }
     const rows = data.filter(({ id }) => id !== 'hero-featured');
     el.innerHTML = rows.map(({ id, status }, i) => {
       const m = PRODUCT_META[id] || { name: id, cat: '—', href: '#' };
-      return `<div class="item-row">
+      return `<div class="item-row" draggable="true" data-id="${id}" data-list="shop">
+        <span class="drag-handle" title="Drag to reorder">⠿</span>
         <span class="item-num">${String(i+1).padStart(2,'0')}</span>
         <span class="item-cat">${m.cat}</span>
         <span class="item-name">${m.name}</span>
@@ -835,11 +847,13 @@
         <a class="item-link" href="${m.href}">→</a>
       </div>`;
     }).join('');
+    initDrag(el, 'shop_products');
   }
 
   // ── PORTFOLIO ──
   const PORT_META = {
-    'f1-sf25':       { name: 'Formula 1 SF-25 Rig', cat: 'Hard Surface',  href: '/pages/portfolio-f1' },
+    'f1-sf25':       { name: 'Formula 1 SF-25 Rig', cat: 'Hard Surface',  href: '/pages/portfolio/sf25' },
+    'f1-sf26':       { name: 'Formula 1 SF-26 Rig', cat: 'Hard Surface',  href: '/pages/portfolio/sf26' },
     'nordic-bandit': { name: 'Nordic Bandit',        cat: 'Character Rig', href: '#' },
     'placeholder-3': { name: '—',                    cat: 'Coming Soon',   href: '#' },
     'placeholder-4': { name: '—',                    cat: 'Coming Soon',   href: '#' },
@@ -849,12 +863,13 @@
 
   async function loadPortfolio() {
     const sb = await _getAdminSb();
-    const { data } = await sb.from('portfolio_projects').select('id, status').order('id');
+    const { data } = await sb.from('portfolio_projects').select('id, status, position').order('position', { ascending: true, nullsFirst: false }).order('id');
     const el = document.getElementById('port-list');
     if (!data?.length) { el.innerHTML = '<div class="table-empty">No projects found.</div>'; return; }
     el.innerHTML = data.map(({ id, status }, i) => {
       const m = PORT_META[id] || { name: id, cat: '—', href: '#' };
-      return `<div class="item-row">
+      return `<div class="item-row" draggable="true" data-id="${id}" data-list="portfolio">
+        <span class="drag-handle" title="Drag to reorder">⠿</span>
         <span class="item-num">${String(i+1).padStart(2,'0')}</span>
         <span class="item-cat">${m.cat}</span>
         <span class="item-name">${m.name || id}</span>
@@ -862,6 +877,59 @@
         <a class="item-link" href="${m.href}">→</a>
       </div>`;
     }).join('');
+    initDrag(el, 'portfolio_projects');
+  }
+
+  // ── DRAG TO REORDER ──
+  function initDrag(container, table) {
+    let dragged = null;
+
+    container.querySelectorAll('.item-row').forEach(row => {
+      row.addEventListener('dragstart', e => {
+        dragged = row;
+        row.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      row.addEventListener('dragend', () => {
+        row.classList.remove('dragging');
+        container.querySelectorAll('.item-row').forEach(r => r.classList.remove('drag-over'));
+        dragged = null;
+        // Save new order
+        saveOrder(container, table);
+      });
+      row.addEventListener('dragover', e => {
+        e.preventDefault();
+        if (row === dragged) return;
+        container.querySelectorAll('.item-row').forEach(r => r.classList.remove('drag-over'));
+        row.classList.add('drag-over');
+        // Move in DOM
+        const rows = [...container.querySelectorAll('.item-row')];
+        const dragIdx = rows.indexOf(dragged);
+        const overIdx = rows.indexOf(row);
+        if (dragIdx < overIdx) container.insertBefore(dragged, row.nextSibling);
+        else container.insertBefore(dragged, row);
+      });
+      row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+      row.addEventListener('drop', e => { e.preventDefault(); });
+    });
+  }
+
+  async function saveOrder(container, table) {
+    const sb = await _getAdminSb();
+    const rows = [...container.querySelectorAll('.item-row')];
+    // Update number labels
+    rows.forEach((row, i) => {
+      const num = row.querySelector('.item-num');
+      if (num) num.textContent = String(i+1).padStart(2,'0');
+    });
+    // Upsert positions to Supabase
+    const updates = rows.map((row, i) => ({
+      id: row.dataset.id,
+      position: i + 1,
+      updated_at: new Date().toISOString()
+    }));
+    const { error } = await sb.from(table).upsert(updates);
+    if (error) console.error('Order save error:', error);
   }
 
   // ── USERS ──
