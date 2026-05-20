@@ -40,7 +40,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .toc-hit { display:flex; align-items:center; justify-content:center; width:44px; height:44px; cursor:pointer; position:relative; margin:-8px 0; }
 .toc-hit .td::after { right: 28px; }
 .td { width: clamp(7px, 0.7vw, 12px) !important; height: clamp(7px, 0.7vw, 12px) !important; }
-.td::after { font-size: clamp(9px, 0.8vw, 12px) !important; }
+.td::after { font-size: clamp(9px, 0.8vw, 12px) !important; opacity: 0; transition: opacity .2s; }
+.td:hover::after { opacity: 1 !important; }
+.td.active::after { opacity: 1 !important; color: var(--ac2) !important; }
 
 /* ── SLIDER FIX ── */
 .rig-cbi { position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: auto !important; min-width: unset !important; }
