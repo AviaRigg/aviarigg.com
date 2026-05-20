@@ -218,12 +218,20 @@
             card.classList.remove('dim');
             card.classList.add('port-hidden');
           }
-          // Draft already handled in DOMContentLoaded early pass
         });
       }
       const sb = await _getPortSb();
       const { data } = await sb.from('portfolio_projects').select('id, status, position').order('position', { ascending: true, nullsFirst: false }).order('id');
       if (!data) return;
+
+      // Reorder DOM cards to match position from Supabase
+      const grid = document.querySelector('.port-grid');
+      if (grid) {
+        data.forEach(({ id }) => {
+          const card = document.querySelector(`[data-port-id="${id}"]`);
+          if (card) grid.appendChild(card);
+        });
+      }
 
       let featuredId = null;
 

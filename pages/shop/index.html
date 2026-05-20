@@ -1672,15 +1672,25 @@ async function loadProductStatuses() {
   const { data: products } = await sb.from('shop_products').select('id, status, position').order('position', { ascending: true, nullsFirst: false }).order('id');
   if (!products) return;
 
+  // Reorder DOM cards to match position from Supabase
+  const grid = document.getElementById('product-grid');
+  if (grid) {
+    products.forEach(({ id }) => {
+      if (id === 'hero-featured') return;
+      const card = document.querySelector(`[data-product-id="${id}"]`);
+      if (card) grid.appendChild(card); // moves to end in order
+    });
+  }
+
   let featuredId = null;
 
   // First pass: apply all non-featured statuses
   products.forEach(({ id, status }) => {
-    if (id === 'hero-featured') return; // skip the hero row entirely
+    if (id === 'hero-featured') return;
     const card = document.querySelector(`[data-product-id="${id}"]`);
     if (!card || status === 'live') return;
     if (status === 'featured') {
-      featuredId = id; // save for second pass
+      featuredId = id;
       return;
     }
     applyStatusToCard(id, status, card, false);
@@ -1694,6 +1704,7 @@ async function loadProductStatuses() {
     showHeroEmpty();
   }
   updateFilterCounts();
+  document.body.classList.remove('shop-loading');
 }
 
 function applyStatusToCard(productId, newStatus, cardEl, save = true) {

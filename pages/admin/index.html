@@ -917,19 +917,19 @@
   async function saveOrder(container, table) {
     const sb = await _getAdminSb();
     const rows = [...container.querySelectorAll('.item-row')];
-    // Update number labels
+    // Update number labels in admin UI
     rows.forEach((row, i) => {
       const num = row.querySelector('.item-num');
       if (num) num.textContent = String(i+1).padStart(2,'0');
     });
-    // Upsert positions to Supabase
-    const updates = rows.map((row, i) => ({
-      id: row.dataset.id,
-      position: i + 1,
-      updated_at: new Date().toISOString()
-    }));
-    const { error } = await sb.from(table).upsert(updates);
-    if (error) console.error('Order save error:', error);
+    // Update ONLY the position column — do NOT touch status or other fields
+    for (let i = 0; i < rows.length; i++) {
+      const id = rows[i].dataset.id;
+      const { error } = await sb.from(table)
+        .update({ position: i + 1, updated_at: new Date().toISOString() })
+        .eq('id', id);
+      if (error) console.error('Order save error for', id, error);
+    }
   }
 
   // ── USERS ──
