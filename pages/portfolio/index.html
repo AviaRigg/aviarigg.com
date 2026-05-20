@@ -133,6 +133,9 @@
   }
   .port-card.port-draft { opacity: 0.35; }
   .port-card.port-hidden { display: none; }
+  /* Non-admin draft: visible but dimmed and unclickable */
+  .port-card.dim { opacity: 0.5; cursor: default; pointer-events: none; }
+  .port-card:not(.dim):hover .pc-thumb img { transform: scale(1.04); }
 
   .pc-cat  { font-size: clamp(11px, 0.9vw, 14px) !important; }
   .pc-title { font-size: clamp(16px, 1.4vw, 22px) !important; }
@@ -203,6 +206,17 @@
     });
 
     async function loadPortfolioStatuses() {
+      // Non-admin: ensure draft/hidden are applied correctly
+      if (!portIsAdmin) {
+        document.querySelectorAll('[data-port-id]').forEach(card => {
+          const s = card.dataset.portStatus;
+          if (s === 'hidden') {
+            card.classList.remove('dim');
+            card.classList.add('port-hidden');
+          }
+          // Draft already handled in DOMContentLoaded early pass
+        });
+      }
       const sb = await _getPortSb();
       const { data } = await sb.from('portfolio_projects').select('id, status');
       if (!data) return;
@@ -234,6 +248,7 @@
         });
       }
       card.dataset.portStatus = status;
+      card.style.opacity = ''; // clear any hardcoded inline opacity
       const badge = card.querySelector('.admin-status-badge');
       if (badge) {
         badge.className = `admin-status-badge status-${status}`;
@@ -245,20 +260,97 @@
       // Featured: swap hero
       if (status === 'featured') {
         swapFeaturedCard(card);
-        card.classList.remove('port-draft', 'port-hidden');
+        card.classList.remove('port-draft', 'port-hidden', 'dim');
+        card.style.opacity = '';
+        card.style.cursor = '';
+        card.style.pointerEvents = '';
+        // Restore onclick
+        if (card.dataset.onclickDisabled) {
+          card.setAttribute('onclick', card.dataset.onclickDisabled);
+          delete card.dataset.onclickDisabled;
+        } else if (card.dataset.href) {
+          card.setAttribute('onclick', `window.location.href='${card.dataset.href}'`);
+        }
+        // Restore thumbnail
+        const thumb = card.querySelector('.pc-thumb');
+        if (thumb) {
+          const img = thumb.querySelector('img');
+          if (img && img.dataset.realSrc) { img.src = img.dataset.realSrc; img.style.display = ''; }
+          const ph = thumb.querySelector('.admin-placeholder');
+          if (ph) ph.remove();
+        }
       } else if (status === 'hidden') {
-        if (portIsAdmin) { card.classList.add('port-draft'); card.classList.remove('port-hidden'); }
-        else { card.classList.add('port-hidden'); card.classList.remove('port-draft'); }
+        // Hidden: admin sees faded, customers see nothing
+        card.classList.remove('dim', 'port-draft', 'port-hidden');
+        if (portIsAdmin) {
+          card.classList.add('port-draft');
+        } else {
+          card.classList.add('port-hidden');
+        }
         const featuredAny = document.querySelector('[data-port-id][data-port-status="featured"]');
         if (!featuredAny) showFeaturedEmpty();
       } else if (status === 'draft') {
-        if (portIsAdmin) { card.classList.add('port-draft'); card.classList.remove('port-hidden'); }
-        else { card.classList.add('port-hidden'); card.classList.remove('port-draft'); }
+        // Draft: everyone sees it, but customers can't click and thumbnail is hidden
+        card.classList.remove('port-draft', 'port-hidden');
+        if (portIsAdmin) {
+          // Admin: faded but still clickable
+          card.classList.add('port-draft');
+          card.style.opacity = '';
+          card.style.cursor = '';
+          card.style.pointerEvents = '';
+          if (card.dataset.onclickDisabled) {
+            card.setAttribute('onclick', card.dataset.onclickDisabled);
+            delete card.dataset.onclickDisabled;
+          }
+          // Restore thumbnail for admin
+          const thumb = card.querySelector('.pc-thumb');
+          if (thumb) {
+            const img = thumb.querySelector('img');
+            if (img && img.dataset.realSrc) { img.src = img.dataset.realSrc; img.style.display = ''; }
+            const ph = thumb.querySelector('.admin-placeholder');
+            if (ph) ph.remove();
+          }
+        } else {
+          // Customer: visible but dim, unclickable, no thumbnail
+          card.classList.add('dim');
+          card.dataset.onclickDisabled = card.getAttribute('onclick') || '';
+          card.removeAttribute('onclick');
+          // Hide thumbnail, show Coming Soon
+          const thumb = card.querySelector('.pc-thumb');
+          if (thumb) {
+            const img = thumb.querySelector('img');
+            if (img) { img.dataset.realSrc = img.dataset.realSrc || img.src; img.style.display = 'none'; }
+            if (!thumb.querySelector('.admin-placeholder')) {
+              const ph = document.createElement('div');
+              ph.className = 'admin-placeholder';
+              ph.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100%;font-family:"Share Tech Mono",monospace;font-size:clamp(11px,1vw,14px);letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);';
+              ph.textContent = '// Coming Soon';
+              thumb.appendChild(ph);
+            }
+          }
+        }
         const featuredAny = document.querySelector('[data-port-id][data-port-status="featured"]');
         if (!featuredAny) showFeaturedEmpty();
       } else {
-        // published / live
-        card.classList.remove('port-draft', 'port-hidden');
+        // published — fully visible and clickable
+        card.classList.remove('port-draft', 'port-hidden', 'dim');
+        card.style.opacity = '';
+        card.style.cursor = '';
+        card.style.pointerEvents = '';
+        if (card.dataset.onclickDisabled) {
+          card.setAttribute('onclick', card.dataset.onclickDisabled);
+          delete card.dataset.onclickDisabled;
+        } else if (card.dataset.href) {
+          card.setAttribute('onclick', `window.location.href='${card.dataset.href}'`);
+        }
+        // Restore thumbnail
+        const thumb = card.querySelector('.pc-thumb');
+        if (thumb) {
+          const img = thumb.querySelector('img');
+          if (img && img.dataset.realSrc) { img.src = img.dataset.realSrc; img.style.display = ''; }
+          const ph = thumb.querySelector('.admin-placeholder');
+          if (ph) ph.remove();
+        }
       }
       if (save) {
         _getPortSb().then(sb => {
@@ -417,7 +509,7 @@
       <div class="port-grid">
 
         <!-- 01 — spans 2 cols -->
-        <div class="port-card" data-port-id="f1-sf25" data-port-status="featured" data-href="/pages/portfolio/sf25" data-img="/projects/f1_SF25/images/F1_Rendered.png" data-tag="// Hard Surface" data-cat="Maya Rig · 2025" data-title="Formula 1 SF-25 Rig" data-desc="Production-ready F1 car rig — DRS system, dual livery, auto wheel spin, AnimSchool picker." data-year="2025" style="opacity:1;cursor:pointer;" onclick="window.location.href='/pages/portfolio/sf25'">
+        <div class="port-card" data-port-id="f1-sf25" data-port-status="featured" data-href="/pages/portfolio/sf25" data-img="/projects/f1_SF25/images/F1_Rendered.png" data-tag="// Hard Surface" data-cat="Maya Rig · 2025" data-title="Formula 1 SF-25 Rig" data-desc="Production-ready F1 car rig — DRS system, dual livery, auto wheel spin, AnimSchool picker." data-year="2025" style="cursor:pointer;" onclick="window.location.href='/pages/portfolio/sf25'">
           <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')"><span class="admin-status-badge status-featured">FEATURED <span style="opacity:0.7;font-size:8px;">▾</span></span><div class="admin-status-dropdown"><button class="admin-status-option opt-published " data-status="published" onclick="event.stopPropagation();applyPortStatus('f1-sf25','published',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">PUBLISHED</button><button class="admin-status-option opt-draft " data-status="draft" onclick="event.stopPropagation();applyPortStatus('f1-sf25','draft',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button><button class="admin-status-option opt-hidden " data-status="hidden" onclick="event.stopPropagation();applyPortStatus('f1-sf25','hidden',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button><button class="admin-status-option opt-featured active-opt" data-status="featured" onclick="event.stopPropagation();applyPortStatus('f1-sf25','featured',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button></div></div>
           <div class="pc-thumb" style="padding:0;overflow:hidden;position:relative;">
             <img src="/projects/f1_SF25/images/F1_Rendered.png" alt="F1 SF-25" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s ease;">
@@ -442,7 +534,7 @@
         </div>
 
         <!-- 03 — SF-26 -->
-        <div class="port-card" data-port-id="f1-sf26" data-port-status="draft" data-href="/pages/portfolio/sf26" data-img="/projects/f1_SF26/images/SF26_Rendered.png" data-tag="// Hard Surface" data-cat="Maya Rig · 2025" data-title="Formula 1 SF-26 Rig" data-desc="Full F1 car rig breakdown — UV maps, deformation, controls and complete build process." data-year="2025" style="cursor:pointer;opacity:0.35;" onclick="window.location.href='/pages/portfolio/sf26'">
+        <div class="port-card" data-port-id="f1-sf26" data-port-status="draft" data-href="/pages/portfolio/sf26" data-img="/projects/f1_SF26/images/SF26_Rendered.png" data-tag="// Hard Surface" data-cat="Maya Rig · 2025" data-title="Formula 1 SF-26 Rig" data-desc="Full F1 car rig breakdown — UV maps, deformation, controls and complete build process." data-year="2025" style="cursor:pointer;" onclick="window.location.href='/pages/portfolio/sf26'">
           <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')"><span class="admin-status-badge status-draft">DRAFT <span style="opacity:0.7;font-size:8px;">▾</span></span><div class="admin-status-dropdown"><button class="admin-status-option opt-published " data-status="published" onclick="event.stopPropagation();applyPortStatus('f1-sf26','published',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">PUBLISHED</button><button class="admin-status-option opt-draft active-opt" data-status="draft" onclick="event.stopPropagation();applyPortStatus('f1-sf26','draft',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button><button class="admin-status-option opt-hidden " data-status="hidden" onclick="event.stopPropagation();applyPortStatus('f1-sf26','hidden',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button><button class="admin-status-option opt-featured " data-status="featured" onclick="event.stopPropagation();applyPortStatus('f1-sf26','featured',this.closest('[data-port-id]'),true);this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button></div></div>
           <div class="pc-thumb" style="padding:0;overflow:hidden;position:relative;">
             <img src="/projects/f1_SF26/images/SF26_Rendered.png" alt="F1 SF-26" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s ease;">
