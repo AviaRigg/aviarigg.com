@@ -29,8 +29,6 @@
 .lib-page {
   display: flex; width: 100%;
   overflow: hidden;
-  /* Pull lib-page up to cancel .page padding-top, fill full height below nav */
-  margin-top: calc(-1 * var(--nav-h, 60px));
   height: calc(100vh - var(--nav-h, 60px));
 }
 
@@ -52,7 +50,9 @@
   overflow: visible;
   transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
   position: relative;
-  align-self: stretch;
+  height: 100vh;
+  margin-top: calc(-1 * var(--nav-h, 60px));
+  padding-top: var(--nav-h, 60px);
 }
 .lib-sidebar.collapsed {
   width: 0 !important;
