@@ -141,26 +141,6 @@
   .port-card.dim { opacity: 0.5; cursor: default; pointer-events: none; }
   .port-card:not(.dim):hover .pc-thumb img { transform: scale(1.04); }
 
-  /* Coming Soon overlay on any dimmed card that has a thumbnail image */
-  .port-card.dim .pc-thumb {
-    position: relative;
-  }
-  .port-card.dim .pc-thumb img ~ .coming-soon-overlay,
-  .port-card.dim .pc-thumb .coming-soon-overlay {
-    display: flex;
-  }
-  .coming-soon-overlay {
-    display: none;
-    position: absolute; inset: 0;
-    align-items: center; justify-content: center;
-    background: rgba(0,0,0,0.45);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(10px, 0.9vw, 13px);
-    letter-spacing: 4px; text-transform: uppercase;
-    color: rgba(255,255,255,0.7);
-    pointer-events: none;
-  }
-
   .pc-cat  { font-size: clamp(11px, 0.9vw, 14px) !important; }
   .pc-title { font-size: clamp(16px, 1.4vw, 22px) !important; }
   .pc-desc { font-size: clamp(13px, 1vw, 16px) !important; line-height: 1.6 !important; }
@@ -329,8 +309,6 @@
           if (img && img.dataset.realSrc) { img.src = img.dataset.realSrc; img.style.display = ''; }
           const ph = thumb.querySelector('.admin-placeholder');
           if (ph) ph.remove();
-          const ov = thumb.querySelector('.coming-soon-overlay');
-          if (ov) ov.remove();
         }
       } else if (status === 'hidden') {
         // Hidden: admin sees faded, customers see nothing
@@ -368,19 +346,11 @@
           card.classList.add('dim');
           card.dataset.onclickDisabled = card.getAttribute('onclick') || '';
           card.removeAttribute('onclick');
+          // Only hide thumbnail and show Coming Soon if card has no real image
           const hasRealImg = card.dataset.img && card.dataset.img.trim() !== '';
-          const thumb = card.querySelector('.pc-thumb');
-          if (thumb) {
-            if (hasRealImg) {
-              // Has thumbnail — keep it visible but add Coming Soon overlay on top
-              if (!thumb.querySelector('.coming-soon-overlay')) {
-                const ov = document.createElement('div');
-                ov.className = 'coming-soon-overlay';
-                ov.textContent = '// Coming Soon';
-                thumb.appendChild(ov);
-              }
-            } else {
-              // No thumbnail — hide image and show text placeholder
+          if (!hasRealImg) {
+            const thumb = card.querySelector('.pc-thumb');
+            if (thumb) {
               const img = thumb.querySelector('img');
               if (img) { img.dataset.realSrc = img.dataset.realSrc || img.src; img.style.display = 'none'; }
               if (!thumb.querySelector('.admin-placeholder')) {
@@ -414,10 +384,9 @@
           if (img && img.dataset.realSrc) { img.src = img.dataset.realSrc; img.style.display = ''; }
           const ph = thumb.querySelector('.admin-placeholder');
           if (ph) ph.remove();
-          const ov = thumb.querySelector('.coming-soon-overlay');
-          if (ov) ov.remove();
         }
       }
+      if (save) {
         _getPortSb().then(sb => {
           sb.from('portfolio_projects')
             .upsert({ id, status, updated_at: new Date().toISOString() })
