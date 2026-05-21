@@ -28,11 +28,19 @@
 /* ── LAYOUT ── */
 .lib-page {
   display: flex; width: 100%;
-  /* Use 100% of whatever height .page gives us after its own padding */
-  height: 100%;
-  min-height: calc(100vh - var(--nav-h, 60px));
   overflow: hidden;
+  /* Pull lib-page up to cancel .page padding-top, fill full height below nav */
+  margin-top: calc(-1 * var(--nav-h, 60px));
+  height: calc(100vh - var(--nav-h, 60px));
 }
+
+/* Main area gets the padding back so breadcrumb/content sits correctly */
+.lib-main {
+  padding-top: var(--nav-h, 60px);
+  flex: 1; overflow-y: auto; scroll-behavior: smooth;
+}
+.lib-main::-webkit-scrollbar { width: 4px; }
+.lib-main::-webkit-scrollbar-thumb { background: rgba(139,79,200,0.25); }
 
 /* ── SIDEBAR ── */
 .lib-sidebar {
@@ -201,9 +209,7 @@
 }
 
 /* ── MAIN ── */
-.lib-main { flex: 1; overflow-y: auto; scroll-behavior: smooth; }
-.lib-main::-webkit-scrollbar { width: 4px; }
-.lib-main::-webkit-scrollbar-thumb { background: rgba(139,79,200,0.25); }
+/* .lib-main defined above with lib-page */
 
 /* ── BREADCRUMB ── */
 .lib-breadcrumb {
