@@ -40,8 +40,19 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
   document.getElementById('lib-gate').style.display = 'none';
   document.getElementById('page-library').style.visibility = 'visible';
+  libSetNavHeight();
+  // Re-measure after nav fully renders
+  setTimeout(libSetNavHeight, 200);
   libInit();
 });
+
+function libSetNavHeight() {
+  const nav = document.querySelector('.topnav') || document.querySelector('nav');
+  if (nav) {
+    const h = nav.getBoundingClientRect().height;
+    document.documentElement.style.setProperty('--lib-nav-h', h + 'px');
+  }
+}
 
 function libToggleSidebar() {
   const sidebar = document.querySelector('.lib-sidebar');

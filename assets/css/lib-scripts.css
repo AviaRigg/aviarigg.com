@@ -58,7 +58,7 @@
   overflow: visible;
   transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
   position: fixed;
-  top: var(--nav-h, 60px);
+  top: var(--lib-nav-h, 60px);
   left: 0;
   bottom: 0;
   z-index: 100;
