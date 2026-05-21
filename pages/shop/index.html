@@ -1723,7 +1723,7 @@ function updateScanHeights() {
 window.addEventListener('resize', updateScanHeights);
 async function loadProductStatuses() {
   const sb = await _getShopSb();
-  const { data: products } = await sb.from('shop_products').select('id, status, position, cat').order('position', { ascending: true, nullsFirst: false }).order('id');
+  const { data: products } = await sb.from('shop_products').select('id, status, position, cat, name').order('position', { ascending: true, nullsFirst: false }).order('id');
   if (!products) return;
 
   // Reorder DOM cards and update category from Supabase
@@ -1735,11 +1735,17 @@ async function loadProductStatuses() {
     '3D Model': 'model'
   };
   if (grid) {
-    products.forEach(({ id, cat, status }) => {
+    products.forEach(({ id, cat, name, status }) => {
       if (id === 'hero-featured') return;
       const card = document.querySelector(`[data-product-id="${id}"]`);
       if (!card) return;
       grid.appendChild(card);
+      // Update name from Supabase
+      if (name) {
+        const titleEl = card.querySelector('.pc-title');
+        if (titleEl) titleEl.textContent = name;
+        card.dataset.title = name;
+      }
       // Update display category and filter slug from Supabase
       if (cat) {
         const catEl = card.querySelector('.pc-cat');

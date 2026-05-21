@@ -221,16 +221,22 @@
         });
       }
       const sb = await _getPortSb();
-      const { data } = await sb.from('portfolio_projects').select('id, status, position, cat').order('position', { ascending: true, nullsFirst: false }).order('id');
+      const { data } = await sb.from('portfolio_projects').select('id, status, position, cat, name').order('position', { ascending: true, nullsFirst: false }).order('id');
       if (!data) return;
 
       // Reorder DOM cards and update category from Supabase
       const grid = document.querySelector('.port-grid');
       if (grid) {
-        data.forEach(({ id, cat }) => {
+        data.forEach(({ id, cat, name }) => {
           const card = document.querySelector(`[data-port-id="${id}"]`);
           if (!card) return;
           grid.appendChild(card);
+          // Update name from Supabase
+          if (name) {
+            const titleEl = card.querySelector('.pc-title');
+            if (titleEl) titleEl.textContent = name;
+            card.dataset.title = name;
+          }
           // Update category label from Supabase if set
           if (cat) {
             card.dataset.tag = '// ' + cat;
@@ -239,7 +245,6 @@
               const year = card.dataset.year ? ' · ' + card.dataset.year : '';
               catEl.textContent = cat + year;
             }
-            // Also update the tag badge in thumbnail
             const tagBadge = card.querySelector('[style*="rgba(139,79,200"]');
             if (tagBadge) tagBadge.textContent = cat;
           }

@@ -226,6 +226,16 @@
   .item-row.dragging { opacity: 0.4; }
   .item-row.drag-over { border-top: 2px solid var(--accent) !important; }
 
+  /* Editable name */
+  .item-name {
+    flex: 1; font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 600;
+    color: var(--text-bright); cursor: text; border-bottom: 1px solid transparent;
+    transition: border-color 0.2s; padding: 2px 4px; border-radius: 2px;
+    background: transparent; outline: none;
+  }
+  .item-name:hover { border-bottom-color: rgba(139,79,200,0.3); }
+  .item-name:focus { border-bottom-color: var(--accent); background: rgba(139,79,200,0.05); }
+
   /* Inline editable pills */
   .pill-wrap { position: relative; display: inline-flex; }
   .pill-dropdown {
@@ -855,7 +865,9 @@
 
   // ── PRODUCTS ──
   const PRODUCT_META = {
-    'f1-sf25':                { name: 'Formula 1 SF-25 Livery', cat: 'Maya Rig',    href: '/pages/product-f1' },
+    'f1-sf25':                { name: 'Formula 1 SF-25 Livery', cat: 'Maya Rig',    href: '/pages/shop/product-f1' },
+    'f1-sf26-rig':            { name: 'Formula 1 SF-26 Rig',    cat: 'Maya Rig',    href: '#' },
+    'f1-sf26-model':          { name: 'Formula 1 SF-26 Model',  cat: '3D Model',    href: '#' },
     'controller-shape-menu':  { name: 'Controller Shape Menu',  cat: 'Python Tool', href: '/pages/product-curvelib' },
     'character-rig-template': { name: 'Character Rig Template', cat: 'Rig Pack',    href: '#' },
     'mel-python-scripts':     { name: 'MEL / Python Scripts',   cat: 'Tool Pack',   href: '#' },
@@ -863,13 +875,14 @@
 
   async function loadProducts() {
     const sb = await _getAdminSb();
-    const { data } = await sb.from('shop_products').select('id, status, position, cat').order('position', { ascending: true, nullsFirst: false }).order('id');
+    const { data } = await sb.from('shop_products').select('id, status, position, cat, name').order('position', { ascending: true, nullsFirst: false }).order('id');
     const el = document.getElementById('product-list');
     if (!data?.length) { el.innerHTML = '<div class="table-empty">No products found.</div>'; return; }
     const rows = data.filter(({ id }) => id !== 'hero-featured');
-    el.innerHTML = rows.map(({ id, status, cat }, i) => {
+    el.innerHTML = rows.map(({ id, status, cat, name }, i) => {
       const m = PRODUCT_META[id] || { name: id, cat: '—', href: '#' };
       const displayCat = cat || m.cat;
+      const displayName = name || m.name || id;
       const shopStatusOpts = `<button class='pill-opt' onclick='saveStatus(this,"live","shop_products")'>LIVE</button>
 <button class='pill-opt' onclick='saveStatus(this,"draft","shop_products")'>DRAFT</button>
 <button class='pill-opt' onclick='saveStatus(this,"hidden","shop_products")'>HIDDEN</button>
@@ -886,7 +899,7 @@
           <span class="item-cat">${displayCat} ▾</span>
           <div class="cat-dropdown">${shopCatOpts}</div>
         </span>
-        <span class="item-name">${m.name}</span>
+        <span class="item-name" contenteditable="true" spellcheck="false" onblur="saveName(this,'shop_products')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayName}</span>
         <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
           <span class="status-pill pill-${status}">${status.toUpperCase()} ▾</span>
           <div class="pill-dropdown">${shopStatusOpts}</div>
@@ -910,12 +923,13 @@
 
   async function loadPortfolio() {
     const sb = await _getAdminSb();
-    const { data } = await sb.from('portfolio_projects').select('id, status, position, cat').order('position', { ascending: true, nullsFirst: false }).order('id');
+    const { data } = await sb.from('portfolio_projects').select('id, status, position, cat, name').order('position', { ascending: true, nullsFirst: false }).order('id');
     const el = document.getElementById('port-list');
     if (!data?.length) { el.innerHTML = '<div class="table-empty">No projects found.</div>'; return; }
-    el.innerHTML = data.map(({ id, status, cat }, i) => {
+    el.innerHTML = data.map(({ id, status, cat, name }, i) => {
       const m = PORT_META[id] || { name: id, cat: '—', href: '#' };
       const displayCat = cat || m.cat;
+      const displayName = name || m.name || id;
       const portStatusOpts = `<button class='pill-opt' onclick='saveStatus(this,"published","portfolio_projects")'>PUBLISHED</button>
 <button class='pill-opt' onclick='saveStatus(this,"draft","portfolio_projects")'>DRAFT</button>
 <button class='pill-opt' onclick='saveStatus(this,"hidden","portfolio_projects")'>HIDDEN</button>
@@ -934,7 +948,7 @@
           <span class="item-cat">${displayCat} ▾</span>
           <div class="cat-dropdown">${portCatOpts}</div>
         </span>
-        <span class="item-name">${m.name || id}</span>
+        <span class="item-name" contenteditable="true" spellcheck="false" onblur="saveName(this,'portfolio_projects')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayName}</span>
         <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
           <span class="status-pill pill-${status}">${status.toUpperCase()} ▾</span>
           <div class="pill-dropdown">${portStatusOpts}</div>
@@ -989,12 +1003,34 @@
     btn.closest('.cat-dropdown').querySelectorAll('.cat-opt').forEach(o => o.classList.toggle('active', o === btn));
   }
 
+  // ── SAVE NAME ──
+  async function saveName(el, table) {
+    const row = el.closest('.item-row');
+    const id = row.dataset.id;
+    const newName = el.textContent.trim();
+    if (!newName) { el.textContent = id; return; }
+    const sb = await _getAdminSb();
+    const { error } = await sb.from(table)
+      .update({ name: newName, updated_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) {
+      console.error('Name save error:', error);
+      el.style.color = 'var(--red)';
+      setTimeout(() => el.style.color = '', 1500);
+    } else {
+      // Flash green to confirm save
+      el.style.color = 'var(--green)';
+      setTimeout(() => el.style.color = '', 800);
+    }
+  }
+
   // ── DRAG TO REORDER ──
   function initDrag(container, table) {
     let dragged = null;
 
     container.querySelectorAll('.item-row').forEach(row => {
       row.addEventListener('dragstart', e => {
+        if (e.target.classList.contains('item-name')) { e.preventDefault(); return; }
         dragged = row;
         row.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
