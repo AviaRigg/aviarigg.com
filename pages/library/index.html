@@ -54,6 +54,12 @@ function libSetNavHeight() {
   }
 }
 
+function libGetSidebarWidth() {
+  const sidebar = document.querySelector('.lib-sidebar');
+  if (!sidebar) return 0;
+  return sidebar.classList.contains('collapsed') ? 0 : sidebar.getBoundingClientRect().width;
+}
+
 function libToggleSidebar() {
   const sidebar = document.querySelector('.lib-sidebar');
   const main    = document.getElementById('lib-main');
