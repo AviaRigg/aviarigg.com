@@ -210,18 +210,48 @@
 
 <!-- UNSUBSCRIBE MODAL -->
 <div id="unsub-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
-  <div style="position:relative;width:min(480px,92vw);background:#0d0d12;border:1px solid rgba(255,255,255,0.08);border-top:2px solid #ff5050;box-shadow:0 0 60px rgba(255,80,80,0.15);padding:clamp(24px,3vw,40px);">
-    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#ff5050;margin-bottom:10px;">// Unsubscribe</div>
-    <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(22px,2.8vw,32px);font-weight:700;color:#eeeef8;margin-bottom:12px;">Hold on — you'll miss out.</div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:clamp(10px,0.85vw,13px);letter-spacing:1px;color:#6a6a8a;line-height:1.8;margin-bottom:28px;">
-      Early access drops, new rigs, Maya tools and free releases — all go to this list first.<br><br>
-      Are you sure you want to unsubscribe?
+  <div style="position:relative;width:min(520px,92vw);background:#0d0d12;border:1px solid rgba(255,255,255,0.08);border-top:2px solid #ff5050;box-shadow:0 0 60px rgba(255,80,80,0.15);padding:clamp(24px,3vw,44px);">
+
+    <div style="font-family:'Share Tech Mono',monospace;font-size:clamp(9px,0.7vw,12px);letter-spacing:4px;text-transform:uppercase;color:#ff5050;margin-bottom:clamp(8px,0.8vw,14px);">// Unsubscribe</div>
+    <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(24px,2.8vw,40px);font-weight:700;color:#eeeef8;line-height:1.1;margin-bottom:clamp(16px,1.6vw,28px);">Hold on —<br>you'll miss out.</div>
+
+    <!-- What they'll miss -->
+    <div style="display:flex;flex-direction:column;gap:clamp(8px,0.7vw,12px);margin-bottom:clamp(20px,2vw,32px);">
+
+      <div style="display:flex;align-items:center;gap:clamp(10px,1vw,16px);padding:clamp(10px,1vw,16px);background:rgba(139,79,200,0.08);border:1px solid rgba(139,79,200,0.2);border-left:3px solid #8b4fc8;">
+        <div style="font-size:clamp(18px,1.6vw,26px);flex-shrink:0;">🔑</div>
+        <div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(14px,1.2vw,18px);font-weight:700;color:#eeeef8;">Early Access Keys</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:clamp(9px,0.7vw,11px);letter-spacing:1px;color:#6a6a8a;margin-top:2px;">Buyer-exclusive drops before public release</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:clamp(10px,1vw,16px);padding:clamp(10px,1vw,16px);background:rgba(0,232,122,0.05);border:1px solid rgba(0,232,122,0.15);border-left:3px solid #00e87a;">
+        <div style="font-size:clamp(18px,1.6vw,26px);flex-shrink:0;">🎁</div>
+        <div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(14px,1.2vw,18px);font-weight:700;color:#eeeef8;">Free Releases & Tools</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:clamp(9px,0.7vw,11px);letter-spacing:1px;color:#6a6a8a;margin-top:2px;">Free Maya scripts, rigs and pipeline tools</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:clamp(10px,1vw,16px);padding:clamp(10px,1vw,16px);background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.12);border-left:3px solid #ffd700;">
+        <div style="font-size:clamp(18px,1.6vw,26px);flex-shrink:0;">⚡</div>
+        <div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(14px,1.2vw,18px);font-weight:700;color:#eeeef8;">New Rig Announcements</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:clamp(9px,0.7vw,11px);letter-spacing:1px;color:#6a6a8a;margin-top:2px;">SF-26, character rigs and more — first to know</div>
+        </div>
+      </div>
+
     </div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;">
-      <button onclick="_unsubConfirm()" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#ff5050;background:none;border:1px solid rgba(255,80,80,0.4);padding:11px 20px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,80,80,0.1)'" onmouseout="this.style.background='none'">Yes, unsubscribe</button>
-      <button onclick="_unsubCancel()" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#8b4fc8;border:none;padding:11px 24px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#7a3fb0'" onmouseout="this.style.background='#8b4fc8'">Keep me subscribed ◆</button>
+
+    <div style="font-family:'Share Tech Mono',monospace;font-size:clamp(9px,0.75vw,12px);letter-spacing:1px;color:#4a4a6a;margin-bottom:clamp(16px,1.6vw,24px);">// Are you sure you want to unsubscribe?</div>
+
+    <div style="display:flex;gap:clamp(8px,0.8vw,14px);flex-wrap:wrap;">
+      <button onclick="_unsubCancel()" style="font-family:'Share Tech Mono',monospace;font-size:clamp(10px,0.8vw,13px);letter-spacing:3px;text-transform:uppercase;color:#fff;background:#8b4fc8;border:none;padding:clamp(11px,1vw,16px) clamp(20px,2vw,30px);cursor:pointer;transition:background 0.2s;flex:1;" onmouseover="this.style.background='#7a3fb0'" onmouseout="this.style.background='#8b4fc8'">Keep me subscribed ◆</button>
+      <button onclick="_unsubConfirm()" style="font-family:'Share Tech Mono',monospace;font-size:clamp(9px,0.7vw,12px);letter-spacing:2px;text-transform:uppercase;color:#4a4a6a;background:none;border:1px solid rgba(255,255,255,0.08);padding:clamp(11px,1vw,16px) clamp(16px,1.5vw,24px);cursor:pointer;transition:color 0.2s,border-color 0.2s;white-space:nowrap;" onmouseover="this.style.color='#ff5050';this.style.borderColor='rgba(255,80,80,0.3)'" onmouseout="this.style.color='#4a4a6a';this.style.borderColor='rgba(255,255,255,0.08)'">Unsubscribe</button>
     </div>
-    <div id="unsub-status" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:#6a6a8a;margin-top:16px;min-height:16px;"></div>
+
+    <div id="unsub-status" style="font-family:'Share Tech Mono',monospace;font-size:clamp(9px,0.75vw,12px);letter-spacing:2px;color:#6a6a8a;margin-top:clamp(12px,1vw,18px);min-height:16px;"></div>
   </div>
 </div>
 
