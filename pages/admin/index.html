@@ -315,6 +315,7 @@
   .user-table tr:last-child td { border-bottom: none; }
   .user-table tr:hover td { background: rgba(139,79,200,0.04); }
   .role-admin { color: var(--accent2); border: 1px solid rgba(139,79,200,0.3); padding: 2px 8px; font-size: 8px; letter-spacing: 2px; background: rgba(139,79,200,0.08); }
+  .role-buyer { color: #00e87a; border: 1px solid rgba(0,232,122,0.3); padding: 2px 8px; font-size: 8px; letter-spacing: 2px; background: rgba(0,232,122,0.06); }
   .role-user  { color: var(--text-dim); border: 1px solid var(--border); padding: 2px 8px; font-size: 8px; letter-spacing: 2px; }
   .user-date  { color: var(--text-dim); font-size: 8px; }
   .user-del-btn {
@@ -491,6 +492,7 @@
     .user-table td        { font-size: 13px; letter-spacing: 1.5px; padding: 15px 16px; }
     .user-email-sub       { font-size: 11px; letter-spacing: 1px; margin-top: 4px; }
     .role-admin,
+    .role-buyer,
     .role-user            { font-size: 11px; letter-spacing: 3px; padding: 3px 12px; }
     .user-del-btn         { font-size: 11px; letter-spacing: 2px; padding: 5px 14px; }
     .user-date            { font-size: 11px; }
@@ -1167,11 +1169,23 @@
       const date  = dateRaw
         ? new Date(dateRaw).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'2-digit' })
         : '—';
-      const roleClass = p.role === 'admin' ? 'role-admin' : 'role-user';
+      const role = p.role || 'user';
+      const roleClass = role === 'admin' ? 'role-admin' : role === 'buyer' ? 'role-buyer' : 'role-user';
       const isMe = p.id === _adminUser?.id;
+      // Role selector dropdown (not shown for self)
+      const roleSelector = isMe
+        ? `<span class="${roleClass}">${role.toUpperCase()}</span>`
+        : `<div class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)" style="display:inline-flex;">
+            <span class="${roleClass}" style="cursor:pointer;">${role.toUpperCase()} ▾</span>
+            <div class="pill-dropdown">
+              <button class="pill-opt${role==='user'?' active':''}" onclick="changeUserRole('${p.id}',this,'user')">USER</button>
+              <button class="pill-opt${role==='buyer'?' active':''}" style="color:#00e87a;" onclick="changeUserRole('${p.id}',this,'buyer')">BUYER</button>
+              <button class="pill-opt${role==='admin'?' active':''}" onclick="changeUserRole('${p.id}',this,'admin')">ADMIN</button>
+            </div>
+          </div>`;
       return `<tr>
         <td>${name}<span class="user-email-sub">${email}</span></td>
-        <td><span class="${roleClass}">${(p.role || 'user').toUpperCase()}</span></td>
+        <td>${roleSelector}</td>
         <td class="user-date">${date}</td>
         <td>${isMe
           ? '<span style="color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:8px;letter-spacing:1px;">YOU</span>'
@@ -1179,6 +1193,24 @@
         }</td>
       </tr>`;
     }).join('');
+  }
+
+  async function changeUserRole(userId, btn, newRole) {
+    const sb = await _getAdminSb();
+    const { error } = await sb.from('profiles')
+      .update({ role: newRole, updated_at: new Date().toISOString() })
+      .eq('id', userId);
+    if (error) { toast('// Role change failed', true); return; }
+    // Update pill UI
+    const wrap = btn.closest('.pill-wrap');
+    const pill = wrap.querySelector('span');
+    const roleClass = newRole === 'admin' ? 'role-admin' : newRole === 'buyer' ? 'role-buyer' : 'role-user';
+    pill.className = roleClass;
+    pill.style.cursor = 'pointer';
+    pill.textContent = newRole.toUpperCase() + ' ▾';
+    wrap.classList.remove('open');
+    wrap.querySelectorAll('.pill-opt').forEach(o => o.classList.toggle('active', o === btn));
+    toast(`// Role → ${newRole}`);
   }
 
   async function deleteUser(userId, btn) {
