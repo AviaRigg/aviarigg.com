@@ -504,12 +504,9 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
         if (buyUrl && buyUrl !== '#') {
           buyBtn.href = buyUrl;
           buyBtn.setAttribute('onclick', `event.preventDefault();event.stopPropagation();openCheckout('${buyUrl}')`);
-        } else {
-          // No URL yet — keep greyed
-          buyBtn.style.opacity = '0.35';
-          buyBtn.style.cursor = 'not-allowed';
-          buyBtn.style.pointerEvents = 'none';
         }
+        // If no buy_url, button is visible but inert — href stays '#'
+        // It will become functional once buy_url is set in Supabase
       }
     }
     if (wasFeatured) {
