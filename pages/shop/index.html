@@ -823,11 +823,13 @@
     .admin-status-option.opt-draft    { color: #f5a623; }
     .admin-status-option.opt-hidden   { color: #ff5050; }
     .admin-status-option.opt-featured { color: #ffd700; }
+    .admin-status-option.opt-early    { color: #b06ef5; }
     .admin-status-option.active-opt   { opacity: 0.4; cursor: default; pointer-events: none; }
     .status-live     { color: #00e87a; border-color: rgba(0,232,122,0.4); background: rgba(0,232,122,0.1); }
     .status-draft    { color: #f5a623; border-color: rgba(245,166,35,0.4); background: rgba(245,166,35,0.1); }
     .status-hidden   { color: #ff5050; border-color: rgba(255,80,80,0.4);  background: rgba(255,80,80,0.1); }
     .status-featured { color: #ffd700; border-color: rgba(255,215,0,0.4);  background: rgba(255,215,0,0.1); }
+    .status-early    { color: #b06ef5; border-color: rgba(176,110,245,0.4); background: rgba(176,110,245,0.1); }
 
     /* badge visibility now handled by .admin-status-wrap */
     body.edit-mode .product-card { outline: 1px dashed rgba(255,80,80,0.35); }
@@ -854,7 +856,31 @@
     }
 
     /* ── DISCOUNT / SALE PRICE DISPLAY ── */
-  .pc-price-wrap { display: flex; flex-direction: column; gap: 1px; }
+  /* ── EARLY ACCESS LOCK OVERLAY ── */
+  .early-lock-overlay {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px;
+    background: rgba(10,10,18,0.75);
+    backdrop-filter: blur(4px);
+    z-index: 4; pointer-events: none;
+  }
+  .early-lock-icon { font-size: clamp(20px,2vw,28px); opacity: 0.8; }
+  .early-lock-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(9px,0.75vw,12px); letter-spacing: 3px;
+    text-transform: uppercase; color: #b06ef5;
+    border: 1px solid rgba(176,110,245,0.4);
+    background: rgba(176,110,245,0.08);
+    padding: 4px 12px;
+  }
+  .early-lock-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(8px,0.65vw,10px); letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(255,255,255,0.35);
+  }
+
+    .pc-price-wrap { display: flex; flex-direction: column; gap: 1px; }
   .pc-price-original {
     font-family: 'Rajdhani', sans-serif;
     font-size: clamp(13px,1.1vw,16px); font-weight: 500;
@@ -1045,6 +1071,14 @@
         if (editToggle) editToggle.style.display = isAdmin ? 'flex' : 'none';
         await loadProductStatuses();
       });
+
+      // Re-evaluate early cards when nav-auth fires (buyer role upgrade via redeem modal)
+      document.addEventListener('navAuthReady', async () => {
+        // Re-apply early status cards based on new role
+        document.querySelectorAll('[data-product-id][data-status="early"]').forEach(card => {
+          applyStatusToCard(card.dataset.productId, 'early', card, false);
+        });
+      });
     });
   </script>
 </head>
@@ -1133,7 +1167,7 @@
           <button class="admin-status-option opt-live active-opt" onclick="event.stopPropagation();setProductStatus('f1-sf25','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
           <button class="admin-status-option opt-draft" onclick="event.stopPropagation();setProductStatus('f1-sf25','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
           <button class="admin-status-option opt-hidden" onclick="event.stopPropagation();setProductStatus('f1-sf25','hidden',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button>
-          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('f1-sf25','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button>
+          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('f1-sf25','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button><button class="admin-status-option opt-early" onclick="event.stopPropagation();setProductStatus(\'f1-sf25\',\'early\',this.closest(\'[data-product-id]\')); this.closest(\'.admin-status-wrap\').classList.remove(\'open\')">EARLY</button>
           </div>
         </div>
           <div class="pc-thumb">
@@ -1158,7 +1192,7 @@
           <button class="admin-status-option opt-live active-opt" onclick="event.stopPropagation();setProductStatus('controller-shape-menu','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
           <button class="admin-status-option opt-draft" onclick="event.stopPropagation();setProductStatus('controller-shape-menu','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
           <button class="admin-status-option opt-hidden" onclick="event.stopPropagation();setProductStatus('controller-shape-menu','hidden',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button>
-          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('controller-shape-menu','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button>
+          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('controller-shape-menu','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button><button class="admin-status-option opt-early" onclick="event.stopPropagation();setProductStatus(\'controller-shape-menu\',\'early\',this.closest(\'[data-product-id]\')); this.closest(\'.admin-status-wrap\').classList.remove(\'open\')">EARLY</button>
           </div>
         </div>
           <div class="pc-thumb">
@@ -1183,7 +1217,7 @@
           <button class="admin-status-option opt-live active-opt" onclick="event.stopPropagation();setProductStatus('character-rig-template','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
           <button class="admin-status-option opt-draft" onclick="event.stopPropagation();setProductStatus('character-rig-template','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
           <button class="admin-status-option opt-hidden" onclick="event.stopPropagation();setProductStatus('character-rig-template','hidden',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button>
-          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('character-rig-template','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button>
+          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('character-rig-template','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button><button class="admin-status-option opt-early" onclick="event.stopPropagation();setProductStatus(\'character-rig-template\',\'early\',this.closest(\'[data-product-id]\')); this.closest(\'.admin-status-wrap\').classList.remove(\'open\')">EARLY</button>
           </div>
         </div>
           <div class="pc-thumb">
@@ -1206,7 +1240,7 @@
           <button class="admin-status-option opt-live active-opt" onclick="event.stopPropagation();setProductStatus('mel-python-scripts','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
           <button class="admin-status-option opt-draft" onclick="event.stopPropagation();setProductStatus('mel-python-scripts','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
           <button class="admin-status-option opt-hidden" onclick="event.stopPropagation();setProductStatus('mel-python-scripts','hidden',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button>
-          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('mel-python-scripts','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button>
+          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('mel-python-scripts','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button><button class="admin-status-option opt-early" onclick="event.stopPropagation();setProductStatus(\'mel-python-scripts\',\'early\',this.closest(\'[data-product-id]\')); this.closest(\'.admin-status-wrap\').classList.remove(\'open\')">EARLY</button>
           </div>
         </div>
           <div class="pc-thumb">
@@ -1230,7 +1264,7 @@
           <button class="admin-status-option opt-live" onclick="event.stopPropagation();setProductStatus('f1-sf26-rig','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
           <button class="admin-status-option opt-draft active-opt" onclick="event.stopPropagation();setProductStatus('f1-sf26-rig','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
           <button class="admin-status-option opt-hidden" onclick="event.stopPropagation();setProductStatus('f1-sf26-rig','hidden',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button>
-          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('f1-sf26-rig','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button>
+          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('f1-sf26-rig','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button><button class="admin-status-option opt-early" onclick="event.stopPropagation();setProductStatus(\'f1-sf26-rig\',\'early\',this.closest(\'[data-product-id]\')); this.closest(\'.admin-status-wrap\').classList.remove(\'open\')">EARLY</button>
           </div>
         </div>
           <div class="pc-thumb">
@@ -1256,7 +1290,7 @@
           <button class="admin-status-option opt-live" onclick="event.stopPropagation();setProductStatus('f1-sf26-model','live',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">LIVE</button>
           <button class="admin-status-option opt-draft active-opt" onclick="event.stopPropagation();setProductStatus('f1-sf26-model','draft',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">DRAFT</button>
           <button class="admin-status-option opt-hidden" onclick="event.stopPropagation();setProductStatus('f1-sf26-model','hidden',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">HIDDEN</button>
-          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('f1-sf26-model','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button>
+          <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('f1-sf26-model','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button><button class="admin-status-option opt-early" onclick="event.stopPropagation();setProductStatus(\'f1-sf26-model\',\'early\',this.closest(\'[data-product-id]\')); this.closest(\'.admin-status-wrap\').classList.remove(\'open\')">EARLY</button>
           </div>
         </div>
           <div class="pc-thumb">
@@ -2016,6 +2050,65 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
         btn.href = '#';
         btn.style.opacity = '0.4';
         btn.style.cursor = 'not-allowed';
+      });
+    }
+  } else if (newStatus === 'early') {
+    // Early: visible only to buyers and admins — others see a lock overlay
+    cardEl.dataset.cat = originalCat;
+    cardEl.classList.remove('dim');
+    cardEl.style.display = '';
+    cardEl.style.opacity = '';
+    cardEl.style.cursor = '';
+
+    const isBuyer = window._navIsBuyer || false;
+    const isAdminUser = window._navIsAdmin || false;
+
+    if (isBuyer || isAdminUser) {
+      // Buyer/admin — full access, show normally
+      const savedOnclick = cardEl.getAttribute('data-onclick-disabled');
+      if (savedOnclick) { cardEl.setAttribute('onclick', savedOnclick); cardEl.removeAttribute('data-onclick-disabled'); }
+      else if (cardEl.dataset.href) cardEl.setAttribute('onclick', `window.location.href='${cardEl.dataset.href}'`);
+      // Remove lock overlay if present
+      const existing = cardEl.querySelector('.early-lock-overlay');
+      if (existing) existing.remove();
+      // Restore buy buttons
+      cardEl.querySelectorAll('.shop-buy-btn').forEach(btn => {
+        if (btn.dataset.realHref) { btn.setAttribute('onclick', btn.dataset.realHref); delete btn.dataset.realHref; }
+        btn.style.opacity = ''; btn.style.cursor = '';
+      });
+      // Restore thumb image
+      const thumb = cardEl.querySelector('.pc-thumb');
+      if (thumb) {
+        const img = thumb.querySelector('.pc-img');
+        if (img && img.dataset.realSrc) { img.src = img.dataset.realSrc; img.style.display = ''; }
+        const ph = thumb.querySelector('.admin-placeholder');
+        if (ph) ph.remove();
+      }
+    } else {
+      // Non-buyer — show card but with lock overlay, disable clicking
+      cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
+      cardEl.removeAttribute('onclick');
+      cardEl.style.cursor = 'default';
+      // Add lock overlay to thumb
+      const thumb = cardEl.querySelector('.pc-thumb');
+      if (thumb) {
+        thumb.style.position = 'relative';
+        if (!thumb.querySelector('.early-lock-overlay')) {
+          const ov = document.createElement('div');
+          ov.className = 'early-lock-overlay';
+          ov.innerHTML = `
+            <div class="early-lock-icon">&#128274;</div>
+            <div class="early-lock-label">// Early Access</div>
+            <div class="early-lock-sub">Redeem a key to unlock</div>`;
+          thumb.appendChild(ov);
+        }
+      }
+      // Disable buy buttons
+      cardEl.querySelectorAll('.shop-buy-btn').forEach(btn => {
+        btn.dataset.realHref = btn.getAttribute('onclick') || '';
+        btn.setAttribute('onclick', "event.preventDefault();event.stopPropagation();_openRedeemModal && _openRedeemModal()");
+        btn.textContent = '🔑 Redeem Key';
+        btn.style.opacity = '0.7'; btn.style.cursor = 'pointer';
       });
     }
   } else if (newStatus === 'featured') {

@@ -7,24 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
 <link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
-<link rel="shortcut icon" href="/favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
-
-<script>
-  document.addEventListener('touchmove', function(e) {
-    if (e.touches.length > 1) e.preventDefault();
-  }, { passive: false });
-  let lastTap = 0;
-  document.addEventListener('touchend', function(e) {
-    const tag = e.target.tagName;
-    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(tag)) return;
-    const now = Date.now();
-    if (now - lastTap < 300) e.preventDefault();
-    lastTap = now;
-  }, { passive: false });
-</script>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
 <script>
@@ -227,6 +212,7 @@
   .pill-draft     { color: #f5a623; border-color: rgba(245,166,35,0.35);  background: rgba(245,166,35,0.06); }
   .pill-hidden    { color: #ff5050; border-color: rgba(255,80,80,0.35);   background: rgba(255,80,80,0.06); }
   .pill-featured  { color: #ffd700; border-color: rgba(255,215,0,0.35);   background: rgba(255,215,0,0.06); }
+  .pill-early     { color: #b06ef5; border-color: rgba(176,110,245,0.35); background: rgba(176,110,245,0.06); }
   .pill-published { color: #00e87a; border-color: rgba(0,232,122,0.35);   background: rgba(0,232,122,0.06); }
 
   /* ── ITEM ROWS (products / portfolio) ── */
@@ -361,6 +347,8 @@
   .user-table tr:last-child td { border-bottom: none; }
   .user-table tr:hover td { background: rgba(139,79,200,0.04); }
   .role-admin { color: var(--accent2); border: 1px solid rgba(139,79,200,0.3); padding: 2px 8px; font-size: 8px; letter-spacing: 2px; background: rgba(139,79,200,0.08); }
+  .opt-early  { color: #b06ef5 !important; }
+  .pill-early { color: #b06ef5; border-color: rgba(176,110,245,0.4); background: rgba(176,110,245,0.1); }
   .role-buyer { color: #00e87a; border: 1px solid rgba(0,232,122,0.3); padding: 2px 8px; font-size: 8px; letter-spacing: 2px; background: rgba(0,232,122,0.06); }
   .role-user  { color: var(--text-dim); border: 1px solid var(--border); padding: 2px 8px; font-size: 8px; letter-spacing: 2px; }
   .user-date  { color: var(--text-dim); font-size: 8px; }
@@ -1164,7 +1152,8 @@
       const shopStatusOpts = `<button class='pill-opt' onclick='saveStatus(this,"live","shop_products")'>LIVE</button>
 <button class='pill-opt' onclick='saveStatus(this,"draft","shop_products")'>DRAFT</button>
 <button class='pill-opt' onclick='saveStatus(this,"hidden","shop_products")'>HIDDEN</button>
-<button class='pill-opt' onclick='saveStatus(this,"featured","shop_products")'>FEATURED</button>`;
+<button class='pill-opt' onclick='saveStatus(this,"featured","shop_products")'>FEATURED</button>
+<button class='pill-opt opt-early' onclick='saveStatus(this,"early","shop_products")'>EARLY</button>`;
       const shopCatOpts = `<button class='cat-opt' onclick='saveCat(this,"Maya Rig","shop_products")'>MAYA RIG</button>
 <button class='cat-opt' onclick='saveCat(this,"Blender Rig","shop_products")'>BLENDER RIG</button>
 <button class='cat-opt' onclick='saveCat(this,"Script","shop_products")'>SCRIPT</button>

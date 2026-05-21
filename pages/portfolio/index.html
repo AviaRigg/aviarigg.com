@@ -154,6 +154,33 @@
   .port-card.dim { opacity: 0.5; cursor: default; pointer-events: none; }
   .port-card:not(.dim):hover .pc-thumb img { transform: scale(1.04); }
 
+  /* Coming Soon watermark overlay for draft cards with thumbnails */
+  .coming-soon-watermark {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px;
+    pointer-events: none; z-index: 3;
+    background: rgba(0,0,0,0.35);
+  }
+  .coming-soon-watermark-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(22px, 3vw, 42px);
+    font-weight: 700; letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+    text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+    border: 2px solid rgba(255,255,255,0.25);
+    padding: 8px 24px;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(2px);
+  }
+  .coming-soon-watermark-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(9px, 0.8vw, 12px);
+    letter-spacing: 4px; text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+
   .pc-cat  { font-size: clamp(11px, 0.9vw, 14px) !important; }
   .pc-title { font-size: clamp(16px, 1.4vw, 22px) !important; }
   .pc-desc { font-size: clamp(13px, 1vw, 16px) !important; line-height: 1.6 !important; }
@@ -324,6 +351,8 @@
           if (img && img.dataset.realSrc) { img.src = img.dataset.realSrc; img.style.display = ''; }
           const ph = thumb.querySelector('.admin-placeholder');
           if (ph) ph.remove();
+          const wm = thumb.querySelector('.coming-soon-watermark');
+          if (wm) wm.remove();
         }
       } else if (status === 'hidden') {
         // Hidden: admin sees faded, customers see nothing
@@ -361,11 +390,21 @@
           card.classList.add('dim');
           card.dataset.onclickDisabled = card.getAttribute('onclick') || '';
           card.removeAttribute('onclick');
-          // Only hide thumbnail and show Coming Soon if card has no real image
           const hasRealImg = card.dataset.img && card.dataset.img.trim() !== '';
-          if (!hasRealImg) {
-            const thumb = card.querySelector('.pc-thumb');
-            if (thumb) {
+          const thumb = card.querySelector('.pc-thumb');
+          if (thumb) {
+            if (hasRealImg) {
+              // Has thumbnail — keep it but add Coming Soon watermark on top
+              if (!thumb.querySelector('.coming-soon-watermark')) {
+                const wm = document.createElement('div');
+                wm.className = 'coming-soon-watermark';
+                wm.innerHTML = `
+                  <div class="coming-soon-watermark-text">Coming Soon</div>
+                  <div class="coming-soon-watermark-sub">// Stay tuned</div>`;
+                thumb.appendChild(wm);
+              }
+            } else {
+              // No thumbnail — hide image and show text placeholder
               const img = thumb.querySelector('img');
               if (img) { img.dataset.realSrc = img.dataset.realSrc || img.src; img.style.display = 'none'; }
               if (!thumb.querySelector('.admin-placeholder')) {
