@@ -34,7 +34,7 @@
 .lib-sidebar-header{padding:20px 16px 14px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));flex-shrink:0;}
 .lib-sidebar-eyebrow{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--accent,#8b4fc8);margin-bottom:4px;}
 .lib-sidebar-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--text-bright,#eeeef8);letter-spacing:2px;text-transform:uppercase;}
-.lib-sidebar-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim,#6a6a8a);letter-spacing:2px;margin-top:3px;}
+.lib-sidebar-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:#9090b0;letter-spacing:2px;margin-top:3px;}
 .lib-search-wrap{padding:10px 12px 8px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));flex-shrink:0;}
 .lib-search{width:100%;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid var(--border,rgba(255,255,255,0.07));color:var(--text,#c8c8e0);padding:7px 10px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;transition:border-color 0.2s;}
 .lib-search:focus{border-color:rgba(139,79,200,0.5);}
@@ -42,20 +42,20 @@
 .lib-nav{flex:1;padding:8px 0;overflow-y:auto;}
 .lib-nav::-webkit-scrollbar{width:3px;}
 .lib-nav::-webkit-scrollbar-thumb{background:rgba(139,79,200,0.3);}
-.lib-home-btn{display:flex;align-items:center;gap:8px;padding:8px 16px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim,#6a6a8a);text-transform:uppercase;transition:color 0.2s;border:none;background:none;width:100%;text-align:left;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));margin-bottom:6px;}
+.lib-home-btn{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;color:#c8c8e0;text-transform:uppercase;transition:color 0.2s;border:none;background:none;width:100%;text-align:left;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));margin-bottom:6px;}
 .lib-home-btn:hover,.lib-home-btn.active{color:var(--accent2,#c084fc);}
 .lib-home-btn .dot{width:5px;height:5px;border-radius:50%;background:var(--accent,#8b4fc8);}
-.lib-cat-label{padding:4px 16px 3px;font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(139,79,200,0.45);}
-.lib-nav-item{display:flex;align-items:center;gap:7px;padding:6px 16px 6px 20px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim,#6a6a8a);transition:color 0.15s,background 0.15s;border-left:2px solid transparent;}
+.lib-cat-label{padding:6px 16px 4px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(139,79,200,0.7);}
+.lib-nav-item{display:flex;align-items:center;gap:7px;padding:7px 16px 7px 20px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1px;color:#c8c8e0;transition:color 0.15s,background 0.15s;border-left:2px solid transparent;}
 .lib-nav-item:hover{color:var(--text,#c8c8e0);background:rgba(255,255,255,0.03);}
 .lib-nav-item.active{color:var(--accent2,#c084fc);border-left-color:var(--accent,#8b4fc8);background:rgba(139,79,200,0.06);}
 .lib-nav-item.hidden-item{display:none;}
 .lib-nav-item .dot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0;}
-.lib-nav-new{font-family:'Share Tech Mono',monospace;font-size:6px;letter-spacing:2px;background:rgba(0,232,122,0.1);border:1px solid rgba(0,232,122,0.3);color:#00e87a;padding:1px 4px;margin-left:auto;}
+.lib-nav-new{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;background:rgba(0,232,122,0.12);border:1px solid rgba(0,232,122,0.5);color:#00e87a;padding:2px 6px;margin-left:auto;font-weight:700;}
 .lib-nav-status{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-left:auto;}
 .status-dot-published{background:#00e87a;}.status-dot-draft{background:#f5a623;}.status-dot-hidden{background:#ff5050;}
 .lib-sidebar-footer{padding:12px 16px;border-top:1px solid var(--border,rgba(255,255,255,0.07));flex-shrink:0;}
-.lib-about-link{display:flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim,#6a6a8a);text-transform:uppercase;cursor:pointer;transition:color 0.2s;text-decoration:none;}
+.lib-about-link{display:flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:#a0a0c0;text-transform:uppercase;cursor:pointer;transition:color 0.2s;text-decoration:none;}
 .lib-about-link:hover{color:var(--accent2,#c084fc);}
 .lib-version{font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(255,255,255,0.12);letter-spacing:1px;margin-top:8px;}
 
@@ -73,18 +73,18 @@
 #lib-view-home{padding:clamp(32px,3vw,60px) clamp(32px,4vw,80px) 80px;}
 .lib-hero-title{font-family:'Rajdhani',sans-serif;font-size:clamp(48px,4vw,96px);font-weight:700;line-height:1;letter-spacing:2px;text-transform:uppercase;color:var(--text-bright,#eeeef8);margin-bottom:6px;}
 .lib-hero-title span{color:var(--accent2,#c084fc);}
-.lib-hero-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--text-dim,#6a6a8a);text-transform:uppercase;margin-bottom:40px;}
+.lib-hero-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:4px;color:#9090b0;text-transform:uppercase;margin-bottom:40px;}
 .lib-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border,rgba(255,255,255,0.07));border:1px solid var(--border,rgba(255,255,255,0.07));margin-bottom:40px;max-width:600px;}
 .lib-stat{background:var(--bg,#07070f);padding:20px 24px;position:relative;overflow:hidden;}
 .lib-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(139,79,200,0.4),transparent);}
 .lib-stat-icon{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent,#8b4fc8);margin-bottom:8px;}
 .lib-stat-value{font-family:'Share Tech Mono',monospace;font-size:clamp(20px,3vw,28px);color:var(--accent2,#c084fc);font-weight:700;letter-spacing:2px;margin-bottom:4px;}
-.lib-stat-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);}
+.lib-stat-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:#a0a0c0;}
 
 /* ── SORT & SEARCH ── */
 .lib-controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:16px;flex-wrap:wrap;}
 .lib-sort-wrap{display:flex;align-items:center;gap:6px;}
-.lib-sort-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);}
+.lib-sort-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#a0a0c0;}
 .lib-sort-btn{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);background:none;border:1px solid rgba(255,255,255,0.07);padding:4px 10px;cursor:pointer;transition:all 0.15s;}
 .lib-sort-btn:hover{color:var(--text,#c8c8e0);border-color:rgba(255,255,255,0.15);}
 .lib-sort-btn.active{color:var(--accent2,#c084fc);border-color:rgba(139,79,200,0.4);background:rgba(139,79,200,0.06);}
@@ -96,7 +96,7 @@
 
 /* ── INDEX ── */
 .lib-index-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
-.lib-index-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);}
+.lib-index-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#a0a0c0;}
 .lib-index-meta{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.18);}
 .lib-index{border:1px solid var(--border,rgba(255,255,255,0.07));}
 .lib-index-row{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));cursor:pointer;transition:background 0.15s;}
@@ -109,9 +109,9 @@
 .lib-row-hidden{opacity:0.35;}
 .lib-index-cat-badge{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;padding:3px 8px;border:1px solid;flex-shrink:0;white-space:nowrap;min-width:72px;text-align:center;}
 .lib-index-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;color:var(--text-bright,#eeeef8);letter-spacing:1px;flex:1;}
-.lib-index-desc{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim,#6a6a8a);flex:2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lib-index-desc{font-family:'Share Tech Mono',monospace;font-size:10px;color:#a0a0c0;flex:2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .lib-index-arrow{font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--accent,#8b4fc8);opacity:0;transform:translateX(-4px);transition:opacity 0.15s,transform 0.15s;flex-shrink:0;}
-.lib-new-badge{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:3px;background:rgba(0,232,122,0.08);border:1px solid rgba(0,232,122,0.35);color:#00e87a;padding:2px 6px;text-transform:uppercase;flex-shrink:0;}
+.lib-new-badge{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;background:rgba(0,232,122,0.1);border:1px solid rgba(0,232,122,0.5);color:#00e87a;padding:3px 8px;text-transform:uppercase;flex-shrink:0;font-weight:700;}
 .lib-lock-badge{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.25);color:#ff5050;padding:3px 8px;flex-shrink:0;}
 .lib-no-results{padding:32px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--text-dim,#6a6a8a);text-align:center;}
 
@@ -187,27 +187,33 @@
 .cat-reference{background:rgba(255,255,255,0.04);color:#888899;border-color:rgba(255,255,255,0.12);}
   /* 4K scaling — base font grows with viewport */
   @media (min-width: 2560px) {
-    .lib-hero-title { font-size: clamp(64px, 4vw, 120px) !important; }
-    .lib-stats { max-width: 900px !important; }
-    .lib-stat-value { font-size: clamp(32px, 2.5vw, 48px) !important; }
-    .lib-index-name { font-size: clamp(18px, 1.2vw, 28px) !important; }
-    .lib-index-cat-badge { font-size: clamp(9px, 0.6vw, 14px) !important; min-width: 100px !important; }
-    .lib-index-desc { font-size: clamp(11px, 0.7vw, 16px) !important; }
-    .lib-index-row { padding: 18px 28px !important; }
-    .lib-sidebar-title { font-size: clamp(22px, 1.4vw, 32px) !important; }
-    .lib-sidebar { width: clamp(260px, 14vw, 420px) !important; }
-    .lib-cat-label { font-size: clamp(9px, 0.55vw, 14px) !important; }
-    .lib-nav-item { font-size: clamp(11px, 0.7vw, 16px) !important; padding: 8px 20px 8px 28px !important; }
-    .lib-home-btn { font-size: clamp(11px, 0.7vw, 16px) !important; padding: 10px 20px !important; }
-    .lib-sort-btn { font-size: clamp(9px, 0.6vw, 14px) !important; padding: 6px 14px !important; }
-    .lib-home-search { font-size: clamp(12px, 0.75vw, 18px) !important; }
-    #lib-view-home { padding: clamp(48px, 4vw, 80px) clamp(48px, 5vw, 100px) 100px !important; }
+    .lib-hero-title { font-size: clamp(56px, 3.2vw, 90px) !important; }
+    .lib-stats { max-width: 700px !important; }
+    .lib-stat-value { font-size: clamp(28px, 1.8vw, 40px) !important; }
+    .lib-stat-label { font-size: clamp(9px, 0.5vw, 12px) !important; }
+    .lib-index-name { font-size: clamp(17px, 1vw, 24px) !important; }
+    .lib-index-cat-badge { font-size: clamp(9px, 0.55vw, 12px) !important; min-width: 90px !important; padding: 4px 10px !important; }
+    .lib-index-desc { font-size: clamp(11px, 0.65vw, 14px) !important; }
+    .lib-index-row { padding: 16px 24px !important; }
+    .lib-sidebar-title { font-size: clamp(18px, 1.1vw, 26px) !important; }
+    .lib-sidebar { width: clamp(260px, 13vw, 380px) !important; }
+    .lib-cat-label { font-size: clamp(10px, 0.6vw, 13px) !important; }
+    .lib-nav-item { font-size: clamp(12px, 0.75vw, 16px) !important; padding: 8px 18px 8px 24px !important; }
+    .lib-home-btn { font-size: clamp(12px, 0.75vw, 16px) !important; padding: 10px 18px !important; }
+    .lib-sort-btn { font-size: clamp(9px, 0.55vw, 12px) !important; padding: 5px 12px !important; }
+    .lib-sort-label { font-size: clamp(9px, 0.55vw, 12px) !important; }
+    .lib-home-search { font-size: clamp(11px, 0.65vw, 14px) !important; }
+    .lib-hero-sub { font-size: clamp(10px, 0.6vw, 13px) !important; }
+    .lib-new-badge { font-size: clamp(9px, 0.55vw, 12px) !important; }
+    .lib-nav-new { font-size: clamp(8px, 0.5vw, 11px) !important; }
+    #lib-view-home { padding: clamp(40px, 3vw, 64px) clamp(40px, 4vw, 80px) 80px !important; }
   }
   @media (min-width: 3840px) {
-    .lib-hero-title { font-size: clamp(80px, 3.5vw, 160px) !important; }
-    .lib-stat-value { font-size: clamp(40px, 2vw, 64px) !important; }
-    .lib-sidebar { width: clamp(320px, 12vw, 480px) !important; }
-    .lib-index-name { font-size: clamp(22px, 1vw, 36px) !important; }
+    .lib-hero-title { font-size: clamp(64px, 2.8vw, 110px) !important; }
+    .lib-stat-value { font-size: clamp(32px, 1.5vw, 52px) !important; }
+    .lib-sidebar { width: clamp(300px, 11vw, 440px) !important; }
+    .lib-index-name { font-size: clamp(18px, 0.9vw, 28px) !important; }
+    .lib-nav-item { font-size: clamp(13px, 0.65vw, 18px) !important; }
   }
 </style>
 
