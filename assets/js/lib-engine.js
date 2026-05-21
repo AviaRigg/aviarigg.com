@@ -49,6 +49,7 @@ async function libInit() {
 
   _isAdmin = window._navIsAdmin || false;
   _isBuyer = window._navIsBuyer || false;
+  console.log('[lib] init — isAdmin:', _isAdmin, 'isBuyer:', _isBuyer, '_navSb:', typeof _navSb);
 
   _sb = _navSb; // always use the shared nav-auth client — never create a new one
 
@@ -62,14 +63,17 @@ async function libInit() {
 // ── FETCH FROM SUPABASE ──
 
 async function libFetchAndRender() {
+  console.log('[lib] fetching scripts, _sb:', !!_sb, 'isAdmin:', _isAdmin);
   let query = _sb.from('library_scripts').select('*');
   if (!_isAdmin) query = query.eq('status', 'published');
   query = query.order('position', { ascending: true });
 
   const { data, error } = await query;
+  console.log('[lib] fetch result:', { data, error });
   if (error) { console.error('Library fetch error:', error); return; }
 
   _rows = data || [];
+  console.log('[lib] rows loaded:', _rows.length);
   await libLoadScriptData();
   libRenderSidebar();
   libRenderIndex();

@@ -27,11 +27,10 @@
 #lib-gate{position:fixed;inset:0;z-index:9998;background:var(--bg,#07070f);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
 
 /* ── LAYOUT ── */
-.lib-page-outer{width:100%;height:calc(100vh - var(--nav-h,60px));overflow:hidden;display:flex;justify-content:center;background:var(--bg,#07070f);}
-.lib-page{display:flex;width:100%;max-width:1800px;height:100%;overflow:hidden;}
+.lib-page{display:flex;width:100%;height:calc(100vh - var(--nav-h,60px));overflow:hidden;}
 
 /* ── SIDEBAR ── */
-.lib-sidebar{width:clamp(220px,16%,300px);flex-shrink:0;background:rgba(255,255,255,0.015);border-right:1px solid var(--border,rgba(255,255,255,0.07));display:flex;flex-direction:column;overflow:hidden;}
+.lib-sidebar{width:clamp(240px,18vw,360px);flex-shrink:0;background:rgba(255,255,255,0.015);border-right:1px solid var(--border,rgba(255,255,255,0.07));display:flex;flex-direction:column;overflow:hidden;}
 .lib-sidebar-header{padding:20px 16px 14px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));flex-shrink:0;}
 .lib-sidebar-eyebrow{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--accent,#8b4fc8);margin-bottom:4px;}
 .lib-sidebar-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--text-bright,#eeeef8);letter-spacing:2px;text-transform:uppercase;}
@@ -71,8 +70,8 @@
 .lib-bc-current{color:var(--text-bright,#eeeef8);}
 
 /* ── HOME ── */
-#lib-view-home{padding:40px 40px 60px;}
-.lib-hero-title{font-family:'Rajdhani',sans-serif;font-size:clamp(36px,5vw,64px);font-weight:700;line-height:1;letter-spacing:2px;text-transform:uppercase;color:var(--text-bright,#eeeef8);margin-bottom:6px;}
+#lib-view-home{padding:clamp(32px,3vw,60px) clamp(32px,4vw,80px) 80px;}
+.lib-hero-title{font-family:'Rajdhani',sans-serif;font-size:clamp(48px,4vw,96px);font-weight:700;line-height:1;letter-spacing:2px;text-transform:uppercase;color:var(--text-bright,#eeeef8);margin-bottom:6px;}
 .lib-hero-title span{color:var(--accent2,#c084fc);}
 .lib-hero-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--text-dim,#6a6a8a);text-transform:uppercase;margin-bottom:40px;}
 .lib-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border,rgba(255,255,255,0.07));border:1px solid var(--border,rgba(255,255,255,0.07));margin-bottom:40px;max-width:600px;}
@@ -235,7 +234,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 </div>
 
 <div class="page active" id="page-library" style="visibility:hidden;">
-<div class="lib-page-outer"><div class="lib-page">
+<div class="lib-page">
 
   <!-- SIDEBAR -->
   <aside class="lib-sidebar">
@@ -321,7 +320,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     <div id="lib-view-script" style="display:none;"></div>
 
   </main>
-</div>
 </div>
 </div>
 
