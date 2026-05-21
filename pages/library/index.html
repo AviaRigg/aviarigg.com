@@ -4,87 +4,222 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Script Library — AviaRigg</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
+<link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-RYTKYEPJG2');</script>
 <script>
-  document.addEventListener('touchmove', function(e) {
-    if (e.touches.length > 1) e.preventDefault();
-  }, { passive: false });
-  let lastTap = 0;
-  document.addEventListener('touchend', function(e) {
-    const tag = e.target.tagName;
-    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(tag)) return;
-    const now = Date.now();
-    if (now - lastTap < 300) e.preventDefault();
-    lastTap = now;
-  }, { passive: false });
+  document.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault();},{passive:false});
+  let _lt=0;document.addEventListener('touchend',function(e){const t=e.target.tagName;if(['INPUT','SELECT','TEXTAREA'].includes(t))return;const n=Date.now();if(n-_lt<300)e.preventDefault();_lt=n;},{passive:false});
 </script>
 <style>
-  .page { display: block !important; }
-  .nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
-  .mobile-library-block { display: none; }
-  @media (max-width: 768px) {
-    .page { display: none !important; }
-    .mobile-library-block {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: calc(100vh - var(--nav-h));
-      padding: 40px 24px;
-      text-align: center;
-      gap: 16px;
-    }
-  }
+/* ── BASE ── */
+.page{display:block!important;}
+.nav-logo,.nav-link,.nav-badge,.nav-drawer a{text-decoration:none;}
+.mobile-library-block{display:none;}
+@media(max-width:768px){
+  .page{display:none!important;}
+  .mobile-library-block{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - var(--nav-h));padding:40px 24px;text-align:center;gap:16px;}
+}
 
+/* ── GATE ── */
+#lib-gate{position:fixed;inset:0;z-index:9998;background:var(--bg,#07070f);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+
+/* ── LAYOUT ── */
+.lib-page{display:flex;height:calc(100vh - var(--nav-h,60px));overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.lib-sidebar{width:240px;flex-shrink:0;background:rgba(255,255,255,0.015);border-right:1px solid var(--border,rgba(255,255,255,0.07));display:flex;flex-direction:column;overflow:hidden;}
+.lib-sidebar-header{padding:20px 16px 14px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));flex-shrink:0;}
+.lib-sidebar-eyebrow{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--accent,#8b4fc8);margin-bottom:4px;}
+.lib-sidebar-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--text-bright,#eeeef8);letter-spacing:2px;text-transform:uppercase;}
+.lib-sidebar-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim,#6a6a8a);letter-spacing:2px;margin-top:3px;}
+.lib-search-wrap{padding:10px 12px 8px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));flex-shrink:0;}
+.lib-search{width:100%;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid var(--border,rgba(255,255,255,0.07));color:var(--text,#c8c8e0);padding:7px 10px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;transition:border-color 0.2s;}
+.lib-search:focus{border-color:rgba(139,79,200,0.5);}
+.lib-search::placeholder{color:var(--text-dim,#6a6a8a);}
+.lib-nav{flex:1;padding:8px 0;overflow-y:auto;}
+.lib-nav::-webkit-scrollbar{width:3px;}
+.lib-nav::-webkit-scrollbar-thumb{background:rgba(139,79,200,0.3);}
+.lib-home-btn{display:flex;align-items:center;gap:8px;padding:8px 16px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim,#6a6a8a);text-transform:uppercase;transition:color 0.2s;border:none;background:none;width:100%;text-align:left;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));margin-bottom:6px;}
+.lib-home-btn:hover,.lib-home-btn.active{color:var(--accent2,#c084fc);}
+.lib-home-btn .dot{width:5px;height:5px;border-radius:50%;background:var(--accent,#8b4fc8);}
+.lib-cat-label{padding:4px 16px 3px;font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(139,79,200,0.45);}
+.lib-nav-item{display:flex;align-items:center;gap:7px;padding:6px 16px 6px 20px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim,#6a6a8a);transition:color 0.15s,background 0.15s;border-left:2px solid transparent;}
+.lib-nav-item:hover{color:var(--text,#c8c8e0);background:rgba(255,255,255,0.03);}
+.lib-nav-item.active{color:var(--accent2,#c084fc);border-left-color:var(--accent,#8b4fc8);background:rgba(139,79,200,0.06);}
+.lib-nav-item.hidden-item{display:none;}
+.lib-nav-item .dot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.lib-nav-new{font-family:'Share Tech Mono',monospace;font-size:6px;letter-spacing:2px;background:rgba(0,232,122,0.1);border:1px solid rgba(0,232,122,0.3);color:#00e87a;padding:1px 4px;margin-left:auto;}
+.lib-nav-status{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-left:auto;}
+.status-dot-published{background:#00e87a;}.status-dot-draft{background:#f5a623;}.status-dot-hidden{background:#ff5050;}
+.lib-sidebar-footer{padding:12px 16px;border-top:1px solid var(--border,rgba(255,255,255,0.07));flex-shrink:0;}
+.lib-about-link{display:flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim,#6a6a8a);text-transform:uppercase;cursor:pointer;transition:color 0.2s;text-decoration:none;}
+.lib-about-link:hover{color:var(--accent2,#c084fc);}
+.lib-version{font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(255,255,255,0.12);letter-spacing:1px;margin-top:8px;}
+
+/* ── MAIN ── */
+.lib-main{flex:1;overflow-y:auto;scroll-behavior:smooth;}
+.lib-main::-webkit-scrollbar{width:4px;}
+.lib-main::-webkit-scrollbar-thumb{background:rgba(139,79,200,0.25);}
+
+/* ── BREADCRUMB ── */
+.lib-breadcrumb{display:flex;align-items:center;gap:8px;padding:14px 40px 0;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);}
+.lib-bc-sep{color:rgba(139,79,200,0.4);}
+.lib-bc-current{color:var(--text-bright,#eeeef8);}
+
+/* ── HOME ── */
+#lib-view-home{padding:40px 40px 60px;}
+.lib-hero-title{font-family:'Rajdhani',sans-serif;font-size:clamp(36px,5vw,64px);font-weight:700;line-height:1;letter-spacing:2px;text-transform:uppercase;color:var(--text-bright,#eeeef8);margin-bottom:6px;}
+.lib-hero-title span{color:var(--accent2,#c084fc);}
+.lib-hero-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--text-dim,#6a6a8a);text-transform:uppercase;margin-bottom:40px;}
+.lib-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border,rgba(255,255,255,0.07));border:1px solid var(--border,rgba(255,255,255,0.07));margin-bottom:40px;max-width:600px;}
+.lib-stat{background:var(--bg,#07070f);padding:20px 24px;position:relative;overflow:hidden;}
+.lib-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(139,79,200,0.4),transparent);}
+.lib-stat-icon{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent,#8b4fc8);margin-bottom:8px;}
+.lib-stat-value{font-family:'Share Tech Mono',monospace;font-size:clamp(20px,3vw,28px);color:var(--accent2,#c084fc);font-weight:700;letter-spacing:2px;margin-bottom:4px;}
+.lib-stat-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);}
+
+/* ── SORT & SEARCH ── */
+.lib-controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:16px;flex-wrap:wrap;}
+.lib-sort-wrap{display:flex;align-items:center;gap:6px;}
+.lib-sort-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);}
+.lib-sort-btn{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);background:none;border:1px solid rgba(255,255,255,0.07);padding:4px 10px;cursor:pointer;transition:all 0.15s;}
+.lib-sort-btn:hover{color:var(--text,#c8c8e0);border-color:rgba(255,255,255,0.15);}
+.lib-sort-btn.active{color:var(--accent2,#c084fc);border-color:rgba(139,79,200,0.4);background:rgba(139,79,200,0.06);}
+.lib-home-search-wrap{position:relative;flex:1;max-width:400px;}
+.lib-home-search{width:100%;box-sizing:border-box;background:rgba(255,255,255,0.03);border:1px solid var(--border,rgba(255,255,255,0.07));border-left:2px solid rgba(139,79,200,0.5);color:var(--text,#c8c8e0);padding:10px 14px 10px 36px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;transition:border-color 0.2s;}
+.lib-home-search:focus{border-color:rgba(139,79,200,0.6);}
+.lib-home-search::placeholder{color:var(--text-dim,#6a6a8a);}
+.lib-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:rgba(139,79,200,0.5);font-size:13px;pointer-events:none;}
+
+/* ── INDEX ── */
+.lib-index-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
+.lib-index-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);}
+.lib-index-meta{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.18);}
+.lib-index{border:1px solid var(--border,rgba(255,255,255,0.07));}
+.lib-index-row{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));cursor:pointer;transition:background 0.15s;}
+.lib-index-row:last-child{border-bottom:none;}
+.lib-index-row:hover{background:rgba(139,79,200,0.04);}
+.lib-index-row:hover .lib-index-arrow{opacity:1;transform:translateX(0);}
+.lib-index-locked{opacity:0.6;cursor:pointer;}
+.lib-index-locked:hover{background:rgba(255,80,80,0.04);}
+.lib-row-draft{opacity:0.55;}
+.lib-row-hidden{opacity:0.35;}
+.lib-index-cat-badge{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;padding:3px 8px;border:1px solid;flex-shrink:0;white-space:nowrap;min-width:72px;text-align:center;}
+.lib-index-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;color:var(--text-bright,#eeeef8);letter-spacing:1px;flex:1;}
+.lib-index-desc{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim,#6a6a8a);flex:2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lib-index-arrow{font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--accent,#8b4fc8);opacity:0;transform:translateX(-4px);transition:opacity 0.15s,transform 0.15s;flex-shrink:0;}
+.lib-new-badge{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:3px;background:rgba(0,232,122,0.08);border:1px solid rgba(0,232,122,0.35);color:#00e87a;padding:2px 6px;text-transform:uppercase;flex-shrink:0;}
+.lib-lock-badge{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.25);color:#ff5050;padding:3px 8px;flex-shrink:0;}
+.lib-no-results{padding:32px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--text-dim,#6a6a8a);text-align:center;}
+
+/* Admin badges in index */
+.lib-admin-status{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:3px;padding:2px 6px;border:1px solid;flex-shrink:0;}
+.lib-status-published{color:#00e87a;border-color:rgba(0,232,122,0.3);background:rgba(0,232,122,0.06);}
+.lib-status-draft{color:#f5a623;border-color:rgba(245,166,35,0.3);background:rgba(245,166,35,0.06);}
+.lib-status-hidden{color:#ff5050;border-color:rgba(255,80,80,0.3);background:rgba(255,80,80,0.06);}
+.lib-access-badge{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;padding:2px 6px;border:1px solid;flex-shrink:0;}
+.lib-access-buyer_only{color:#b06ef5;border-color:rgba(176,110,245,0.3);background:rgba(176,110,245,0.06);}
+
+/* ── SCRIPT VIEW ── */
+#lib-view-script{padding:0 40px 80px;}
+
+/* Admin bar */
+.lib-admin-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));margin-bottom:28px;margin-top:20px;gap:16px;flex-wrap:wrap;}
+.lib-admin-bar-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(139,79,200,0.5);}
+.lib-admin-controls{display:flex;gap:20px;flex-wrap:wrap;}
+.lib-admin-group{display:flex;align-items:center;gap:8px;}
+.lib-admin-group-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);}
+.lib-admin-pill-group{display:flex;gap:4px;}
+.lib-admin-pill{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);background:none;border:1px solid rgba(255,255,255,0.08);padding:4px 10px;cursor:pointer;transition:all 0.15s;}
+.lib-admin-pill:hover{color:var(--text,#c8c8e0);border-color:rgba(255,255,255,0.2);}
+.lib-admin-pill.active{color:#00e87a;border-color:rgba(0,232,122,0.4);background:rgba(0,232,122,0.06);}
+.lib-admin-pill-access.active{color:#b06ef5;border-color:rgba(176,110,245,0.4);background:rgba(176,110,245,0.06);}
+
+.lib-script-eyebrow{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--accent,#8b4fc8);margin-top:28px;margin-bottom:10px;}
+.lib-script-title{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:700;line-height:1.05;letter-spacing:2px;text-transform:uppercase;color:var(--text-bright,#eeeef8);margin-bottom:20px;}
+.lib-script-desc{font-size:14px;line-height:1.8;color:var(--text,#c8c8e0);max-width:700px;margin-bottom:20px;}
+.lib-script-desc code{font-family:'Share Tech Mono',monospace;color:var(--accent,#8b4fc8);font-size:13px;}
+.lib-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:32px;}
+.lib-tag{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;padding:4px 10px;border:1px solid rgba(139,79,200,0.3);background:rgba(139,79,200,0.06);color:var(--accent2,#c084fc);}
+.lib-tag-python{border-color:rgba(139,79,200,0.4);color:#a78bfa;}
+.lib-tag-maya{border-color:rgba(0,180,255,0.3);color:#00b4ff;background:rgba(0,180,255,0.06);}
+.lib-tag-new{border-color:rgba(0,232,122,0.3);color:#00e87a;background:rgba(0,232,122,0.06);}
+.lib-section-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);padding-bottom:10px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));margin-bottom:16px;margin-top:32px;}
+.lib-sublabel{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim,#6a6a8a);line-height:1.6;margin-bottom:12px;}
+.lib-when-box{border:1px solid rgba(255,200,0,0.15);background:rgba(255,200,0,0.03);border-left:2px solid rgba(255,200,0,0.4);padding:16px 20px;margin-bottom:32px;}
+.lib-when-title{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,200,0,0.6);margin-bottom:10px;}
+.lib-code-wrap{background:rgba(0,0,0,0.35);border:1px solid rgba(139,79,200,0.15);border-left:2px solid rgba(139,79,200,0.5);margin-bottom:24px;}
+.lib-code-toolbar{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:rgba(139,79,200,0.06);border-bottom:1px solid rgba(139,79,200,0.1);}
+.lib-code-lang{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(139,79,200,0.7);}
+.lib-copy-btn{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);background:none;border:1px solid rgba(255,255,255,0.08);padding:4px 10px;cursor:pointer;transition:all 0.2s;}
+.lib-copy-btn:hover{color:var(--accent2,#c084fc);border-color:rgba(139,79,200,0.4);}
+.lib-copy-btn.copied{color:#00e87a;border-color:rgba(0,232,122,0.4);}
+.lib-code-wrap pre{margin:0;padding:18px 20px;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.7;color:var(--text,#c8c8e0);overflow-x:auto;white-space:pre;}
+.lib-params-table{width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:11px;margin-bottom:8px;}
+.lib-params-table th{text-align:left;padding:8px 14px;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);border-bottom:1px solid var(--border,rgba(255,255,255,0.07));}
+.lib-params-table td{padding:10px 14px;vertical-align:top;}
+.lib-params-table tr{border-bottom:1px solid rgba(255,255,255,0.04);}
+.lib-params-table tr:last-child{border-bottom:none;}
+.p-name{color:var(--accent2,#c084fc);}.p-type{color:rgba(0,180,255,0.8);}.p-desc{color:var(--text,#c8c8e0);line-height:1.5;}
+.lib-notes-box{border:1px solid var(--border,rgba(255,255,255,0.07));background:rgba(255,255,255,0.02);padding:16px 20px;}
+.lib-note-item{display:flex;gap:10px;padding:5px 0;font-family:'Share Tech Mono',monospace;font-size:11px;line-height:1.6;color:var(--text,#c8c8e0);border-bottom:1px solid rgba(255,255,255,0.03);}
+.lib-note-item:last-child{border-bottom:none;}
+.lib-note-bullet{color:var(--accent,#8b4fc8);flex-shrink:0;}
+.lib-note-item code{font-family:'Share Tech Mono',monospace;color:var(--accent,#8b4fc8);font-size:11px;}
+.lib-conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
+.lib-conv-section{background:rgba(255,255,255,0.02);border:1px solid var(--border,rgba(255,255,255,0.07));padding:18px;}
+.lib-conv-title{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--accent,#8b4fc8);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));}
+.lib-conv-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.03);}
+.lib-conv-row:last-child{border-bottom:none;}
+.lib-conv-name{color:var(--text,#c8c8e0);font-family:'Inter',sans-serif;}
+.lib-conv-suffix{font-family:'Share Tech Mono',monospace;font-size:12px;color:#c084fc;background:rgba(192,132,252,0.08);padding:2px 8px;border:1px solid rgba(192,132,252,0.2);}
+
+/* Category badge colors */
+.cat-arnold{background:rgba(255,140,0,0.08);color:#ff8c00;border-color:rgba(255,140,0,0.25);}
+.cat-attrs{background:rgba(0,232,122,0.06);color:#00e87a;border-color:rgba(0,232,122,0.2);}
+.cat-deformers{background:rgba(139,79,200,0.1);color:#a78bfa;border-color:rgba(139,79,200,0.3);}
+.cat-ikfk{background:rgba(255,180,0,0.08);color:#ffb400;border-color:rgba(255,180,0,0.25);}
+.cat-shape{background:rgba(0,200,255,0.08);color:#00c8ff;border-color:rgba(0,200,255,0.2);}
+.cat-uvs{background:rgba(0,180,255,0.08);color:#00b4ff;border-color:rgba(0,180,255,0.2);}
+.cat-reference{background:rgba(255,255,255,0.04);color:#888899;border-color:rgba(255,255,255,0.12);}
 </style>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-RYTKYEPJG2');
-  </script>
-  <link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
-  <link rel="shortcut icon" href="/favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
-  <script src="/assets/js/status.js"></script>
-  <script src="/assets/js/nav.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/assets/js/nav-auth.js"></script>
-  <script src="/assets/js/banner.js"></script>
-  <script>
-    // ── LIBRARY LOGIN GATE ──
-    // Wait for auth to resolve, then check if user is logged in
-    document.addEventListener('DOMContentLoaded', async function() {
-      // Give nav-auth.js time to initialize
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Check session directly
-      const _gateSb = supabase.createClient(
-        'https://bbyiezjvonacajigqoik.supabase.co',
-        'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb'
-      );
-      const { data: { session } } = await _gateSb.auth.getSession();
-      
-      if (!session) {
-        // Not logged in — redirect to login with return URL
-        window.location.replace('/pages/login?redirect=' + encodeURIComponent(window.location.pathname));
-      } else {
-        // Logged in — reveal the page
-        document.getElementById('library-gate-overlay').style.display = 'none';
-        document.getElementById('page-library').style.visibility = 'visible';
-      }
-    });
-  </script>
+
+<script src="/assets/js/status.js"></script>
+<script src="/assets/js/nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/nav-auth.js"></script>
+<script src="/assets/js/banner.js"></script>
+
+<!-- LOGIN GATE -->
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+  const _gateSb = supabase.createClient(
+    'https://bbyiezjvonacajigqoik.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJieWllemp2b25hY2FqaWdxb2lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMTI0MTcsImV4cCI6MjA5NDY4ODQxN30.TbSdKC1qXcGTpyEmILfPlZi_z1RrTR1-SPCFjE-1mLs'
+  );
+  const { data: { session } } = await _gateSb.auth.getSession();
+  if (!session) {
+    window.location.replace('/pages/login?redirect=' + encodeURIComponent(window.location.pathname));
+    return;
+  }
+  document.getElementById('lib-gate').style.display = 'none';
+  document.getElementById('page-library').style.visibility = 'visible';
+  // Load engine then init
+  const s = document.createElement('script');
+  s.src = '/assets/js/lib-engine.js';
+  s.onload = () => libInit();
+  document.head.appendChild(s);
+});
+</script>
 </head>
 <body>
-<!-- Login gate overlay -->
-<div id="library-gate-overlay" style="position:fixed;inset:0;z-index:9998;background:var(--bg,#0c0b10);display:flex;align-items:center;justify-content:center;">
-  <div style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);animation:blink 2.5s ease-in-out infinite;">// Checking access...</div>
+
+<div id="lib-gate">
+  <div style="font-family:'Share Tech Mono',monospace;font-size:28px;color:rgba(139,79,200,0.2);letter-spacing:8px;">://</div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);">// Checking access...</div>
 </div>
 
 <div id="nav-root"></div>
@@ -97,1103 +232,94 @@
 </div>
 
 <div class="page active" id="page-library" style="visibility:hidden;">
-  <div class="lib-page">
-    <aside class="lib-sidebar">
-      <div onclick="libHome()" style="cursor:pointer; padding:24px 20px; border-bottom:1px solid var(--border);">
-        <div style="font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:4px; color:var(--accent); text-transform:uppercase; margin-bottom:6px;">Script Library</div>
-        <div style="font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700; color:var(--text-bright); letter-spacing:2px; text-transform:uppercase;">AviaRigg</div>
-        <div style="font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:2px; margin-top:4px;">Maya Rigging Toolkit</div>
-      </div>
+<div class="lib-page">
 
-      <div style="padding:14px 16px; border-bottom:1px solid var(--border);">
-        <input id="libSearch" type="text" placeholder="Search scripts..." oninput="libFilter(this.value)"
-          style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:8px 12px; font-family:'Share Tech Mono',monospace; font-size:12px; outline:none; transition:border-color 0.2s;"
-          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
-      </div>
+  <!-- SIDEBAR -->
+  <aside class="lib-sidebar">
+    <div class="lib-sidebar-header">
+      <div class="lib-sidebar-eyebrow">Script Library</div>
+      <div class="lib-sidebar-title">AviaRigg</div>
+      <div class="lib-sidebar-sub">Maya Rigging Toolkit</div>
+    </div>
+    <div class="lib-search-wrap">
+      <input id="lib-sidebar-search" class="lib-search" type="text" placeholder="Search scripts..."
+        oninput="libSyncSearch(this.value)">
+    </div>
+    <nav class="lib-nav" id="lib-nav">
+      <div style="padding:20px 16px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--text-dim,#6a6a8a);">// Loading...</div>
+    </nav>
+    <div class="lib-sidebar-footer">
+      <a href="/pages/about" class="lib-about-link"><span style="color:var(--accent2);">◈</span> About Paul</a>
+      <div class="lib-version">AviaRigg v1.0 · Maya 2022+ // Python 3</div>
+    </div>
+  </aside>
 
-      <nav style="flex:1; padding:10px 0; overflow-y:auto;">
-        <div id="lni-home" class="lni" onclick="libHome()" style="padding-left:16px; margin-bottom:6px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-          <span style="color:var(--accent); font-size:12px;">⌂</span> Home
+  <!-- MAIN -->
+  <main class="lib-main" id="lib-main">
+
+    <div class="lib-breadcrumb">
+      <span>AVIARIGG</span>
+      <span class="lib-bc-sep">/</span>
+      <span>SCRIPTS</span>
+      <span class="lib-bc-sep" id="lib-bc-sep" style="display:none;">/</span>
+      <span class="lib-bc-current" id="lib-bc">HOME</span>
+    </div>
+
+    <!-- HOME VIEW -->
+    <div id="lib-view-home" style="padding:40px 40px 60px;">
+      <div class="lib-hero-title">MAYA <span>SCRIPT</span><br>LIBRARY</div>
+      <div class="lib-hero-sub">// AviaRigg Personal Reference &mdash; Maya 2026 // Python 3</div>
+
+      <div class="lib-stats">
+        <div class="lib-stat">
+          <div class="lib-stat-icon">II</div>
+          <div class="lib-stat-value" id="stat-count">—</div>
+          <div class="lib-stat-label">Total Scripts</div>
         </div>
-
-        <!-- Sidebar: alphabetical by category -->
-        <div>
-          <div class="lib-cat-header open" onclick="toggleLibCat(this, 'lcat-arnold')">
-            <span>Arnold / Viewport</span><span class="arr">▶</span>
-          </div>
-          <div class="lib-cat-items open" id="lcat-arnold">
-            <div class="lni" data-script="fix-arnold-visibility" data-tags="arnold visibility primaryVisibility render invisible transparent" onclick="libShow('fix-arnold-visibility')"><span class="dot"></span>Fix Arnold Mesh Visibility</div>
-          </div>
+        <div class="lib-stat">
+          <div class="lib-stat-icon">◆</div>
+          <div class="lib-stat-value">Python 3</div>
+          <div class="lib-stat-label">Language</div>
         </div>
-
-        <div>
-          <div class="lib-cat-header open" onclick="toggleLibCat(this, 'lcat-attributes')">
-            <span>Attributes</span><span class="arr">▶</span>
-          </div>
-          <div class="lib-cat-items open" id="lcat-attributes">
-            <div class="lni" data-script="change-default-value" data-tags="attribute default value enum" onclick="libShow('change-default-value')"><span class="dot"></span>Change Default Attribute Value</div>
-          </div>
-        </div>
-
-        <div>
-          <div class="lib-cat-header open" onclick="toggleLibCat(this, 'lcat-deformers')">
-            <span>Deformers</span><span class="arr">▶</span>
-          </div>
-          <div class="lib-cat-items open" id="lcat-deformers">
-            <div class="lni" data-script="add-geo-deformer" data-tags="deformer geometry controllers" onclick="libShow('add-geo-deformer')"><span class="dot"></span>Add Geometry to Deformer</div>
-            <div class="lni" data-script="mirror-nonlinear" data-tags="deformer mirror weights" onclick="libShow('mirror-nonlinear')"><span class="dot"></span>Mirror NonLinear Weights</div>
-          </div>
-        </div>
-
-        <div>
-          <div class="lib-cat-header open" onclick="toggleLibCat(this, 'lcat-ikfk')">
-            <span>IK / FK</span><span class="arr">▶</span>
-          </div>
-          <div class="lib-cat-items open" id="lcat-ikfk">
-            <div class="lni" data-script="ikfk-switch" data-tags="ik fk switch match transform arm settings IKFK" onclick="libShow('ikfk-switch')"><span class="dot"></span>IK / FK Switch with Match</div>
-          </div>
-        </div>
-
-        <div>
-          <div class="lib-cat-header open" onclick="toggleLibCat(this, 'lcat-shape-editor')">
-            <span>Shape Editor</span><span class="arr">▶</span>
-          </div>
-          <div class="lib-cat-items open" id="lcat-shape-editor">
-            <div class="lni" data-script="fix-shape-editor" data-tags="shape editor blendshape manager shapeEditorManager broken empty missing fix" onclick="libShow('fix-shape-editor')"><span class="dot"></span>Fix Broken Shape Editor</div>
-          </div>
-        </div>
-
-        <div>
-          <div class="lib-cat-header open" onclick="toggleLibCat(this, 'lcat-uvs')">
-            <span>UVs</span><span class="arr">▶</span>
-          </div>
-          <div class="lib-cat-items open" id="lcat-uvs">
-            <div class="lni" data-script="transfer-uvs" data-tags="uv uvs transfer polyTransfer uvset" onclick="libShow('transfer-uvs')"><span class="dot"></span>Transfer UVs</div>
-          </div>
-        </div>
-
-        <div>
-          <div class="lib-cat-header open" onclick="toggleLibCat(this, 'lcat-reference')">
-            <span>Reference</span><span class="arr">▶</span>
-          </div>
-          <div class="lib-cat-items open" id="lcat-reference">
-            <div class="lni" data-script="naming-conventions" data-tags="naming prefix suffix convention" onclick="libShow('naming-conventions')"><span class="dot"></span>Naming Conventions</div>
-          </div>
-        </div>
-      </nav>
-
-      <div onclick="window.location.href='/pages/about'" style="display:flex; align-items:center; gap:10px; padding:12px 16px; border-top:1px solid var(--border); cursor:pointer; font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; transition:color 0.2s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text-dim)'">
-        <span style="color:var(--accent2);">◈</span> About Paul
-      </div>
-
-      <div style="padding:12px 16px; border-top:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:9px; color:var(--text-dim); letter-spacing:1px;">
-        <div>AVIARIGG v1.0 — MAYA 2022+ // PYTHON 3</div>
-      </div>
-    </aside>
-
-    <div class="lib-main">
-      <div class="lib-topbar">
-        <div class="lib-breadcrumb">
-          <span onclick="window.location.href='/'" style="cursor:pointer; transition:color 0.15s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text-dim)'">AVIARIGG</span>
-          <span style="color:var(--accent);">/</span>
-          <span onclick="libHome()" style="cursor:pointer; transition:color 0.15s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text-dim)'">SCRIPTS</span>
-          <span style="color:var(--accent);" id="lib-bc-sep" style="display:none;">/</span>
-          <span id="lib-bc" style="color:var(--text-bright);">HOME</span>
-        </div>
-        <div style="margin-left:auto;"></div>
-      </div>
-      <div class="lib-content">
-        <!-- Welcome -->
-    <div class="welcome active" id="welcome">
-      <div class="welcome-header">
-        <h1>Maya <span>Script</span><br>Library</h1>
-        <p>// AVIARIGG PERSONAL REFERENCE — MAYA 2026 // PYTHON 3</p>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-glyph">⌗</div>
-          <div class="stat-number" id="total-count">7</div>
-          <div class="stat-label">Total Scripts</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-glyph">◈</div>
-          <div class="stat-number">Python 3</div>
-          <div class="stat-label">Language</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-glyph">◎</div>
-          <div class="stat-number">2022+</div>
-          <div class="stat-label">Maya Version</div>
+        <div class="lib-stat">
+          <div class="lib-stat-icon">○</div>
+          <div class="lib-stat-value">2022+</div>
+          <div class="lib-stat-label">Maya Version</div>
         </div>
       </div>
 
-      <div class="home-search-wrap">
-        <input type="text" class="home-search" placeholder="⌕  Search scripts..." oninput="filterScripts(this.value); syncSidebarSearch(this.value)">
+      <div class="lib-controls">
+        <div class="lib-sort-wrap">
+          <span class="lib-sort-label">Sort</span>
+          <button class="lib-sort-btn active" onclick="libSetSort('newest',this)">Newest</button>
+          <button class="lib-sort-btn" onclick="libSetSort('oldest',this)">Oldest</button>
+          <button class="lib-sort-btn" onclick="libSetSort('name-az',this)">A → Z</button>
+          <button class="lib-sort-btn" onclick="libSetSort('name-za',this)">Z → A</button>
+          <button class="lib-sort-btn" onclick="libSetSort('category',this)">Category</button>
+        </div>
+        <div class="lib-home-search-wrap">
+          <div class="lib-search-icon">⌕</div>
+          <input id="lib-home-search" class="lib-home-search" type="text"
+            placeholder="Search scripts..."
+            oninput="libSyncSearch(this.value)">
+        </div>
       </div>
 
-      <div class="recent-section">
-        <div class="index-header">
-          <h2>// Script Index</h2>
-          <span class="last-updated">Last updated: April 2026</span>
-        </div>
-        <div class="recent-list" id="recent-list">
-          <div class="recent-item" data-script="fix-shape-editor" data-tags="shape editor blendshape manager shapeEditorManager broken empty missing fix" onclick="libShow('fix-shape-editor')">
-            <span class="recent-item-tag">SHAPE ED.</span>
-            <div class="recent-item-info">
-              <span class="recent-item-name">Fix Broken Shape Editor</span>
-              <span class="recent-item-desc">Fixes a blank Shape Editor caused by a duplicate shapeEditorManager node. Migrates all blendshapes to the primary node.</span>
-            </div>
-            <span class="recent-item-arrow">▶</span>
-          </div>
-          <div class="recent-item" data-script="fix-arnold-visibility" data-tags="arnold visibility primaryVisibility render invisible transparent" onclick="libShow('fix-arnold-visibility')">
-            <span class="recent-item-tag">ARNOLD</span>
-            <div class="recent-item-info">
-              <span class="recent-item-name">Fix Arnold Mesh Visibility</span>
-              <span class="recent-item-desc">Restore Arnold render visibility flags on a mesh that is invisible in the Arnold viewport despite being unhidden.</span>
-            </div>
-            <span class="recent-item-arrow">▶</span>
-          </div>
-          <div class="recent-item" data-script="ikfk-switch" data-tags="ik fk switch match transform arm settings IKFK" onclick="libShow('ikfk-switch')">
-            <span class="recent-item-tag">IK / FK</span>
-            <div class="recent-item-info">
-              <span class="recent-item-name">IK / FK Switch with Match</span>
-              <span class="recent-item-desc">Toggle arm between IK and FK while preserving pose via matchTransform. Assign to a picker button.</span>
-            </div>
-            <span class="recent-item-arrow">▶</span>
-          </div>
-          <div class="recent-item" data-script="transfer-uvs" data-tags="uv uvs transfer polyTransfer uvset" onclick="libShow('transfer-uvs')">
-            <span class="recent-item-tag">UVS</span>
-            <div class="recent-item-info">
-              <span class="recent-item-name">Transfer UVs</span>
-              <span class="recent-item-desc">Transfer UVs from one mesh to multiple targets using polyTransfer. Select source first, then shift-select targets.</span>
-            </div>
-            <span class="recent-item-arrow">▶</span>
-          </div>
-          <div class="recent-item" data-script="change-default-value" data-tags="attribute default value enum" onclick="libShow('change-default-value')">
-            <span class="recent-item-tag">ATTRIBUTES</span>
-            <div class="recent-item-info">
-              <span class="recent-item-name">Change Default Attribute Value</span>
-              <span class="recent-item-desc">Edit the default value of any existing attribute, including enums.</span>
-            </div>
-            <span class="recent-item-arrow">▶</span>
-          </div>
-          <div class="recent-item" data-script="add-geo-deformer" data-tags="deformer geometry controllers add" onclick="libShow('add-geo-deformer')">
-            <span class="recent-item-tag">DEFORMERS</span>
-            <div class="recent-item-info">
-              <span class="recent-item-name">Add Geometry to Deformer</span>
-              <span class="recent-item-desc">Add a control group or mesh to a nonLinear deformer, with optional hierarchy exclusions.</span>
-            </div>
-            <span class="recent-item-arrow">▶</span>
-          </div>
-          <div class="recent-item" data-script="mirror-nonlinear" data-tags="deformer mirror weights nonlinear" onclick="libShow('mirror-nonlinear')">
-            <span class="recent-item-tag">DEFORMERS</span>
-            <div class="recent-item-info">
-              <span class="recent-item-name">Mirror NonLinear Deformer Weights</span>
-              <span class="recent-item-desc">Mirror painted deformer weights left→right on a symmetrical mesh. Maya 2022+ method.</span>
-            </div>
-            <span class="recent-item-arrow">▶</span>
-          </div>
-          <div class="recent-item" data-script="naming-conventions" data-tags="naming prefix suffix convention node mat shader texture" onclick="libShow('naming-conventions')" style="border-top: 1px solid var(--border); margin-top:4px; padding-top:4px; opacity:0.7;">
-            <span class="recent-item-tag">REFERENCE</span>
-            <div class="recent-item-info">
-              <span class="recent-item-name">Naming Conventions</span>
-              <span class="recent-item-desc">Full suffix reference for all node types used in AviaRigg rigs, including shaders and texture naming.</span>
-            </div>
-            <span class="recent-item-arrow">▶</span>
-          </div>
-        </div>
+      <div class="lib-index-header">
+        <div class="lib-index-label">// Script Index</div>
+        <div class="lib-index-meta" id="lib-index-meta"></div>
+      </div>
+      <div class="lib-index" id="lib-index">
+        <div style="padding:32px 20px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--text-dim,#6a6a8a);text-align:center;">// Loading scripts...</div>
       </div>
     </div>
 
-    <!-- Script: Mirror NonLinear Weights -->
-    <div class="script-card" id="script-mirror-nonlinear">
-      <div class="card-header">
-        <div class="card-category">// Deformers</div>
-        <div class="card-title">Mirror NonLinear<br>Deformer Weights</div>
-        <div class="card-desc">
-          Mirrors painted deformer weights from the left side to the right side across the YZ plane on a symmetrical mesh.
-          Uses <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">closestPoint</code> surface association —
-          required for nonLinear deformers in Maya 2022+. The old Relationship Editor method no longer works.
-        </div>
-        <div class="tags">
-          <span class="tag tag-deformer">NonLinear</span>
-          <span class="tag tag-mirror">Mirror</span>
-          <span class="tag tag-weights">Weights</span>
-          <span class="tag tag-python">Python</span>
-          <span class="tag tag-maya2022">Maya 2022+</span>
-        </div>
-      </div>
+    <!-- SCRIPT VIEW -->
+    <div id="lib-view-script" style="display:none;"></div>
 
-      <div class="section-label">// Script</div>
-      <div class="code-wrap">
-        <div class="code-toolbar">
-          <span class="code-lang">Python</span>
-          <button class="copy-btn" onclick="copyCode('code-mirror-nonlinear', this)">Copy</button>
-        </div>
-        <pre id="code-mirror-nonlinear"><span class="kw">import</span> maya.cmds <span class="kw">as</span> cmds
-
-cmds.<span class="fn">copyDeformerWeights</span>(
-    <span class="kv">sourceDeformer</span>=<span class="str">"head_bend_lo"</span>,        <span class="cm"># replace with your deformer name</span>
-    <span class="kv">destinationDeformer</span>=<span class="str">"head_bend_lo"</span>,   <span class="cm"># same deformer</span>
-    <span class="kv">sourceShape</span>=<span class="str">"Bdt_Body_FinalShape"</span>,    <span class="cm"># replace with your mesh shape node</span>
-    <span class="kv">destinationShape</span>=<span class="str">"Bdt_Body_FinalShape"</span>,
-    <span class="kv">mirrorMode</span>=<span class="str">"YZ"</span>,                     <span class="cm"># YZ = left/right (Z forward, Y up)</span>
-    <span class="kv">mirrorInverse</span>=<span class="nb">False</span>,               <span class="cm"># flip to True if wrong direction</span>
-    <span class="kv">surfaceAssociation</span>=<span class="str">"closestPoint"</span>   <span class="cm"># critical — vertex ID fails on nonLinear</span>
-)</pre>
-      </div>
-
-      <div class="section-label">// Parameters</div>
-      <table class="params-table">
-        <thead>
-          <tr>
-            <th>Parameter</th>
-            <th>Type</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="param-name">sourceDeformer</td>
-            <td class="param-type">str</td>
-            <td class="param-desc">Name of the nonLinear deformer node (e.g. head_bend_lo, head_squash)</td>
-          </tr>
-          <tr>
-            <td class="param-name">destinationDeformer</td>
-            <td class="param-type">str</td>
-            <td class="param-desc">Same as sourceDeformer — mirroring within the same deformer</td>
-          </tr>
-          <tr>
-            <td class="param-name">sourceShape</td>
-            <td class="param-type">str</td>
-            <td class="param-desc">Shape node of the mesh (not the transform). Find via Attribute Editor tab name.</td>
-          </tr>
-          <tr>
-            <td class="param-name">mirrorMode</td>
-            <td class="param-type">str</td>
-            <td class="param-desc">"YZ" for left/right mirror on Z-forward Y-up rigs. Use "XY" or "XZ" for other orientations.</td>
-          </tr>
-          <tr>
-            <td class="param-name">mirrorInverse</td>
-            <td class="param-type">bool</td>
-            <td class="param-desc">False = mirrors left→right. True = mirrors right→left. Flip if result is wrong.</td>
-          </tr>
-          <tr>
-            <td class="param-name">surfaceAssociation</td>
-            <td class="param-type">str</td>
-            <td class="param-desc">"closestPoint" is required for nonLinear deformers. Vertex ID association fails.</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="section-label">// Notes</div>
-      <div class="notes-box">
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>Works for any nonLinear deformer: head_bend, head_squash, head_bend_lo, etc.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>The old Maya 2020 method (Relationship Editor → Deformer Sets) no longer works in Maya 2022+. Component tags replaced deformer sets.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>Mesh must be symmetrical. Works as long as the skinCluster mirror works on the same mesh.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>Do NOT use influenceAssociation flag — that is skinCluster only and will error.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>Always save your scene before running mirror operations on weights.</span>
-        </div>
-      </div>
-
-    </div><!-- end script card -->
-
-    <!-- Script: Change Default Attribute Value -->
-    <div class="script-card" id="script-change-default-value">
-      <div class="card-header">
-        <div class="card-category">// Attributes</div>
-        <div class="card-title">Change Default<br>Attribute Value</div>
-        <div class="card-desc">
-          Changes the default value of an existing attribute on a node. Useful for enum attributes
-          (e.g. off/on) where you want the default to be something other than 0.
-          Works on any numeric or enum attribute.
-        </div>
-        <div class="tags">
-          <span class="tag tag-python">Python</span>
-          <span class="tag tag-deformer">Attributes</span>
-        </div>
-      </div>
-
-      <div class="section-label">// Script</div>
-      <div class="code-wrap">
-        <div class="code-toolbar">
-          <span class="code-lang">Python</span>
-          <button class="copy-btn" onclick="copyCode('code-change-default', this)">Copy</button>
-        </div>
-        <pre id="code-change-default"><span class="kw">import</span> maya.cmds <span class="kw">as</span> cmds
-
-cmds.<span class="fn">addAttr</span>(<span class="str">"your_node.your_attribute"</span>, <span class="kv">edit</span>=<span class="nb">True</span>, <span class="kv">defaultValue</span>=<span class="nb">1</span>)
-<span class="cm"># replace "your_node" with your node name
-# replace "your_attribute" with your attribute name
-# replace 1 with your desired default value</span></pre>
-      </div>
-
-      <div class="section-label">// Parameters</div>
-      <table class="params-table">
-        <thead>
-          <tr>
-            <th>Parameter</th>
-            <th>Type</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="param-name">node.attribute</td>
-            <td class="param-type">str</td>
-            <td class="param-desc">The node and attribute in dot notation (e.g. "head_ctl.tweak")</td>
-          </tr>
-          <tr>
-            <td class="param-name">edit</td>
-            <td class="param-type">bool</td>
-            <td class="param-desc">Must be True to modify an existing attribute rather than create a new one</td>
-          </tr>
-          <tr>
-            <td class="param-name">defaultValue</td>
-            <td class="param-type">float</td>
-            <td class="param-desc">The new default value. For enums: 0 = first option, 1 = second option, etc.</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="section-label">// Notes</div>
-      <div class="notes-box">
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>For enum attributes, the default value is the index — 0 = first enum, 1 = second, etc.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>This only changes the default — it does not change the current value. Use setAttr separately if needed.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>The default value is what the attribute resets to when you right-click → Set Default Value in Maya.</span>
-        </div>
-      </div>
-
-    </div><!-- end script card -->
-    <div class="script-card" id="script-add-geo-deformer">
-      <div class="card-header">
-        <div class="card-category">// Deformers</div>
-        <div class="card-title">Add Geometry<br>to Deformer</div>
-        <div class="card-desc">
-          Adds a geometry group (e.g. controller shapes under <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">ctl_grp</code>) to an existing nonLinear deformer.
-          Used in Maya 2022+ as a replacement for the old Relationship Editor method, which no longer works due to component tags replacing deformer sets.
-          Useful for making controllers squash and stretch along with the mesh.
-        </div>
-        <div class="tags">
-          <span class="tag tag-deformer">NonLinear</span>
-          <span class="tag tag-python">Python</span>
-          <span class="tag tag-maya2022">Maya 2022+</span>
-        </div>
-      </div>
-
-      <div class="section-label">// Script — Simple (add entire group)</div>
-      <div class="code-wrap">
-        <div class="code-toolbar">
-          <span class="code-lang">Python</span>
-          <button class="copy-btn" onclick="copyCode('code-add-geo-simple', this)">Copy</button>
-        </div>
-        <pre id="code-add-geo-simple"><span class="kw">import</span> maya.cmds <span class="kw">as</span> cmds
-
-cmds.<span class="fn">deformer</span>(<span class="str">"head_squash"</span>, <span class="kv">edit</span>=<span class="nb">True</span>, <span class="kv">geometry</span>=<span class="str">"ctl_grp"</span>)
-<span class="cm"># replace "head_squash" with your deformer name
-# replace "ctl_grp" with your group or geometry name</span></pre>
-      </div>
-
-      <div class="section-label" style="margin-top:24px;">// Script — Verbose (add individual shapes with error handling)</div>
-      <div class="code-wrap">
-        <div class="code-toolbar">
-          <span class="code-lang">Python</span>
-          <button class="copy-btn" onclick="copyCode('code-add-geo-verbose', this)">Copy</button>
-        </div>
-        <pre id="code-add-geo-verbose"><span class="kw">import</span> maya.cmds <span class="kw">as</span> cmds
-
-ctls = cmds.<span class="fn">listRelatives</span>(<span class="str">"ctl_grp"</span>, <span class="kv">allDescendants</span>=<span class="nb">True</span>, <span class="kv">type</span>=<span class="str">"nurbsCurve"</span>)
-
-<span class="kw">for</span> shape <span class="kw">in</span> ctls:
-    <span class="kw">try</span>:
-        cmds.<span class="fn">deformer</span>(<span class="str">"head_squash"</span>, <span class="kv">edit</span>=<span class="nb">True</span>, <span class="kv">geometry</span>=shape)
-    <span class="kw">except</span> <span class="nb">Exception</span> <span class="kw">as</span> e:
-        <span class="fn">print</span>(<span class="str">f"Skipped <span class="kv">{shape}</span>: <span class="kv">{e}</span>"</span>)</pre>
-      </div>
-
-      <div class="section-label">// Parameters</div>
-      <table class="params-table">
-        <thead>
-          <tr>
-            <th>Parameter</th>
-            <th>Type</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="param-name">deformer name</td>
-            <td class="param-type">str</td>
-            <td class="param-desc">The nonLinear deformer node to add geometry to (e.g. head_squash, head_bend)</td>
-          </tr>
-          <tr>
-            <td class="param-name">geometry</td>
-            <td class="param-type">str</td>
-            <td class="param-desc">The group or shape node to add. Can be a transform group (ctl_grp) or individual nurbsCurve shape.</td>
-          </tr>
-          <tr>
-            <td class="param-name">edit</td>
-            <td class="param-type">bool</td>
-            <td class="param-desc">Must be True to modify an existing deformer rather than create a new one.</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="section-label">// Notes</div>
-      <div class="notes-box">
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>In Maya 2022+, the Relationship Editor no longer shows nonLinear deformer sets. Use this script instead.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>Adding ctl_grp makes controller shapes squash and stretch with the deformer — intentional for cartoon rigs.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>Use the simple version first. Use the verbose version if the simple one errors on nurbs curves.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>Works for any nonLinear deformer: head_squash, head_bend, head_bend_lo, etc.</span>
-        </div>
-      </div>
-
-      <div class="section-label" style="margin-top:32px;">// Add with Exclusions</div>
-      <div style="color:var(--text); font-size:14px; line-height:1.7; margin-bottom:12px;">
-        Add an entire group to the deformer but exclude specific control hierarchies from being affected.
-        Run this as a single script — it adds the group first, then removes the excluded roots and all their descendants.
-      </div>
-      <div class="code-wrap">
-        <div class="code-toolbar">
-          <span class="code-lang">Python</span>
-          <button class="copy-btn" onclick="copyCode('code-add-geo-exclude', this)">Copy</button>
-        </div>
-        <pre id="code-add-geo-exclude"><span class="kw">import</span> maya.cmds <span class="kw">as</span> cmds
-
-<span class="cm"># Step 1 — Add the entire control group to the deformer</span>
-cmds.<span class="fn">deformer</span>(<span class="str">"jaw_bend"</span>, <span class="kv">edit</span>=<span class="nb">True</span>, <span class="kv">geometry</span>=<span class="str">"ctl_grp"</span>)
-
-<span class="cm"># Step 2 — List every control root you want to EXCLUDE
-# Add as many as needed — entire hierarchy under each will be removed</span>
-exclude_roots = [
-    <span class="str">"l_ear_master_ctl"</span>,   <span class="cm"># exclude left ear and all children</span>
-    <span class="str">"r_ear_master_ctl"</span>,   <span class="cm"># exclude right ear and all children</span>
-    <span class="str">"jaw_deformer_ctl"</span>,   <span class="cm"># exclude jaw deformer ctl (avoids double transform)</span>
-]
-
-<span class="cm"># Step 3 — Remove excluded hierarchies from the deformer</span>
-<span class="kw">for</span> root <span class="kw">in</span> exclude_roots:
-    descendants = cmds.<span class="fn">listRelatives</span>(root, <span class="kv">allDescendents</span>=<span class="nb">True</span>, <span class="kv">type</span>=<span class="str">"nurbsCurve"</span>, <span class="kv">fullPath</span>=<span class="nb">True</span>) <span class="kw">or</span> []
-    shapes = cmds.<span class="fn">listRelatives</span>(root, <span class="kv">shapes</span>=<span class="nb">True</span>, <span class="kv">type</span>=<span class="str">"nurbsCurve"</span>, <span class="kv">fullPath</span>=<span class="nb">True</span>) <span class="kw">or</span> []
-    all_shapes = <span class="fn">list</span>(<span class="fn">set</span>(descendants + shapes))
-    <span class="kw">for</span> shape <span class="kw">in</span> all_shapes:
-        <span class="kw">try</span>:
-            cmds.<span class="fn">deformer</span>(<span class="str">"jaw_bend"</span>, <span class="kv">edit</span>=<span class="nb">True</span>, <span class="kv">remove</span>=<span class="nb">True</span>, <span class="kv">geometry</span>=shape)
-        <span class="kw">except</span> <span class="nb">Exception</span> <span class="kw">as</span> e:
-            <span class="fn">print</span>(<span class="str">f"Skipped <span class="kv">{shape}</span>: <span class="kv">{e}</span>"</span>)
-
-<span class="fn">print</span>(<span class="str">"Done"</span>)</pre>
-      </div>
-      <div class="notes-box" style="margin-top:12px;">
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>Replace <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">"jaw_bend"</code> with your deformer name and <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">"ctl_grp"</code> with your group name.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>Add or remove entries in <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">exclude_roots</code> as needed — one name per line.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>Note the spelling: <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">allDescendents</code> — Maya uses an 'e', not 'a'. Wrong spelling will error.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span><code style="color:var(--accent);font-family:'Share Tech Mono',monospace">fullPath=True</code> is required — without it Maya errors if two shapes share the same name.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>Exclude controllers that would get double transforms — any ctl that drives the deformer itself should be in the exclusion list.</span>
-        </div>
-      </div>
-
-    </div><!-- end script card -->
-
-    <!-- Script: Transfer UVs Blender to Maya -->
-    <div class="script-card" id="script-transfer-uvs">
-      <div class="card-header">
-        <div class="card-category">// UVs</div>
-        <div class="card-title">Transfer UVs</div>
-        <div class="card-desc">
-          Transfer UVs from one mesh to multiple others using <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">polyTransfer</code>.
-          Select the source mesh first, then shift-select all target meshes. Run the script.
-        </div>
-        <div class="tags">
-          <span class="tag tag-python">Python</span>
-          <span class="tag" style="background:rgba(0,180,255,0.1);color:#00b4ff;border-color:rgba(0,180,255,0.3);">UVs</span>
-          <span class="tag tag-maya2022">Maya 2022+</span>
-        </div>
-      </div>
-
-      <div class="section-label">// Script</div>
-      <div style="color:var(--text-dim); font-size:13px; line-height:1.7; margin-bottom:12px; font-family:'Share Tech Mono',monospace;">
-        Select new UV mesh first → then shift-select old geo → run
-      </div>
-      <div class="code-wrap">
-        <div class="code-toolbar">
-          <span class="code-lang">Python</span>
-          <button class="copy-btn" onclick="copyCode('code-transfer-uvs-batch', this)">Copy</button>
-        </div>
-        <pre id="code-transfer-uvs-batch"><span class="cm"># transfer uvs
-# select new uvs mesh and then old geo</span>
-<span class="kw">import</span> maya.cmds <span class="kw">as</span> mc
-
-selection = mc.<span class="fn">ls</span>(<span class="kv">sl</span>=<span class="nb">True</span>)
-<span class="kw">for</span> i, x <span class="kw">in</span> <span class="fn">enumerate</span>(selection):
-    <span class="kw">if</span> i != <span class="nb">0</span>:
-        mc.<span class="fn">polyTransfer</span>(selection[i], <span class="kv">uvSets</span>=<span class="nb">True</span>, <span class="kv">ao</span>=selection[<span class="nb">0</span>], <span class="kv">constructionHistory</span>=<span class="nb">False</span>)
-        mc.<span class="fn">warning</span>(<span class="str">"uvs transfered correctly"</span>)</pre>
-      </div>
-
-      <div class="note-box" style="margin-top:20px;">
-        <div class="note-title">// Notes</div>
-        <div class="note-item"><span class="note-bullet">▸</span><span>Selection order matters — first selected is always the source. All subsequent objects receive the UVs.</span></div>
-        <div class="note-item"><span class="note-bullet">▸</span><span>Requires identical topology between source and targets. Won't work across different polygon counts.</span></div>
-        <div class="note-item"><span class="note-bullet">▸</span><span>No construction history left behind — <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">constructionHistory=False</code> keeps the scene clean.</span></div>
-      </div>
-
-    </div><!-- end transfer uvs card -->
-
-    <!-- Script: IK/FK Switch with Match -->
-    <div class="script-card" id="script-ikfk-switch">
-      <div class="card-header">
-        <div class="card-category">// IK / FK</div>
-        <div class="card-title">IK / FK Switch<br>with Match</div>
-        <div class="card-desc">
-          Toggles the arm between IK and FK while preserving pose. When switching from IK → FK,
-          the FK controls match the IK joint positions. When switching FK → IK, the IK controls
-          match the FK joint positions. Assign to a picker button for one-click switching.
-        </div>
-        <div class="tags">
-          <span class="tag tag-python">Python</span>
-          <span class="tag" style="background:rgba(255,180,0,0.1);color:#ffb400;border-color:rgba(255,180,0,0.3);">Rigging</span>
-          <span class="tag" style="background:rgba(255,180,0,0.1);color:#ffb400;border-color:rgba(255,180,0,0.3);">Animation</span>
-          <span class="tag tag-maya2022">Maya 2022+</span>
-        </div>
-      </div>
-
-      <div class="section-label">// Script</div>
-      <div class="code-wrap">
-        <div class="code-toolbar">
-          <span class="code-lang">Python</span>
-          <button class="copy-btn" onclick="copyCode('code-ikfk-switch', this)">Copy</button>
-        </div>
-        <pre id="code-ikfk-switch"><span class="kw">import</span> maya.cmds <span class="kw">as</span> mc
-
-ikfk = mc.<span class="fn">getAttr</span>(<span class="str">'l_arm_settings_ctl.IKFK'</span>)
-
-<span class="kw">if</span> ikfk == <span class="num">0</span>:
-    <span class="cm"># FK → IK : match IK controls to FK joint positions</span>
-    mc.<span class="fn">setAttr</span>(<span class="str">'l_arm_settings_ctl.IKFK'</span>, <span class="num">1</span>)
-    mc.<span class="fn">matchTransform</span>(<span class="str">'l_shoulder_fk_ctl'</span>, <span class="str">'l_shoulder_ik_jnt'</span>)
-    mc.<span class="fn">matchTransform</span>(<span class="str">'l_elbow_fk_ctl'</span>,    <span class="str">'l_elbow_ik_jnt'</span>)
-    mc.<span class="fn">matchTransform</span>(<span class="str">'l_wrist_fk_ctl'</span>,    <span class="str">'l_wrist_ik_jnt'</span>)
-<span class="kw">else</span>:
-    <span class="cm"># IK → FK : match FK controls to IK joint positions</span>
-    mc.<span class="fn">setAttr</span>(<span class="str">'l_arm_settings_ctl.IKFK'</span>, <span class="num">0</span>)
-    mc.<span class="fn">matchTransform</span>(<span class="str">'l_wrist_ik_ctl'</span>,    <span class="str">'l_wrist_fk_jnt'</span>)
-    mc.<span class="fn">matchTransform</span>(<span class="str">'l_elbow_ik_ctl'</span>,    <span class="str">'l_elbow_fk_jnt'</span>)
-    mc.<span class="fn">matchTransform</span>(<span class="str">'l_shoulder_ik_ctl'</span>, <span class="str">'l_shoulder_fk_jnt'</span>)</pre>
-      </div>
-
-      <div class="note-box" style="margin-top:20px;">
-        <div class="note-title">// Notes</div>
-        <div class="note-item"><span class="note-bullet">▸</span><span><code style="color:var(--accent);font-family:'Share Tech Mono',monospace">IKFK = 0</code> is FK mode, <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">IKFK = 1</code> is IK mode. The switch attribute is set before matching so the controls are active when matched.</span></div>
-        <div class="note-item"><span class="note-bullet">▸</span><span>Node names are hardcoded for the Nordic Bandit rig left arm — update <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">l_arm_settings_ctl</code> and the control/joint names to match your rig. For referenced rigs, prepend the namespace: <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">'NordBand:l_arm_settings_ctl'</code>.</span></div>
-        <div class="note-item"><span class="note-bullet">▸</span><span>Assign to a picker button in MGPicker Studio for one-click switching during animation. For namespace-agnostic picker buttons, retrieve the namespace dynamically via <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">mc.MGPickerView(view, query=True, namespace=True)</code>.</span></div>
-      </div>
-    </div><!-- end ikfk switch card -->
-
-    <!-- Naming Conventions -->
-    <div class="script-card" id="script-naming-conventions">
-      <div class="card-header">
-        <div class="card-category">// Reference</div>
-        <div class="card-title">Naming<br>Conventions</div>
-        <div class="card-desc">
-          Standard suffix conventions for all node types used in AviaRigg rigs.
-          Consistent naming keeps rigs readable, maintainable, and scriptable.
-        </div>
-      </div>
-
-      <style>
-        .conv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 8px; }
-        .conv-section { background: var(--surface); border: 1px solid var(--border); padding: 20px; }
-        .conv-section-title {
-          font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-          color: var(--accent); margin-bottom: 14px; padding-bottom: 10px;
-          border-bottom: 1px solid var(--border); font-family: 'Share Tech Mono', monospace;
-        }
-        .conv-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 14px; }
-        .conv-row:last-child { border-bottom: none; }
-        .conv-name { color: var(--text); }
-        .conv-suffix { font-family: 'Share Tech Mono', monospace; color: #c084fc; font-size: 13px; background: rgba(192,132,252,0.08); padding: 2px 10px; border: 1px solid rgba(192,132,252,0.2); }
-      </style>
-
-      <div class="conv-grid">
-
-        <div class="conv-section">
-          <div class="conv-section-title">Transforms & Hierarchy</div>
-          <div class="conv-row"><span class="conv-name">Transform</span><span class="conv-suffix">transform</span></div>
-          <div class="conv-row"><span class="conv-name">Group</span><span class="conv-suffix">grp</span></div>
-          <div class="conv-row"><span class="conv-name">Offset</span><span class="conv-suffix">offset</span></div>
-          <div class="conv-row"><span class="conv-name">Locator</span><span class="conv-suffix">loc</span></div>
-          <div class="conv-row"><span class="conv-name">Connection Offset</span><span class="conv-suffix">con</span></div>
-        </div>
-
-        <div class="conv-section">
-          <div class="conv-section-title">Controllers</div>
-          <div class="conv-row"><span class="conv-name">Control</span><span class="conv-suffix">ctl</span></div>
-          <div class="conv-row"><span class="conv-name">Control Offset</span><span class="conv-suffix">ctl_offset</span></div>
-          <div class="conv-row"><span class="conv-name">Gimbal Control</span><span class="conv-suffix">gimbal_ctl</span></div>
-          <div class="conv-row"><span class="conv-name">Set Driven Key</span><span class="conv-suffix">sdk</span></div>
-        </div>
-
-        <div class="conv-section">
-          <div class="conv-section-title">Joints</div>
-          <div class="conv-row"><span class="conv-name">Joint</span><span class="conv-suffix">jnt</span></div>
-          <div class="conv-row"><span class="conv-name">Bind Joint</span><span class="conv-suffix">bind_jnt</span></div>
-          <div class="conv-row"><span class="conv-name">Twist Joint</span><span class="conv-suffix">twist_jnt</span></div>
-          <div class="conv-row"><span class="conv-name">End Joint</span><span class="conv-suffix">end_jnt</span></div>
-          <div class="conv-row"><span class="conv-name">IK Joint</span><span class="conv-suffix">ik_jnt</span></div>
-          <div class="conv-row"><span class="conv-name">FK Joint</span><span class="conv-suffix">fk_jnt</span></div>
-          <div class="conv-row"><span class="conv-name">Driver Joint</span><span class="conv-suffix">drv_jnt</span></div>
-        </div>
-
-        <div class="conv-section">
-          <div class="conv-section-title">Geometry</div>
-          <div class="conv-row"><span class="conv-name">Mesh</span><span class="conv-suffix">geo</span></div>
-          <div class="conv-row"><span class="conv-name">NURBS Surface</span><span class="conv-suffix">nrb</span></div>
-          <div class="conv-row"><span class="conv-name">NURBS Curve</span><span class="conv-suffix">crv</span></div>
-        </div>
-
-        <div class="conv-section">
-          <div class="conv-section-title">Deformers</div>
-          <div class="conv-row"><span class="conv-name">Skin Cluster</span><span class="conv-suffix">sc</span></div>
-          <div class="conv-row"><span class="conv-name">Blendshape</span><span class="conv-suffix">bs</span></div>
-          <div class="conv-row"><span class="conv-name">Cluster</span><span class="conv-suffix">cls</span></div>
-          <div class="conv-row"><span class="conv-name">Lattice</span><span class="conv-suffix">lat</span></div>
-          <div class="conv-row"><span class="conv-name">Wrap</span><span class="conv-suffix">wrap</span></div>
-          <div class="conv-row"><span class="conv-name">Delta Mush</span><span class="conv-suffix">dm</span></div>
-          <div class="conv-row"><span class="conv-name">Squash</span><span class="conv-suffix">squash</span></div>
-          <div class="conv-row"><span class="conv-name">Bend</span><span class="conv-suffix">bend</span></div>
-          <div class="conv-row"><span class="conv-name">NonLinear</span><span class="conv-suffix">nonLin</span></div>
-        </div>
-
-        <div class="conv-section">
-          <div class="conv-section-title">Utility Nodes</div>
-          <div class="conv-row"><span class="conv-name">Multiply Divide</span><span class="conv-suffix">md</span></div>
-          <div class="conv-row"><span class="conv-name">Plus Minus Average</span><span class="conv-suffix">pma</span></div>
-          <div class="conv-row"><span class="conv-name">Condition</span><span class="conv-suffix">cond</span></div>
-          <div class="conv-row"><span class="conv-name">Clamp</span><span class="conv-suffix">clamp</span></div>
-          <div class="conv-row"><span class="conv-name">Remap Value</span><span class="conv-suffix">rmv</span></div>
-          <div class="conv-row"><span class="conv-name">Blend Colors</span><span class="conv-suffix">bc</span></div>
-          <div class="conv-row"><span class="conv-name">Blend Two Attr</span><span class="conv-suffix">bta</span></div>
-          <div class="conv-row"><span class="conv-name">Reverse</span><span class="conv-suffix">rev</span></div>
-          <div class="conv-row"><span class="conv-name">Set Range</span><span class="conv-suffix">sr</span></div>
-        </div>
-
-        <div class="conv-section">
-          <div class="conv-section-title">Math / Matrix Nodes</div>
-          <div class="conv-row"><span class="conv-name">Sum</span><span class="conv-suffix">sum</span></div>
-          <div class="conv-row"><span class="conv-name">Decompose Matrix</span><span class="conv-suffix">dcm</span></div>
-          <div class="conv-row"><span class="conv-name">Compose Matrix</span><span class="conv-suffix">cm</span></div>
-          <div class="conv-row"><span class="conv-name">Inverse Matrix</span><span class="conv-suffix">invMat</span></div>
-          <div class="conv-row"><span class="conv-name">Mult Matrix</span><span class="conv-suffix">mmx</span></div>
-        </div>
-
-        <div class="conv-section">
-          <div class="conv-section-title">Constraints</div>
-          <div class="conv-row"><span class="conv-name">Parent Constraint</span><span class="conv-suffix">pc</span></div>
-          <div class="conv-row"><span class="conv-name">Point Constraint</span><span class="conv-suffix">pointCon</span></div>
-          <div class="conv-row"><span class="conv-name">Orient Constraint</span><span class="conv-suffix">oc</span></div>
-          <div class="conv-row"><span class="conv-name">Scale Constraint</span><span class="conv-suffix">sc</span></div>
-          <div class="conv-row"><span class="conv-name">Aim Constraint</span><span class="conv-suffix">ac</span></div>
-          <div class="conv-row"><span class="conv-name">Matrix Constraint</span><span class="conv-suffix">matCon</span></div>
-        </div>
-
-        <div class="conv-section">
-          <div class="conv-section-title">IK</div>
-          <div class="conv-row"><span class="conv-name">IK Handle</span><span class="conv-suffix">ikh</span></div>
-          <div class="conv-row"><span class="conv-name">IK Effector</span><span class="conv-suffix">ike</span></div>
-          <div class="conv-row"><span class="conv-name">Spline IK</span><span class="conv-suffix">splineIK</span></div>
-        </div>
-
-        <div class="conv-section">
-          <div class="conv-section-title">Spaces & Locators</div>
-          <div class="conv-row"><span class="conv-name">Local Space Locator</span><span class="conv-suffix">local_loc</span></div>
-          <div class="conv-row"><span class="conv-name">World Space Locator</span><span class="conv-suffix">world_loc</span></div>
-          <div class="conv-row"><span class="conv-name">Space Switch</span><span class="conv-suffix">space_sw</span></div>
-        </div>
-
-        <div class="conv-section">
-          <div class="conv-section-title">Rigging Misc</div>
-          <div class="conv-row"><span class="conv-name">Follicle</span><span class="conv-suffix">fol</span></div>
-          <div class="conv-row"><span class="conv-name">Curve Info</span><span class="conv-suffix">crv_info</span></div>
-          <div class="conv-row"><span class="conv-name">Motion Path</span><span class="conv-suffix">mpath</span></div>
-        </div>
-
-        <div class="conv-section">
-          <div class="conv-section-title">Display & Organization</div>
-          <div class="conv-row"><span class="conv-name">Display Layer</span><span class="conv-suffix">layer</span></div>
-          <div class="conv-row"><span class="conv-name">Set</span><span class="conv-suffix">set</span></div>
-        </div>
-
-        <div class="conv-section">
-          <div class="conv-section-title">Shaders & Materials</div>
-          <div class="conv-row"><span class="conv-name">Shader / Material</span><span class="conv-suffix">_mat</span></div>
-          <div class="conv-row"><span class="conv-name">Shading Group</span><span class="conv-suffix">_mat_sg</span></div>
-          <div class="conv-row"><span class="conv-name">File Node</span><span class="conv-suffix">_file</span></div>
-          <div class="conv-row"><span class="conv-name">Place2D Texture</span><span class="conv-suffix">_p2d</span></div>
-        </div>
-
-      </div><!-- end conv-grid -->
-
-    </div><!-- end naming conventions card -->
-
-    <!-- Script: Fix Arnold Mesh Visibility -->
-    <div class="script-card" id="script-fix-arnold-visibility">
-      <div class="card-header">
-        <div class="card-category">// Arnold / Viewport</div>
-        <div class="card-title">Fix Arnold<br>Mesh Visibility</div>
-        <div class="card-desc">
-          Restores Arnold render visibility flags on a mesh that appears invisible in the Arnold viewport
-          even though it is not hidden in the outliner. Caused by Arnold's <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">primaryVisibility</code>,
-          <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">visibleInReflections</code>, and <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">visibleInRefractions</code> flags
-          being silently set to <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">False</code> — commonly triggered by blend shape target editing sessions.
-        </div>
-        <div class="tags">
-          <span class="tag tag-python">Python</span>
-          <span class="tag" style="background:rgba(255,140,0,0.12);color:#ff8c00;border-color:rgba(255,140,0,0.3);">Arnold</span>
-          <span class="tag" style="background:rgba(255,140,0,0.12);color:#ff8c00;border-color:rgba(255,140,0,0.3);">Viewport</span>
-          <span class="tag tag-maya2022">Maya 2022+</span>
-        </div>
-      </div>
-
-      <div class="section-label">// Diagnose — check visibility flags</div>
-      <div class="code-wrap">
-        <div class="code-toolbar">
-          <span class="code-lang">Python</span>
-          <button class="copy-btn" onclick="copyCode('code-arnold-vis-check', this)">Copy</button>
-        </div>
-        <pre id="code-arnold-vis-check"><span class="kw">import</span> maya.cmds <span class="kw">as</span> mc
-
-shape = <span class="str">"Bdt_Body_FinalShape"</span>  <span class="cm"># replace with your shape node name</span>
-<span class="fn">print</span>(<span class="str">"primaryVisibility  :"</span>, mc.<span class="fn">getAttr</span>(shape + <span class="str">".primaryVisibility"</span>))
-<span class="fn">print</span>(<span class="str">"visibleInReflections:"</span>, mc.<span class="fn">getAttr</span>(shape + <span class="str">".visibleInReflections"</span>))
-<span class="fn">print</span>(<span class="str">"visibleInRefractions:"</span>, mc.<span class="fn">getAttr</span>(shape + <span class="str">".visibleInRefractions"</span>))</pre>
-      </div>
-
-      <div class="section-label" style="margin-top:24px;">// Fix — restore flags on a single mesh</div>
-      <div class="code-wrap">
-        <div class="code-toolbar">
-          <span class="code-lang">Python</span>
-          <button class="copy-btn" onclick="copyCode('code-arnold-vis-fix', this)">Copy</button>
-        </div>
-        <pre id="code-arnold-vis-fix"><span class="kw">import</span> maya.cmds <span class="kw">as</span> mc
-
-shape = <span class="str">"Bdt_Body_FinalShape"</span>  <span class="cm"># replace with your shape node name</span>
-mc.<span class="fn">setAttr</span>(shape + <span class="str">".primaryVisibility"</span>,   <span class="nb">True</span>)
-mc.<span class="fn">setAttr</span>(shape + <span class="str">".visibleInReflections"</span>, <span class="nb">True</span>)
-mc.<span class="fn">setAttr</span>(shape + <span class="str">".visibleInRefractions"</span>, <span class="nb">True</span>)
-<span class="fn">print</span>(<span class="str">f"[AviaRigg] Arnold visibility restored on {shape}"</span>)</pre>
-      </div>
-
-      <div class="section-label" style="margin-top:24px;">// Fix All — restore flags on every affected mesh in scene</div>
-      <div style="color:var(--text); font-size:14px; line-height:1.7; margin-bottom:12px;">
-        Run this if multiple meshes were affected at once. Safe to run as a post-blend-shape sanity check.
-      </div>
-      <div class="code-wrap">
-        <div class="code-toolbar">
-          <span class="code-lang">Python</span>
-          <button class="copy-btn" onclick="copyCode('code-arnold-vis-fix-all', this)">Copy</button>
-        </div>
-        <pre id="code-arnold-vis-fix-all"><span class="kw">import</span> maya.cmds <span class="kw">as</span> mc
-
-fixed = []
-<span class="kw">for</span> shape <span class="kw">in</span> mc.<span class="fn">ls</span>(<span class="kv">type</span>=<span class="str">"mesh"</span>):
-    <span class="kw">if</span> mc.<span class="fn">attributeQuery</span>(<span class="str">"primaryVisibility"</span>, <span class="kv">node</span>=shape, <span class="kv">exists</span>=<span class="nb">True</span>):
-        <span class="kw">if</span> <span class="kw">not</span> mc.<span class="fn">getAttr</span>(shape + <span class="str">".primaryVisibility"</span>):
-            mc.<span class="fn">setAttr</span>(shape + <span class="str">".primaryVisibility"</span>,   <span class="nb">True</span>)
-            mc.<span class="fn">setAttr</span>(shape + <span class="str">".visibleInReflections"</span>, <span class="nb">True</span>)
-            mc.<span class="fn">setAttr</span>(shape + <span class="str">".visibleInRefractions"</span>, <span class="nb">True</span>)
-            fixed.<span class="fn">append</span>(shape)
-
-<span class="fn">print</span>(<span class="str">f"[AviaRigg] Fixed {len(fixed)} mesh(es): {fixed}"</span>)</pre>
-      </div>
-
-      <div class="section-label">// Parameters</div>
-      <table class="params-table">
-        <thead>
-          <tr>
-            <th>Attribute</th>
-            <th>Type</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="param-name">primaryVisibility</td>
-            <td class="param-type">bool</td>
-            <td class="param-desc">Controls whether Arnold renders the mesh at all. False = completely invisible in Arnold viewport and final render.</td>
-          </tr>
-          <tr>
-            <td class="param-name">visibleInReflections</td>
-            <td class="param-type">bool</td>
-            <td class="param-desc">Whether the mesh appears in reflections on other surfaces.</td>
-          </tr>
-          <tr>
-            <td class="param-name">visibleInRefractions</td>
-            <td class="param-type">bool</td>
-            <td class="param-desc">Whether the mesh appears in refractions through transparent materials.</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="section-label">// Notes</div>
-      <div class="notes-box">
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>These are Arnold-specific attributes — they have no effect in Viewport 2.0. A mesh can look fine in VP2 and be completely invisible in Arnold.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>The flags are silently set to False during blend shape target editing. Exiting edit mode does not restore them.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>Confirmed trigger: entering blend shape target edit mode (Deform → Edit Blend Shape → Edit) on a mesh with MtoA loaded.</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>The shape node name is not the same as the transform. Find it in the Attribute Editor — it's the tab ending in "Shape".</span>
-        </div>
-        <div class="note-item">
-          <span class="note-bullet">▸</span>
-          <span>Run the "Fix All" version after any blend shape editing session as a sanity check.</span>
-        </div>
-      </div>
-
-    </div><!-- end script card -->
-
-    <!-- Script: Fix Broken Shape Editor -->
-    <div class="script-card" id="script-fix-shape-editor">
-      <div class="card-header">
-        <div class="card-category">// Shape Editor</div>
-        <div class="card-title">Fix Broken<br>Shape Editor</div>
-        <div class="card-desc">
-          Fixes a blank or incomplete Shape Editor caused by a duplicate <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">shapeEditorManager</code> node.
-          Maya's Shape Editor UI only reads from the default node — if a second one exists (from a scene merge, import, or reference),
-          blendshapes registered there will be invisible in the UI. This script reconnects all blendshapes
-          to the correct node via <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">.message</code> and removes the duplicate.
-        </div>
-        <div class="tags">
-          <span class="tag tag-python">Python</span>
-          <span class="tag" style="background:rgba(0,200,255,0.1);color:#00c8ff;border-color:rgba(0,200,255,0.25);">Shape Editor</span>
-          <span class="tag" style="background:rgba(0,200,255,0.1);color:#00c8ff;border-color:rgba(0,200,255,0.25);">BlendShape</span>
-          <span class="tag tag-maya2022">Maya 2022+</span>
-        </div>
-      </div>
-
-      <div class="note-box" style="margin-bottom:24px;">
-        <div class="note-title">// When to use this</div>
-        <div class="note-item"><span class="note-bullet">▸</span><span>Shape Editor opens but shows 0 or only some blendshapes, even though the nodes exist in the scene.</span></div>
-        <div class="note-item"><span class="note-bullet">▸</span><span>Node Editor shows two <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">shapeEditorManager</code> nodes — one connected to all blendshapes, one empty.</span></div>
-        <div class="note-item"><span class="note-bullet">▸</span><span>Caused by scene merges, imports, or references creating a second manager node.</span></div>
-      </div>
-
-      <div class="section-label">// Step 1 — Diagnose: check which manager has which connections</div>
-      <div class="code-wrap">
-        <div class="code-toolbar">
-          <span class="code-lang">Python</span>
-          <button class="copy-btn" onclick="copyCode('code-sem-diagnose', this)">Copy</button>
-        </div>
-        <pre id="code-sem-diagnose"><span class="kw">import</span> maya.cmds <span class="kw">as</span> mc
-
-<span class="kw">for</span> node <span class="kw">in</span> [<span class="str">"shapeEditorManager"</span>, <span class="str">"shapeEditorManager1"</span>]:
-    <span class="kw">if not</span> mc.<span class="fn">objExists</span>(node):
-        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"{node} — does not exist"</span>)
-        <span class="kw">continue</span>
-    indices = mc.<span class="fn">getAttr</span>(node + <span class="str">".blendShapeParent"</span>, multiIndices=<span class="kw">True</span>) <span class="kw">or</span> []
-    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"\n{node} — {len(indices)} blendshapes connected:"</span>)
-    <span class="kw">for</span> i <span class="kw">in</span> indices:
-        conn = mc.<span class="fn">listConnections</span>(<span class="fn">f</span><span class="str">"{node}.blendShapeParent[{i}]"</span>, source=<span class="kw">True</span>, plugs=<span class="kw">True</span>) <span class="kw">or</span> []
-        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"  [{i}]: {conn}"</span>)</pre>
-      </div>
-
-      <div class="section-label" style="margin-top:24px;">// Step 2 — Fix: reconnect all blendshapes via .message to primary manager</div>
-      <div class="code-wrap">
-        <div class="code-toolbar">
-          <span class="code-lang">Python</span>
-          <button class="copy-btn" onclick="copyCode('code-sem-fix', this)">Copy</button>
-        </div>
-        <pre id="code-sem-fix"><span class="kw">import</span> maya.cmds <span class="kw">as</span> mc
-
-node = <span class="str">"shapeEditorManager"</span>
-
-<span class="cm"># Collect blendshapes and disconnect wrong plugs</span>
-indices = mc.<span class="fn">getAttr</span>(node + <span class="str">".blendShapeParent"</span>, multiIndices=<span class="kw">True</span>) <span class="kw">or</span> []
-bs_nodes = []
-
-<span class="kw">for</span> i <span class="kw">in</span> indices:
-    plug = <span class="fn">f</span><span class="str">"{node}.blendShapeParent[{i}]"</span>
-    conns = mc.<span class="fn">listConnections</span>(plug, source=<span class="kw">True</span>, plugs=<span class="kw">True</span>) <span class="kw">or</span> []
-    <span class="kw">for</span> c <span class="kw">in</span> conns:
-        bs_name = c.<span class="fn">split</span>(<span class="str">"."</span>)[<span class="num">0</span>]
-        bs_nodes.<span class="fn">append</span>(bs_name)
-        mc.<span class="fn">disconnectAttr</span>(c, plug)
-
-<span class="cm"># Reconnect via .message — the only plug the Shape Editor reads</span>
-<span class="kw">for</span> i, bs <span class="kw">in</span> <span class="fn">enumerate</span>(bs_nodes):
-    mc.<span class="fn">connectAttr</span>(<span class="fn">f</span><span class="str">"{bs}.message"</span>, <span class="fn">f</span><span class="str">"{node}.blendShapeParent[{i}]"</span>, force=<span class="kw">True</span>)
-    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"Fixed: {bs}.message → {node}.blendShapeParent[{i}]"</span>)
-
-<span class="fn">print</span>(<span class="str">"Done — reopen Shape Editor."</span>)</pre>
-      </div>
-
-      <div class="note-box" style="margin-top:20px;">
-        <div class="note-title">// Notes</div>
-        <div class="note-item"><span class="note-bullet">▸</span><span><code style="color:var(--accent);font-family:'Share Tech Mono',monospace">shapeEditorManager</code> is a protected Maya default node — it cannot be deleted, only the duplicate can be removed.</span></div>
-        <div class="note-item"><span class="note-bullet">▸</span><span>The correct connection is <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">blendShape.message → shapeEditorManager.blendShapeParent[i]</code>. Any other plug (e.g. <code style="color:var(--accent);font-family:'Share Tech Mono',monospace">.midLayerParent</code>) won't register in the UI.</span></div>
-        <div class="note-item"><span class="note-bullet">▸</span><span>Save a backup before running if your scene uses referenced rigs — the duplicate manager may belong to a reference.</span></div>
-      </div>
-    </div><!-- end fix shape editor card -->
-      </div>
-    </div>
-  </div>
+  </main>
 </div>
-<script>
+</div>
 
-const scripts = {
-  'mirror-nonlinear': { category: 'Deformers', name: 'Mirror NonLinear Deformer Weights' },
-  'add-geo-deformer': { category: 'Deformers', name: 'Add Geometry to Deformer' },
-  'change-default-value': { category: 'Attributes', name: 'Change Default Attribute Value' },
-  'transfer-uvs': { category: 'UVs', name: 'Transfer UVs' },
-  'ikfk-switch': { category: 'IK / FK', name: 'IK / FK Switch with Match' },
-  'fix-arnold-visibility': { category: 'Arnold / Viewport', name: 'Fix Arnold Mesh Visibility' },
-  'fix-shape-editor': { category: 'Shape Editor', name: 'Fix Broken Shape Editor' },
-  'naming-conventions': { category: 'Reference', name: 'Naming Conventions' }
-};
-
-function libShow(id) {
-  const name = (scripts[id]?.name || id).toUpperCase();
-  const bc = document.getElementById('lib-bc');
-  const sep = document.getElementById('lib-bc-sep');
-  bc.textContent = name;
-  bc.style.color = 'var(--text-bright)';
-  bc.style.cursor = 'default';
-  bc.onclick = null;
-  sep.style.display = '';
-  document.querySelectorAll('.script-card').forEach(c => c.classList.remove('active'));
-  document.querySelectorAll('#page-library .welcome').forEach(w => w.classList.remove('active'));
-  const card = document.getElementById('script-' + id);
-  if (card) card.classList.add('active');
-  document.querySelectorAll('.lni[data-script]').forEach(i => i.classList.remove('active'));
-  const ni = document.querySelector('.lni[data-script="' + id + '"]');
-  if (ni) ni.classList.add('active');
-  document.getElementById('lni-home').classList.remove('active');
-}
-
-function libHome() {
-  const bc = document.getElementById('lib-bc');
-  const sep = document.getElementById('lib-bc-sep');
-  bc.textContent = 'HOME';
-  bc.style.color = 'var(--text-bright)';
-  bc.style.cursor = 'default';
-  bc.onclick = null;
-  sep.style.display = 'none';
-  document.querySelectorAll('.script-card').forEach(c => c.classList.remove('active'));
-  document.querySelectorAll('#page-library .welcome').forEach(w => w.classList.add('active'));
-  document.querySelectorAll('.lni[data-script]').forEach(i => i.classList.remove('active'));
-  document.getElementById('lni-home').classList.add('active');
-}
-
-function toggleLibCat(header, id) {
-  const items = document.getElementById(id);
-  items.classList.toggle('open');
-  header.classList.toggle('open');
-}
-
-function normalise(s) { return s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim(); }
-function tokenMatch(query, haystack) {
-  const tokens = normalise(query).split(' ').filter(Boolean);
-  const norm = normalise(haystack);
-  return tokens.every(t => norm.includes(t));
-}
-function collapseMatch(query, haystack) {
-  const q = normalise(query).replace(/\s+/g, '');
-  const h = normalise(haystack).replace(/\s+/g, '');
-  return q.length > 0 && h.includes(q);
-}
-function smartMatch(query, name, tags) {
-  if (!query) return true;
-  const haystack = name + ' ' + tags;
-  return tokenMatch(query, haystack) || collapseMatch(query, haystack);
-}
-function runFilter(q) {
-  document.querySelectorAll('.lni[data-script]').forEach(item => {
-    const tags = item.getAttribute('data-tags') || '';
-    const name = item.textContent.replace('•', '').trim();
-    item.style.display = smartMatch(q, name, tags) ? '' : 'none';
-  });
-  document.querySelectorAll('.recent-item[data-script]').forEach(item => {
-    const tags = item.getAttribute('data-tags') || '';
-    const name = item.querySelector('.recent-item-name') ? item.querySelector('.recent-item-name').textContent.trim() : '';
-    item.style.display = smartMatch(q, name, tags) ? '' : 'none';
-  });
-}
-function libFilter(q) { runFilter(q); }
-function filterScripts(q) {
-  runFilter(q);
-  const sidebar = document.getElementById('libSearch');
-  if (sidebar) sidebar.value = q;
-}
-function syncSidebarSearch(val) {
-  const sidebar = document.getElementById('libSearch');
-  if (sidebar) sidebar.value = val;
-}
-function copyCode(id, btn) {
-  navigator.clipboard.writeText(document.getElementById(id).innerText).then(() => {
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
-  });
-}
-
-document.addEventListener('DOMContentLoaded', libHome);
-</script>
 </body>
 </html>
