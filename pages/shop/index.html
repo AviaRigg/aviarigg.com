@@ -840,7 +840,48 @@
       pointer-events: none;
     }
 
-    /* No featured empty state */
+    /* ── DISCOUNT / SALE PRICE DISPLAY ── */
+  .pc-price-wrap { display: flex; flex-direction: column; gap: 1px; }
+  .pc-price-original {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(13px,1.1vw,16px); font-weight: 500;
+    color: var(--text-dim);
+    text-decoration: line-through;
+    line-height: 1;
+  }
+  .pc-price-sale {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(18px,1.8vw,24px); font-weight: 700;
+    color: #00e87a; line-height: 1;
+  }
+  .pc-sale-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px; letter-spacing: 2px;
+    color: #00e87a; border: 1px solid rgba(0,232,122,0.4);
+    background: rgba(0,232,122,0.08);
+    padding: 2px 7px; text-transform: uppercase; white-space: nowrap;
+  }
+  /* Hero card discount */
+  .hero-price-original {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(16px,1.4vw,22px); font-weight: 500;
+    color: var(--text-dim); text-decoration: line-through; line-height: 1;
+  }
+  .hero-price-sale {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(26px,2.5vw,36px); font-weight: 700;
+    color: #00e87a; line-height: 1;
+  }
+  .hero-sale-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 2px;
+    color: #00e87a; border: 1px solid rgba(0,232,122,0.4);
+    background: rgba(0,232,122,0.08);
+    padding: 3px 9px; text-transform: uppercase; white-space: nowrap;
+    align-self: center;
+  }
+
+  /* No featured empty state */
     .hero-empty {
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
@@ -1623,6 +1664,7 @@ function swapHeroCard(cardEl) {
   const desc    = cardEl.dataset.desc    || '';
   const price   = cardEl.dataset.price   || '';
   const priceSub= cardEl.dataset.priceSub|| 'EUR · Pay what you want';
+  const salePrice = cardEl.dataset.salePrice || '';
   const buyUrl  = cardEl.dataset.buyUrl  || '#';
   const buyLabel= cardEl.dataset.buyLabel|| 'Buy Now';
   const href    = cardEl.dataset.href    || '#';
@@ -1634,6 +1676,24 @@ function swapHeroCard(cardEl) {
   const heroTag = hero.querySelector('.hero-card-tag');
   if (heroTag) heroTag.textContent = tag + ' · Featured';
 
+  // Build price HTML
+  function buildHeroPriceHtml(price, salePrice, priceSub) {
+    if (salePrice && salePrice.trim()) {
+      const parseNum = s => parseFloat(String(s || '').replace(/[^0-9.]/g, '')) || 0;
+      const p = parseNum(price), s = parseNum(salePrice);
+      const pct = (p && s && s < p) ? Math.round((1 - s/p)*100) : 0;
+      return `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div>
+          <div class="hero-price-original">${price}</div>
+          <div class="hero-price-sale">${salePrice}</div>
+        </div>
+        ${pct > 0 ? `<span class="hero-sale-badge">-${pct}%</span>` : ''}
+      </div>
+      <div class="hero-price-sub">${priceSub}</div>`;
+    }
+    return `<div class="hero-price">${price}</div><div class="hero-price-sub">${priceSub}</div>`;
+  }
+
   // Always rebuild the body in case it was replaced by empty state
   const body = hero.querySelector('.hero-card-body');
   if (body) {
@@ -1643,10 +1703,7 @@ function swapHeroCard(cardEl) {
       <div class="hero-title">${title}</div>
       <div class="hero-desc">${desc}</div>
       <div class="hero-footer">
-        <div>
-          <div class="hero-price">${price}</div>
-          <div class="hero-price-sub">${priceSub}</div>
-        </div>
+        <div>${buildHeroPriceHtml(price, salePrice, priceSub)}</div>
         <a href="${buyUrl}" class="shop-buy-btn" onclick="event.preventDefault();event.stopPropagation();openCheckout('${buyUrl}')">${buyLabel} &#8594;</a>
       </div>`;
   }
@@ -1721,9 +1778,56 @@ function updateScanHeights() {
   });
 }
 window.addEventListener('resize', updateScanHeights);
+// ── PRICE / DISCOUNT HELPERS ──
+function calcDiscount(price, salePrice) {
+  // Parse numeric value from strings like "€19.99" or "19.99"
+  const parseNum = s => parseFloat(String(s || '').replace(/[^0-9.]/g, '')) || 0;
+  const p = parseNum(price), s = parseNum(salePrice);
+  if (!p || !s || s >= p) return 0;
+  return Math.round((1 - s / p) * 100);
+}
+
+function applyPriceToCard(card, price, salePrice) {
+  const footer = card.querySelector('.pc-footer');
+  if (!footer) return;
+  const priceEl = footer.querySelector('.pc-price');
+  if (!priceEl) return;
+
+  if (salePrice && salePrice.trim()) {
+    const pct = calcDiscount(price, salePrice);
+    const badgeHtml = pct > 0 ? `<span class="pc-sale-badge">-${pct}%</span>` : '';
+    priceEl.outerHTML = `<div class="pc-price-wrap">
+      <div class="pc-price-original">${price || ''}</div>
+      <div class="pc-price-sale">${salePrice}</div>
+      ${badgeHtml}
+    </div>`;
+  } else if (price && price.trim()) {
+    // Normal price — just update text
+    priceEl.textContent = price;
+  }
+}
+
+function applyHeroPrice(price, salePrice) {
+  const heroPriceEl = document.querySelector('.hero-price');
+  if (!heroPriceEl) return;
+  if (salePrice && salePrice.trim()) {
+    const pct = calcDiscount(price, salePrice);
+    const badgeHtml = pct > 0 ? `<span class="hero-sale-badge">-${pct}%</span>` : '';
+    heroPriceEl.outerHTML = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div>
+        <div class="hero-price-original">${price || ''}</div>
+        <div class="hero-price-sale">${salePrice}</div>
+      </div>
+      ${badgeHtml}
+    </div>`;
+  } else if (price && price.trim()) {
+    heroPriceEl.textContent = price;
+  }
+}
+
 async function loadProductStatuses() {
   const sb = await _getShopSb();
-  const { data: products } = await sb.from('shop_products').select('id, status, position, cat, name').order('position', { ascending: true, nullsFirst: false }).order('id');
+  const { data: products } = await sb.from('shop_products').select('id, status, position, cat, name, price, sale_price').order('position', { ascending: true, nullsFirst: false }).order('id');
   if (!products) return;
 
   // Reorder DOM cards and update category from Supabase
@@ -1735,7 +1839,7 @@ async function loadProductStatuses() {
     '3D Model': 'model'
   };
   if (grid) {
-    products.forEach(({ id, cat, name, status }) => {
+    products.forEach(({ id, cat, name, status, price, sale_price }) => {
       if (id === 'hero-featured') return;
       const card = document.querySelector(`[data-product-id="${id}"]`);
       if (!card) return;
@@ -1756,18 +1860,26 @@ async function loadProductStatuses() {
           if (!card.dataset.originalCat) card.dataset.originalCat = slug;
         }
       }
+      // Update price/sale_price from Supabase
+      if (price) card.dataset.price = price;
+      if (sale_price) card.dataset.salePrice = sale_price;
+      else delete card.dataset.salePrice;
+      applyPriceToCard(card, price, sale_price);
     });
   }
 
   let featuredId = null;
+  let featuredPrice = null, featuredSalePrice = null;
 
   // First pass: apply all non-featured statuses
-  products.forEach(({ id, status }) => {
+  products.forEach(({ id, status, price, sale_price }) => {
     if (id === 'hero-featured') return;
     const card = document.querySelector(`[data-product-id="${id}"]`);
     if (!card || status === 'live') return;
     if (status === 'featured') {
       featuredId = id;
+      featuredPrice = price;
+      featuredSalePrice = sale_price;
       return;
     }
     applyStatusToCard(id, status, card, false);
@@ -1777,6 +1889,7 @@ async function loadProductStatuses() {
   if (featuredId) {
     const card = document.querySelector(`[data-product-id="${featuredId}"]`);
     if (card) applyStatusToCard(featuredId, 'featured', card, false);
+    applyHeroPrice(featuredPrice, featuredSalePrice);
   } else {
     showHeroEmpty();
   }

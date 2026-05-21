@@ -399,6 +399,38 @@
 
   .admin-gap { height: 40px; }
 
+  /* ── PRICE FIELDS ── */
+  .item-price-wrap {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+    flex-shrink: 0; min-width: 80px;
+  }
+  .item-price {
+    font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700;
+    color: var(--text-bright); cursor: text;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s; padding: 2px 4px;
+    background: transparent; outline: none; text-align: right;
+    min-width: 60px; max-width: 90px;
+  }
+  .item-price:hover { border-bottom-color: rgba(139,79,200,0.3); }
+  .item-price:focus { border-bottom-color: var(--accent); background: rgba(139,79,200,0.05); }
+  .item-sale-price {
+    font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 600;
+    color: #00e87a; cursor: text;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s; padding: 2px 4px;
+    background: transparent; outline: none; text-align: right;
+    min-width: 60px; max-width: 90px;
+  }
+  .item-sale-price:empty::before { content: 'sale...'; color: var(--text-dim); font-weight: 400; font-size: 11px; }
+  .item-sale-price:hover { border-bottom-color: rgba(0,232,122,0.3); }
+  .item-sale-price:focus { border-bottom-color: #00e87a; background: rgba(0,232,122,0.05); }
+  .item-price-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-dim); text-align: right;
+  }
+
   /* ── HINT TEXT ── */
   .admin-hint {
     font-family: 'Share Tech Mono', monospace;
@@ -875,14 +907,16 @@
 
   async function loadProducts() {
     const sb = await _getAdminSb();
-    const { data } = await sb.from('shop_products').select('id, status, position, cat, name').order('position', { ascending: true, nullsFirst: false }).order('id');
+    const { data } = await sb.from('shop_products').select('id, status, position, cat, name, price, sale_price').order('position', { ascending: true, nullsFirst: false }).order('id');
     const el = document.getElementById('product-list');
     if (!data?.length) { el.innerHTML = '<div class="table-empty">No products found.</div>'; return; }
     const rows = data.filter(({ id }) => id !== 'hero-featured');
-    el.innerHTML = rows.map(({ id, status, cat, name }, i) => {
+    el.innerHTML = rows.map(({ id, status, cat, name, price, sale_price }, i) => {
       const m = PRODUCT_META[id] || { name: id, cat: '—', href: '#' };
       const displayCat = cat || m.cat;
       const displayName = name || m.name || id;
+      const displayPrice = price || '';
+      const displaySalePrice = sale_price || '';
       const shopStatusOpts = `<button class='pill-opt' onclick='saveStatus(this,"live","shop_products")'>LIVE</button>
 <button class='pill-opt' onclick='saveStatus(this,"draft","shop_products")'>DRAFT</button>
 <button class='pill-opt' onclick='saveStatus(this,"hidden","shop_products")'>HIDDEN</button>
@@ -900,6 +934,11 @@
           <div class="cat-dropdown">${shopCatOpts}</div>
         </span>
         <span class="item-name" contenteditable="true" spellcheck="false" onblur="saveName(this,'shop_products')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayName}</span>
+        <div class="item-price-wrap">
+          <div class="item-price-label">price / sale</div>
+          <span class="item-price" contenteditable="true" spellcheck="false" title="Regular price (e.g. €19.99)" onblur="savePrice(this,'shop_products','price')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayPrice}</span>
+          <span class="item-sale-price" contenteditable="true" spellcheck="false" title="Sale price — leave empty for no discount" onblur="savePrice(this,'shop_products','sale_price')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displaySalePrice}</span>
+        </div>
         <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
           <span class="status-pill pill-${status}">${status.toUpperCase()} ▾</span>
           <div class="pill-dropdown">${shopStatusOpts}</div>
@@ -1020,6 +1059,25 @@
     } else {
       // Flash green to confirm save
       el.style.color = 'var(--green)';
+      setTimeout(() => el.style.color = '', 800);
+    }
+  }
+
+  // ── SAVE PRICE ──
+  async function savePrice(el, table, field) {
+    const row = el.closest('.item-row');
+    const id = row.dataset.id;
+    const val = el.textContent.trim();
+    const sb = await _getAdminSb();
+    const { error } = await sb.from(table)
+      .update({ [field]: val || null, updated_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) {
+      el.style.color = '#ff5050';
+      setTimeout(() => el.style.color = '', 1500);
+      toast('// Price save failed', true);
+    } else {
+      el.style.color = field === 'sale_price' ? '#00e87a' : 'var(--accent2)';
       setTimeout(() => el.style.color = '', 800);
     }
   }

@@ -194,6 +194,40 @@
 </div>
 <script>
 
+// ── FETCH LIVE PRICE FROM SUPABASE ──
+(async function() {
+  try {
+    let n = 0;
+    while (typeof _navSb === 'undefined' && n++ < 40) await new Promise(r => setTimeout(r, 50));
+    const sb = _navSb;
+    const { data } = await sb.from('shop_products').select('price, sale_price').eq('id', 'f1-sf25').single();
+    if (!data) return;
+    const { price, sale_price } = data;
+    if (!price) return;
+
+    function parseNum(s) { return parseFloat(String(s||'').replace(/[^0-9.]/g,'')) || 0; }
+    function pct(p, s) { const a = parseNum(p), b = parseNum(s); return (a && b && b < a) ? Math.round((1-b/a)*100) : 0; }
+
+    function buildPriceHtml(price, salePrice) {
+      if (salePrice && salePrice.trim()) {
+        const d = pct(price, salePrice);
+        return `<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(14px,1.1vw,18px);font-weight:500;color:var(--text-dim);text-decoration:line-through;line-height:1;">${price}</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(26px,2.5vw,36px);font-weight:700;color:#00e87a;line-height:1;">${salePrice}</div>
+          </div>
+          ${d > 0 ? `<span style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:#00e87a;border:1px solid rgba(0,232,122,0.4);background:rgba(0,232,122,0.08);padding:4px 10px;text-transform:uppercase;">-${d}%</span>` : ''}
+        </div>`;
+      }
+      return `<span class="product-price">${price}</span>`;
+    }
+
+    document.querySelectorAll('.product-price').forEach(el => {
+      el.outerHTML = buildPriceHtml(price, sale_price);
+    });
+  } catch(e) { /* fail silently — static price remains */ }
+})();
+
 function openCheckout(url) {
   const modal = document.getElementById('checkout-modal');
   document.getElementById('checkout-iframe').src = url;
