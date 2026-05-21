@@ -1567,7 +1567,7 @@
     const isHtml = body.includes('<') && body.includes('>');
     const bodyHtml = isHtml ? body : body.replace(/\n/g, '<br>');
 
-    // Wrap in branded template
+    // Wrap in branded template with signature
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1583,28 +1583,53 @@
       <!-- Logo header -->
       <tr>
         <td style="background:#0d0d18;border:1px solid rgba(255,255,255,0.08);border-bottom:2px solid #8b4fc8;padding:28px 36px;text-align:center;">
-          <img src="https://aviarigg.com/apple-touch-icon.png" width="56" height="56" alt="AviaRigg" style="display:block;margin:0 auto 12px;border-radius:12px;">
-          <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:5px;text-transform:uppercase;color:#8b4fc8;margin-bottom:4px;">// AviaRigg</div>
-          <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:700;color:#eeeef8;letter-spacing:1px;">${subject}</div>
+          <img src="https://aviarigg.com/apple-touch-icon.png" width="60" height="60" alt="AviaRigg" style="display:block;margin:0 auto 10px;border-radius:14px;">
+          <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:#8b4fc8;margin-bottom:4px;">// AviaRigg</div>
+          <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:20px;font-weight:700;color:#eeeef8;letter-spacing:1px;">${subject}</div>
         </td>
       </tr>
 
       <!-- Body -->
       <tr>
-        <td style="background:#0d0d18;border:1px solid rgba(255,255,255,0.08);border-top:none;padding:36px 36px 28px;">
+        <td style="background:#0d0d18;border:1px solid rgba(255,255,255,0.08);border-top:none;border-bottom:none;padding:32px 36px 28px;">
           <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.8;color:#b0b0c8;">
             ${bodyHtml}
           </div>
         </td>
       </tr>
 
+      <!-- Signature -->
+      <tr>
+        <td style="background:#0d0d18;border:1px solid rgba(255,255,255,0.08);border-top:1px solid rgba(255,255,255,0.06);padding:20px 36px;">
+          <table cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding-right:16px;vertical-align:middle;">
+                <img src="https://aviarigg.com/apple-touch-icon.png" width="44" height="44" alt="AviaRigg" style="display:block;border-radius:10px;">
+              </td>
+              <td style="border-left:2px solid #8b4fc8;padding-left:16px;vertical-align:middle;">
+                <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;font-weight:700;color:#eeeef8;">Paul Chedozeau</div>
+                <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#8b4fc8;margin:2px 0;">Character Rigger · AviaRigg</div>
+                <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;color:#6a6a8a;margin-top:4px;">
+                  <a href="mailto:contact@aviarigg.com" style="color:#8b4fc8;text-decoration:none;">contact@aviarigg.com</a>
+                  &nbsp;·&nbsp;
+                  <a href="https://aviarigg.com" style="color:#6a6a8a;text-decoration:none;">aviarigg.com</a>
+                  &nbsp;·&nbsp;
+                  <a href="https://linkedin.com" style="color:#6a6a8a;text-decoration:none;">LinkedIn</a>
+                  &nbsp;·&nbsp;
+                  <a href="https://instagram.com" style="color:#6a6a8a;text-decoration:none;">Instagram</a>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
       <!-- Footer -->
       <tr>
-        <td style="padding:20px 36px;text-align:center;">
-          <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:2px;color:#3a3a5a;text-transform:uppercase;">
-            Paul Chedozeau — AviaRigg &nbsp;·&nbsp;
-            <a href="https://aviarigg.com" style="color:#8b4fc8;text-decoration:none;">aviarigg.com</a>
-            &nbsp;·&nbsp;
+        <td style="padding:16px 36px;text-align:center;">
+          <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;letter-spacing:1px;color:#3a3a5a;">
+            You received this because you have an account on aviarigg.com.<br>
+            © 2026 AviaRigg — Paul Chedozeau &nbsp;·&nbsp;
             <a href="https://aviarigg.com" style="color:#3a3a5a;text-decoration:none;">Unsubscribe</a>
           </div>
         </td>
