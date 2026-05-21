@@ -958,6 +958,28 @@
     </div>
     <div class="admin-gap"></div>
 
+    <!-- ══ LIBRARY MANAGEMENT ════════════════════════════════ -->
+    <div class="admin-section-label">
+      <span>// Script Library</span>
+      <a href="/pages/library" style="color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-decoration:none;">Open Library →</a>
+    </div>
+    <div class="admin-full">
+      <div class="admin-panel-title">Scripts</div>
+      <div class="item-list-header" style="grid-template-columns:24px 36px 180px 1fr 160px 160px 30px;">
+        <span></span><span></span>
+        <span>Category</span>
+        <span>Name</span>
+        <span>Status</span>
+        <span>Access</span>
+        <span></span>
+      </div>
+      <div class="item-list" id="library-list">
+        <div class="table-empty skeleton" style="height:48px;"></div>
+        <div class="table-empty skeleton" style="height:48px;opacity:0.6;"></div>
+      </div>
+    </div>
+    <div class="admin-gap"></div>
+
     <!-- ══ PORTFOLIO MANAGEMENT ═══════════════════════════════ -->
     <div class="admin-section-label">
       <span>// Portfolio</span>
@@ -1130,6 +1152,7 @@
       loadSettings(),
       loadStats(),
       loadProducts(),
+      loadLibraryScripts(),
       loadPortfolio(),
       loadUsers(),
       loadBanner(),
@@ -1222,6 +1245,93 @@
     'character-rig-template': { name: 'Character Rig Template', cat: 'Rig Pack',    href: '#' },
     'mel-python-scripts':     { name: 'MEL / Python Scripts',   cat: 'Tool Pack',   href: '#' },
   };
+
+  // ── LIBRARY SCRIPTS ──
+  async function loadLibraryScripts() {
+    const sb = await _getAdminSb();
+    const { data } = await sb
+      .from('library_scripts')
+      .select('id, name, category, status, access, date_added, position')
+      .order('position', { ascending: true, nullsFirst: false })
+      .order('date_added', { ascending: false });
+    const el = document.getElementById('library-list');
+    if (!data?.length) { el.innerHTML = '<div class="table-empty">No scripts found.</div>'; return; }
+
+    const statusOpts = `
+      <button class='pill-opt' onclick='saveLibField(this,"status","published","library_scripts")'>PUBLISHED</button>
+      <button class='pill-opt' onclick='saveLibField(this,"status","draft","library_scripts")'>DRAFT</button>
+      <button class='pill-opt' onclick='saveLibField(this,"status","hidden","library_scripts")'>HIDDEN</button>`;
+
+    const accessOpts = `
+      <button class='pill-opt' onclick='saveLibField(this,"access","logged_in","library_scripts")'>FREE</button>
+      <button class='pill-opt opt-early' onclick='saveLibField(this,"access","buyer_only","library_scripts")'>🔑 BUYER</button>`;
+
+    const catOpts = `
+      <button class='cat-opt' onclick='saveCat(this,"Arnold / Viewport","library_scripts")'>ARNOLD</button>
+      <button class='cat-opt' onclick='saveCat(this,"Attributes","library_scripts")'>ATTRIBUTES</button>
+      <button class='cat-opt' onclick='saveCat(this,"Deformers","library_scripts")'>DEFORMERS</button>
+      <button class='cat-opt' onclick='saveCat(this,"IK / FK","library_scripts")'>IK / FK</button>
+      <button class='cat-opt' onclick='saveCat(this,"Shape Editor","library_scripts")'>SHAPE EDITOR</button>
+      <button class='cat-opt' onclick='saveCat(this,"UVs","library_scripts")'>UVS</button>
+      <button class='cat-opt' onclick='saveCat(this,"Reference","library_scripts")'>REFERENCE</button>`;
+
+    el.innerHTML = data.map(({ id, name, category, status, access, date_added }, i) => {
+      const displayStatus = status || 'published';
+      const displayAccess = access || 'logged_in';
+      const accessLabel   = displayAccess === 'buyer_only' ? '🔑 BUYER' : 'FREE';
+      const dateStr = date_added ? new Date(date_added).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+      return `<div class="item-row" data-id="${id}" data-list="library">
+        <span class="drag-handle" title="Position">⠿</span>
+        <span class="item-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="cat-wrap" onclick="event.stopPropagation();toggleWrap(this)">
+          <span class="item-cat">${category || '—'} ▾</span>
+          <div class="cat-dropdown">${catOpts}</div>
+        </span>
+        <span style="display:flex;flex-direction:column;gap:3px;overflow:hidden;min-width:0;">
+          <span class="item-name" contenteditable="true" spellcheck="false"
+            onblur="saveName(this,'library_scripts')"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${name || id}</span>
+          <span class="item-id-sub">${id} · Added ${dateStr}</span>
+        </span>
+        <div class="item-row-footer" style="gap:6px;">
+          <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
+            <span class="status-pill pill-${displayStatus}">${displayStatus.toUpperCase()} ▾</span>
+            <div class="pill-dropdown">${statusOpts}</div>
+          </span>
+        </div>
+        <div class="item-row-footer" style="gap:6px;">
+          <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
+            <span class="status-pill pill-${displayAccess === 'buyer_only' ? 'early' : 'live'}">${accessLabel} ▾</span>
+            <div class="pill-dropdown">${accessOpts}</div>
+          </span>
+        </div>
+        <a class="item-link" href="/pages/library#${id}" target="_blank">→</a>
+      </div>`;
+    }).join('');
+  }
+
+  async function saveLibField(btn, field, value, table) {
+    const row = btn.closest('[data-id]');
+    if (!row) return;
+    const id = row.dataset.id;
+    const sb = await _getAdminSb();
+    const { error } = await sb.from(table).update({ [field]: value }).eq('id', id);
+    if (error) { toast('// Save failed', true); return; }
+    // Update pill display
+    const wrap = btn.closest('.pill-wrap');
+    if (wrap) {
+      const pill = wrap.querySelector('.status-pill');
+      if (pill) {
+        const isAccess = field === 'access';
+        const label = isAccess ? (value === 'buyer_only' ? '🔑 BUYER' : 'FREE') : value.toUpperCase();
+        const cls   = isAccess ? (value === 'buyer_only' ? 'early' : 'live') : value;
+        pill.className = `status-pill pill-${cls}`;
+        pill.innerHTML = label + ' ▾';
+      }
+      wrap.classList.remove('open');
+    }
+    toast('// Saved: ' + (field === 'access' ? value : value));
+  }
 
   async function loadProducts() {
     const sb = await _getAdminSb();
