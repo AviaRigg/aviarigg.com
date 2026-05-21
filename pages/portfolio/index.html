@@ -397,8 +397,11 @@
 
     function swapFeaturedCard(cardEl) {
       const featured = document.querySelector('.port-featured');
+      const label = document.getElementById('port-featured-label');
       if (!featured) return;
       featured.classList.remove('no-featured');
+      featured.style.display = '';
+      if (label) label.style.display = '';
       // Restore featured structure if it was empty
       const img   = cardEl.dataset.img   || '';
       const tag   = cardEl.dataset.tag   || '// Project';
@@ -434,7 +437,9 @@
 
     function showFeaturedEmpty() {
       const featured = document.querySelector('.port-featured');
+      const label = document.getElementById('port-featured-label');
       if (!featured) return;
+      if (label) label.style.display = 'none';
       if (portIsAdmin) {
         featured.classList.add('no-featured');
         featured.removeAttribute('onclick');
@@ -481,7 +486,7 @@
     </div>
 
     <!-- ══ FEATURED PROJECT ══ -->
-    <div class="port-new-label">
+    <div class="port-new-label" id="port-featured-label">
       <span>// Featured Project</span>
       <span style="color:var(--accent);">&#9679; Featured</span>
     </div>
