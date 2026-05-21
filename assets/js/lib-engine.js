@@ -284,7 +284,7 @@ async function libShow(id) {
   document.getElementById('lib-view-home').style.display = 'none';
   const view = document.getElementById('lib-view-script');
   view.style.display = '';
-  view.innerHTML = renderScript(row, s);
+  view.innerHTML = `<div class="lib-script-inner">${renderScript(row, s)}</div>`;
   document.getElementById('lib-main').scrollTo(0, 0);
 }
 

@@ -45,9 +45,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 function libToggleSidebar() {
   const sidebar = document.querySelector('.lib-sidebar');
-  sidebar.classList.toggle('collapsed');
   const btn = document.querySelector('.lib-sidebar-toggle');
-  btn.title = sidebar.classList.contains('collapsed') ? 'Expand sidebar' : 'Collapse sidebar';
+  const isCollapsing = !sidebar.classList.contains('collapsed');
+  sidebar.classList.toggle('collapsed');
+  // Rotate arrow: ‹ when open, › when closed
+  btn.innerHTML = isCollapsing ? '&#10095;' : '&#10094;';
+  btn.title = isCollapsing ? 'Expand sidebar' : 'Collapse sidebar';
 }
 </script>
 </head>

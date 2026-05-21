@@ -39,43 +39,47 @@
   background: rgba(255,255,255,0.015);
   border-right: 1px solid var(--border, rgba(255,255,255,0.07));
   display: flex; flex-direction: column;
-  overflow: hidden;
-  transition: width 0.25s cubic-bezier(0.4,0,0.2,1),
-              min-width 0.25s cubic-bezier(0.4,0,0.2,1);
+  overflow: visible;
+  transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
   position: relative;
 }
 .lib-sidebar.collapsed {
   width: 0 !important;
-  min-width: 0 !important;
   border-right: none;
 }
 .lib-sidebar.collapsed .lib-sidebar-inner { opacity: 0; pointer-events: none; }
 .lib-sidebar-inner {
   display: flex; flex-direction: column;
   height: 100%; overflow: hidden;
-  transition: opacity 0.15s;
+  transition: opacity 0.2s;
   min-width: clamp(220px, 16vw, 300px);
+  flex: 1;
 }
 
-/* Collapse toggle button */
+/* Collapse toggle — sits outside sidebar on the main area side */
 .lib-sidebar-toggle {
   position: absolute;
-  right: -14px; top: 20px;
-  width: 28px; height: 28px;
+  right: -13px; top: clamp(14px, 1.2vw, 22px);
+  width: 26px; height: 26px;
   background: var(--bg, #07070f);
-  border: 1px solid var(--border, rgba(255,255,255,0.07));
+  border: 1px solid rgba(139,79,200,0.35);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; z-index: 10;
-  font-size: 10px; color: rgba(139,79,200,0.7);
-  transition: color 0.2s, border-color 0.2s, transform 0.25s;
+  cursor: pointer; z-index: 100;
+  font-size: 9px; color: rgba(139,79,200,0.8);
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
   font-family: 'Share Tech Mono', monospace;
   flex-shrink: 0;
+  line-height: 1;
+  box-shadow: 0 0 0 4px var(--bg, #07070f);
 }
-.lib-sidebar-toggle:hover { color: var(--accent2, #c084fc); border-color: rgba(139,79,200,0.4); }
+.lib-sidebar-toggle:hover {
+  color: var(--accent2, #c084fc);
+  border-color: rgba(139,79,200,0.7);
+  background: rgba(139,79,200,0.1);
+}
 .lib-sidebar.collapsed .lib-sidebar-toggle {
-  right: -36px;
-  transform: rotate(180deg);
+  right: -38px;
 }
 
 .lib-sidebar-header {
@@ -401,7 +405,14 @@
 .lib-access-buyer_only { color:#b06ef5;border-color:rgba(176,110,245,0.3);background:rgba(176,110,245,0.06);}
 
 /* ── SCRIPT VIEW ── */
-#lib-view-script { padding: 0 clamp(24px,3vw,60px) clamp(60px,5vw,100px); }
+#lib-view-script {
+  padding: 0 clamp(24px,3vw,60px) clamp(60px,5vw,100px);
+  display: flex; justify-content: flex-start;
+}
+.lib-script-inner {
+  width: 100%;
+  max-width: clamp(640px, 66%, 1100px);
+}
 
 /* Admin bar */
 .lib-admin-bar {
