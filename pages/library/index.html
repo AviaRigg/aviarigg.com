@@ -45,10 +45,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 function libToggleSidebar() {
   const sidebar = document.querySelector('.lib-sidebar');
-  const btn = document.querySelector('.lib-sidebar-toggle');
+  const main    = document.getElementById('lib-main');
+  const btn     = document.querySelector('.lib-sidebar-toggle');
   const isCollapsing = !sidebar.classList.contains('collapsed');
   sidebar.classList.toggle('collapsed');
-  // Rotate arrow: ‹ when open, › when closed
+  // Slide main content to fill the space
+  main.style.marginLeft = isCollapsing ? '0' : '';
   btn.innerHTML = isCollapsing ? '&#10095;' : '&#10094;';
   btn.title = isCollapsing ? 'Expand sidebar' : 'Collapse sidebar';
 }

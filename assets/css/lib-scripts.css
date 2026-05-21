@@ -30,15 +30,23 @@
   display: flex; width: 100%;
   overflow: hidden;
   height: calc(100vh - var(--nav-h, 60px));
+  position: relative;
 }
 
-/* Main area gets the padding back so breadcrumb/content sits correctly */
 .lib-main {
-  padding-top: var(--nav-h, 60px);
-  flex: 1; overflow-y: auto; scroll-behavior: smooth;
+  flex: 1;
+  margin-left: clamp(220px, 16vw, 300px);
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  transition: margin-left 0.25s cubic-bezier(0.4,0,0.2,1);
 }
 .lib-main::-webkit-scrollbar { width: 4px; }
 .lib-main::-webkit-scrollbar-thumb { background: rgba(139,79,200,0.25); }
+/* When sidebar collapses, main fills the space */
+.lib-sidebar.collapsed ~ * .lib-main,
+.lib-page:has(.lib-sidebar.collapsed) .lib-main {
+  margin-left: 0;
+}
 
 /* ── SIDEBAR ── */
 .lib-sidebar {
@@ -49,14 +57,16 @@
   display: flex; flex-direction: column;
   overflow: visible;
   transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
-  position: relative;
-  height: 100vh;
-  margin-top: calc(-1 * var(--nav-h, 60px));
-  padding-top: var(--nav-h, 60px);
+  position: fixed;
+  top: var(--nav-h, 60px);
+  left: 0;
+  bottom: 0;
+  z-index: 100;
 }
 .lib-sidebar.collapsed {
   width: 0 !important;
   border-right: none;
+  overflow: hidden;
 }
 .lib-sidebar.collapsed .lib-sidebar-inner { opacity: 0; pointer-events: none; }
 .lib-sidebar-inner {
