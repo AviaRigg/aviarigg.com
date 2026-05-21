@@ -95,9 +95,6 @@ async function submitAddProduct() {
       id, name, cat, status,
       price: price || null,
       sale_price: salePrice || null,
-      buy_url: buyUrl || null,
-      img: img || null,
-      href: href || null,
       position,
       updated_at: new Date().toISOString()
     });
