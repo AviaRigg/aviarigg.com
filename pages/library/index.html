@@ -6,6 +6,7 @@
 <title>Script Library — AviaRigg</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/assets/css/lib-scripts.css">
 <link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-RYTKYEPJG2');</script>
@@ -13,209 +14,6 @@
   document.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault();},{passive:false});
   let _lt=0;document.addEventListener('touchend',function(e){const t=e.target.tagName;if(['INPUT','SELECT','TEXTAREA'].includes(t))return;const n=Date.now();if(n-_lt<300)e.preventDefault();_lt=n;},{passive:false});
 </script>
-<style>
-/* ── BASE ── */
-.page{display:block!important;}
-.nav-logo,.nav-link,.nav-badge,.nav-drawer a{text-decoration:none;}
-.mobile-library-block{display:none;}
-@media(max-width:768px){
-  .page{display:none!important;}
-  .mobile-library-block{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - var(--nav-h));padding:40px 24px;text-align:center;gap:16px;}
-}
-
-/* ── GATE ── */
-#lib-gate{position:fixed;inset:0;z-index:9998;background:var(--bg,#07070f);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
-
-/* ── LAYOUT ── */
-.lib-page{display:flex;width:100%;height:calc(100vh - var(--nav-h,60px));overflow:hidden;}
-
-/* ── SIDEBAR ── */
-.lib-sidebar{width:240px;flex-shrink:0;background:rgba(255,255,255,0.015);border-right:1px solid var(--border,rgba(255,255,255,0.07));display:flex;flex-direction:column;overflow:hidden;}
-.lib-sidebar-header{padding:20px 16px 14px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));flex-shrink:0;}
-.lib-sidebar-eyebrow{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--accent,#8b4fc8);margin-bottom:4px;}
-.lib-sidebar-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--text-bright,#eeeef8);letter-spacing:2px;text-transform:uppercase;}
-.lib-sidebar-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:#9090b0;letter-spacing:2px;margin-top:3px;}
-.lib-search-wrap{padding:10px 12px 8px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));flex-shrink:0;}
-.lib-search{width:100%;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid var(--border,rgba(255,255,255,0.07));color:var(--text,#c8c8e0);padding:7px 10px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;transition:border-color 0.2s;}
-.lib-search:focus{border-color:rgba(139,79,200,0.5);}
-.lib-search::placeholder{color:var(--text-dim,#6a6a8a);}
-.lib-nav{flex:1;padding:8px 0;overflow-y:auto;}
-.lib-nav::-webkit-scrollbar{width:3px;}
-.lib-nav::-webkit-scrollbar-thumb{background:rgba(139,79,200,0.3);}
-.lib-home-btn{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;color:#c8c8e0;text-transform:uppercase;transition:color 0.2s;border:none;background:none;width:100%;text-align:left;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));margin-bottom:6px;}
-.lib-home-btn:hover,.lib-home-btn.active{color:var(--accent2,#c084fc);}
-.lib-home-btn .dot{width:5px;height:5px;border-radius:50%;background:var(--accent,#8b4fc8);}
-.lib-cat-label{padding:6px 16px 4px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(139,79,200,0.7);}
-.lib-nav-item{display:flex;align-items:center;gap:7px;padding:7px 16px 7px 20px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1px;color:#c8c8e0;transition:color 0.15s,background 0.15s;border-left:2px solid transparent;}
-.lib-nav-item:hover{color:var(--text,#c8c8e0);background:rgba(255,255,255,0.03);}
-.lib-nav-item.active{color:var(--accent2,#c084fc);border-left-color:var(--accent,#8b4fc8);background:rgba(139,79,200,0.06);}
-.lib-nav-item.hidden-item{display:none;}
-.lib-nav-item .dot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0;}
-.lib-nav-new{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;background:rgba(0,232,122,0.12);border:1px solid rgba(0,232,122,0.5);color:#00e87a;padding:2px 6px;margin-left:auto;font-weight:700;}
-.lib-nav-status{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-left:auto;}
-.status-dot-published{background:#00e87a;}.status-dot-draft{background:#f5a623;}.status-dot-hidden{background:#ff5050;}
-.lib-sidebar-footer{padding:12px 16px;border-top:1px solid var(--border,rgba(255,255,255,0.07));flex-shrink:0;}
-.lib-about-link{display:flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:#a0a0c0;text-transform:uppercase;cursor:pointer;transition:color 0.2s;text-decoration:none;}
-.lib-about-link:hover{color:var(--accent2,#c084fc);}
-.lib-version{font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(255,255,255,0.12);letter-spacing:1px;margin-top:8px;}
-
-/* ── MAIN ── */
-.lib-main{flex:1;overflow-y:auto;scroll-behavior:smooth;}
-.lib-main::-webkit-scrollbar{width:4px;}
-.lib-main::-webkit-scrollbar-thumb{background:rgba(139,79,200,0.25);}
-
-/* ── BREADCRUMB ── */
-.lib-breadcrumb{display:flex;align-items:center;gap:8px;padding:14px 40px 0;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);}
-.lib-bc-sep{color:rgba(139,79,200,0.4);}
-.lib-bc-current{color:var(--text-bright,#eeeef8);}
-
-/* ── HOME ── */
-#lib-view-home{padding:clamp(32px,3vw,60px) clamp(32px,4vw,80px) 80px;}
-.lib-hero-title{font-family:'Rajdhani',sans-serif;font-size:clamp(48px,4vw,96px);font-weight:700;line-height:1;letter-spacing:2px;text-transform:uppercase;color:var(--text-bright,#eeeef8);margin-bottom:6px;}
-.lib-hero-title span{color:var(--accent2,#c084fc);}
-.lib-hero-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:4px;color:#9090b0;text-transform:uppercase;margin-bottom:40px;}
-.lib-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border,rgba(255,255,255,0.07));border:1px solid var(--border,rgba(255,255,255,0.07));margin-bottom:40px;max-width:600px;}
-.lib-stat{background:var(--bg,#07070f);padding:20px 24px;position:relative;overflow:hidden;}
-.lib-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(139,79,200,0.4),transparent);}
-.lib-stat-icon{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent,#8b4fc8);margin-bottom:8px;}
-.lib-stat-value{font-family:'Share Tech Mono',monospace;font-size:clamp(20px,3vw,28px);color:var(--accent2,#c084fc);font-weight:700;letter-spacing:2px;margin-bottom:4px;}
-.lib-stat-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:#a0a0c0;}
-
-/* ── SORT & SEARCH ── */
-.lib-controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:16px;flex-wrap:wrap;}
-.lib-sort-wrap{display:flex;align-items:center;gap:6px;}
-.lib-sort-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#a0a0c0;}
-.lib-sort-btn{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);background:none;border:1px solid rgba(255,255,255,0.07);padding:4px 10px;cursor:pointer;transition:all 0.15s;}
-.lib-sort-btn:hover{color:var(--text,#c8c8e0);border-color:rgba(255,255,255,0.15);}
-.lib-sort-btn.active{color:var(--accent2,#c084fc);border-color:rgba(139,79,200,0.4);background:rgba(139,79,200,0.06);}
-.lib-home-search-wrap{position:relative;flex:1;max-width:400px;}
-.lib-home-search{width:100%;box-sizing:border-box;background:rgba(255,255,255,0.03);border:1px solid var(--border,rgba(255,255,255,0.07));border-left:2px solid rgba(139,79,200,0.5);color:var(--text,#c8c8e0);padding:10px 14px 10px 36px;font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;transition:border-color 0.2s;}
-.lib-home-search:focus{border-color:rgba(139,79,200,0.6);}
-.lib-home-search::placeholder{color:var(--text-dim,#6a6a8a);}
-.lib-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:rgba(139,79,200,0.5);font-size:13px;pointer-events:none;}
-
-/* ── INDEX ── */
-.lib-index-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
-.lib-index-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#a0a0c0;}
-.lib-index-meta{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.18);}
-.lib-index{border:1px solid var(--border,rgba(255,255,255,0.07));}
-.lib-index-row{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));cursor:pointer;transition:background 0.15s;}
-.lib-index-row:last-child{border-bottom:none;}
-.lib-index-row:hover{background:rgba(139,79,200,0.04);}
-.lib-index-row:hover .lib-index-arrow{opacity:1;transform:translateX(0);}
-.lib-index-locked{opacity:0.6;cursor:pointer;}
-.lib-index-locked:hover{background:rgba(255,80,80,0.04);}
-.lib-row-draft{opacity:0.55;}
-.lib-row-hidden{opacity:0.35;}
-.lib-index-cat-badge{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;padding:3px 8px;border:1px solid;flex-shrink:0;white-space:nowrap;min-width:72px;text-align:center;}
-.lib-index-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;color:var(--text-bright,#eeeef8);letter-spacing:1px;flex:1;}
-.lib-index-desc{font-family:'Share Tech Mono',monospace;font-size:10px;color:#a0a0c0;flex:2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.lib-index-arrow{font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--accent,#8b4fc8);opacity:0;transform:translateX(-4px);transition:opacity 0.15s,transform 0.15s;flex-shrink:0;}
-.lib-new-badge{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;background:rgba(0,232,122,0.1);border:1px solid rgba(0,232,122,0.5);color:#00e87a;padding:3px 8px;text-transform:uppercase;flex-shrink:0;font-weight:700;}
-.lib-lock-badge{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.25);color:#ff5050;padding:3px 8px;flex-shrink:0;}
-.lib-no-results{padding:32px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--text-dim,#6a6a8a);text-align:center;}
-
-/* Admin badges in index */
-.lib-admin-status{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:3px;padding:2px 6px;border:1px solid;flex-shrink:0;}
-.lib-status-published{color:#00e87a;border-color:rgba(0,232,122,0.3);background:rgba(0,232,122,0.06);}
-.lib-status-draft{color:#f5a623;border-color:rgba(245,166,35,0.3);background:rgba(245,166,35,0.06);}
-.lib-status-hidden{color:#ff5050;border-color:rgba(255,80,80,0.3);background:rgba(255,80,80,0.06);}
-.lib-access-badge{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;padding:2px 6px;border:1px solid;flex-shrink:0;}
-.lib-access-buyer_only{color:#b06ef5;border-color:rgba(176,110,245,0.3);background:rgba(176,110,245,0.06);}
-
-/* ── SCRIPT VIEW ── */
-#lib-view-script{padding:0 40px 80px;}
-
-/* Admin bar */
-.lib-admin-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));margin-bottom:28px;margin-top:20px;gap:16px;flex-wrap:wrap;}
-.lib-admin-bar-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(139,79,200,0.5);}
-.lib-admin-controls{display:flex;gap:20px;flex-wrap:wrap;}
-.lib-admin-group{display:flex;align-items:center;gap:8px;}
-.lib-admin-group-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);}
-.lib-admin-pill-group{display:flex;gap:4px;}
-.lib-admin-pill{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);background:none;border:1px solid rgba(255,255,255,0.08);padding:4px 10px;cursor:pointer;transition:all 0.15s;}
-.lib-admin-pill:hover{color:var(--text,#c8c8e0);border-color:rgba(255,255,255,0.2);}
-.lib-admin-pill.active{color:#00e87a;border-color:rgba(0,232,122,0.4);background:rgba(0,232,122,0.06);}
-.lib-admin-pill-access.active{color:#b06ef5;border-color:rgba(176,110,245,0.4);background:rgba(176,110,245,0.06);}
-
-.lib-script-eyebrow{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--accent,#8b4fc8);margin-top:28px;margin-bottom:10px;}
-.lib-script-title{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,4vw,48px);font-weight:700;line-height:1.05;letter-spacing:2px;text-transform:uppercase;color:var(--text-bright,#eeeef8);margin-bottom:20px;}
-.lib-script-desc{font-size:14px;line-height:1.8;color:var(--text,#c8c8e0);max-width:700px;margin-bottom:20px;}
-.lib-script-desc code{font-family:'Share Tech Mono',monospace;color:var(--accent,#8b4fc8);font-size:13px;}
-.lib-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:32px;}
-.lib-tag{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;padding:4px 10px;border:1px solid rgba(139,79,200,0.3);background:rgba(139,79,200,0.06);color:var(--accent2,#c084fc);}
-.lib-tag-python{border-color:rgba(139,79,200,0.4);color:#a78bfa;}
-.lib-tag-maya{border-color:rgba(0,180,255,0.3);color:#00b4ff;background:rgba(0,180,255,0.06);}
-.lib-tag-new{border-color:rgba(0,232,122,0.3);color:#00e87a;background:rgba(0,232,122,0.06);}
-.lib-section-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);padding-bottom:10px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));margin-bottom:16px;margin-top:32px;}
-.lib-sublabel{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim,#6a6a8a);line-height:1.6;margin-bottom:12px;}
-.lib-when-box{border:1px solid rgba(255,200,0,0.15);background:rgba(255,200,0,0.03);border-left:2px solid rgba(255,200,0,0.4);padding:16px 20px;margin-bottom:32px;}
-.lib-when-title{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,200,0,0.6);margin-bottom:10px;}
-.lib-code-wrap{background:rgba(0,0,0,0.35);border:1px solid rgba(139,79,200,0.15);border-left:2px solid rgba(139,79,200,0.5);margin-bottom:24px;}
-.lib-code-toolbar{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:rgba(139,79,200,0.06);border-bottom:1px solid rgba(139,79,200,0.1);}
-.lib-code-lang{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:rgba(139,79,200,0.7);}
-.lib-copy-btn{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);background:none;border:1px solid rgba(255,255,255,0.08);padding:4px 10px;cursor:pointer;transition:all 0.2s;}
-.lib-copy-btn:hover{color:var(--accent2,#c084fc);border-color:rgba(139,79,200,0.4);}
-.lib-copy-btn.copied{color:#00e87a;border-color:rgba(0,232,122,0.4);}
-.lib-code-wrap pre{margin:0;padding:18px 20px;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.7;color:var(--text,#c8c8e0);overflow-x:auto;white-space:pre;}
-.lib-params-table{width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:11px;margin-bottom:8px;}
-.lib-params-table th{text-align:left;padding:8px 14px;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);border-bottom:1px solid var(--border,rgba(255,255,255,0.07));}
-.lib-params-table td{padding:10px 14px;vertical-align:top;}
-.lib-params-table tr{border-bottom:1px solid rgba(255,255,255,0.04);}
-.lib-params-table tr:last-child{border-bottom:none;}
-.p-name{color:var(--accent2,#c084fc);}.p-type{color:rgba(0,180,255,0.8);}.p-desc{color:var(--text,#c8c8e0);line-height:1.5;}
-.lib-notes-box{border:1px solid var(--border,rgba(255,255,255,0.07));background:rgba(255,255,255,0.02);padding:16px 20px;}
-.lib-note-item{display:flex;gap:10px;padding:5px 0;font-family:'Share Tech Mono',monospace;font-size:11px;line-height:1.6;color:var(--text,#c8c8e0);border-bottom:1px solid rgba(255,255,255,0.03);}
-.lib-note-item:last-child{border-bottom:none;}
-.lib-note-bullet{color:var(--accent,#8b4fc8);flex-shrink:0;}
-.lib-note-item code{font-family:'Share Tech Mono',monospace;color:var(--accent,#8b4fc8);font-size:11px;}
-.lib-conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
-.lib-conv-section{background:rgba(255,255,255,0.02);border:1px solid var(--border,rgba(255,255,255,0.07));padding:18px;}
-.lib-conv-title{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--accent,#8b4fc8);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));}
-.lib-conv-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.03);}
-.lib-conv-row:last-child{border-bottom:none;}
-.lib-conv-name{color:var(--text,#c8c8e0);font-family:'Inter',sans-serif;}
-.lib-conv-suffix{font-family:'Share Tech Mono',monospace;font-size:12px;color:#c084fc;background:rgba(192,132,252,0.08);padding:2px 8px;border:1px solid rgba(192,132,252,0.2);}
-
-/* Category badge colors */
-.cat-arnold{background:rgba(255,140,0,0.08);color:#ff8c00;border-color:rgba(255,140,0,0.25);}
-.cat-attrs{background:rgba(0,232,122,0.06);color:#00e87a;border-color:rgba(0,232,122,0.2);}
-.cat-deformers{background:rgba(139,79,200,0.1);color:#a78bfa;border-color:rgba(139,79,200,0.3);}
-.cat-ikfk{background:rgba(255,180,0,0.08);color:#ffb400;border-color:rgba(255,180,0,0.25);}
-.cat-shape{background:rgba(0,200,255,0.08);color:#00c8ff;border-color:rgba(0,200,255,0.2);}
-.cat-uvs{background:rgba(0,180,255,0.08);color:#00b4ff;border-color:rgba(0,180,255,0.2);}
-.cat-reference{background:rgba(255,255,255,0.04);color:#888899;border-color:rgba(255,255,255,0.12);}
-  /* 4K scaling — base font grows with viewport */
-  @media (min-width: 2560px) {
-    .lib-hero-title { font-size: clamp(56px, 3.2vw, 90px) !important; }
-    .lib-stats { max-width: 700px !important; }
-    .lib-stat-value { font-size: clamp(28px, 1.8vw, 40px) !important; }
-    .lib-stat-label { font-size: clamp(9px, 0.5vw, 12px) !important; }
-    .lib-index-name { font-size: clamp(17px, 1vw, 24px) !important; }
-    .lib-index-cat-badge { font-size: clamp(9px, 0.55vw, 12px) !important; min-width: 90px !important; padding: 4px 10px !important; }
-    .lib-index-desc { font-size: clamp(11px, 0.65vw, 14px) !important; }
-    .lib-index-row { padding: 16px 24px !important; }
-    .lib-sidebar-title { font-size: clamp(18px, 1.1vw, 26px) !important; }
-    .lib-sidebar { width: clamp(260px, 13vw, 380px) !important; }
-    .lib-cat-label { font-size: clamp(10px, 0.6vw, 13px) !important; }
-    .lib-nav-item { font-size: clamp(12px, 0.75vw, 16px) !important; padding: 8px 18px 8px 24px !important; }
-    .lib-home-btn { font-size: clamp(12px, 0.75vw, 16px) !important; padding: 10px 18px !important; }
-    .lib-sort-btn { font-size: clamp(9px, 0.55vw, 12px) !important; padding: 5px 12px !important; }
-    .lib-sort-label { font-size: clamp(9px, 0.55vw, 12px) !important; }
-    .lib-home-search { font-size: clamp(11px, 0.65vw, 14px) !important; }
-    .lib-hero-sub { font-size: clamp(10px, 0.6vw, 13px) !important; }
-    .lib-new-badge { font-size: clamp(9px, 0.55vw, 12px) !important; }
-    .lib-nav-new { font-size: clamp(8px, 0.5vw, 11px) !important; }
-    #lib-view-home { padding: clamp(40px, 3vw, 64px) clamp(40px, 4vw, 80px) 80px !important; }
-  }
-  @media (min-width: 3840px) {
-    .lib-hero-title { font-size: clamp(64px, 2.8vw, 110px) !important; }
-    .lib-stat-value { font-size: clamp(32px, 1.5vw, 52px) !important; }
-    .lib-sidebar { width: clamp(300px, 11vw, 440px) !important; }
-    .lib-index-name { font-size: clamp(18px, 0.9vw, 28px) !important; }
-    .lib-nav-item { font-size: clamp(13px, 0.65vw, 18px) !important; }
-  }
-</style>
 
 <script src="/assets/js/status.js"></script>
 <script src="/assets/js/nav.js"></script>
@@ -224,10 +22,9 @@
 <script src="/assets/js/banner.js"></script>
 <script src="/assets/js/lib-engine.js"></script>
 
-<!-- LOGIN GATE — reuses _navSb from nav-auth.js, no duplicate client -->
+<!-- LOGIN GATE — reuses _navSb from nav-auth.js -->
 <script>
 document.addEventListener('DOMContentLoaded', async function() {
-  // Wait for nav-auth.js to initialise _navSb
   let attempts = 0;
   while (typeof _navSb === 'undefined' && attempts++ < 40) {
     await new Promise(r => setTimeout(r, 50));
@@ -245,13 +42,20 @@ document.addEventListener('DOMContentLoaded', async function() {
   document.getElementById('page-library').style.visibility = 'visible';
   libInit();
 });
+
+function libToggleSidebar() {
+  const sidebar = document.querySelector('.lib-sidebar');
+  sidebar.classList.toggle('collapsed');
+  const btn = document.querySelector('.lib-sidebar-toggle');
+  btn.title = sidebar.classList.contains('collapsed') ? 'Expand sidebar' : 'Collapse sidebar';
+}
 </script>
 </head>
 <body>
 
 <div id="lib-gate">
   <div style="font-family:'Share Tech Mono',monospace;font-size:28px;color:rgba(139,79,200,0.2);letter-spacing:8px;">://</div>
-  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);">// Checking access...</div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:rgba(255,255,255,0.3);">// Checking access...</div>
 </div>
 
 <div id="nav-root"></div>
@@ -268,21 +72,24 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   <!-- SIDEBAR -->
   <aside class="lib-sidebar">
-    <div class="lib-sidebar-header">
-      <div class="lib-sidebar-eyebrow">Script Library</div>
-      <div class="lib-sidebar-title">AviaRigg</div>
-      <div class="lib-sidebar-sub">Maya Rigging Toolkit</div>
-    </div>
-    <div class="lib-search-wrap">
-      <input id="lib-sidebar-search" class="lib-search" type="text" placeholder="Search scripts..."
-        oninput="libSyncSearch(this.value)">
-    </div>
-    <nav class="lib-nav" id="lib-nav">
-      <div style="padding:20px 16px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--text-dim,#6a6a8a);">// Loading...</div>
-    </nav>
-    <div class="lib-sidebar-footer">
-      <a href="/pages/about" class="lib-about-link"><span style="color:var(--accent2);">◈</span> About Paul</a>
-      <div class="lib-version">AviaRigg v1.0 · Maya 2022+ // Python 3</div>
+    <button class="lib-sidebar-toggle" onclick="libToggleSidebar()" title="Collapse sidebar">&#10094;</button>
+    <div class="lib-sidebar-inner">
+      <div class="lib-sidebar-header">
+        <div class="lib-sidebar-eyebrow">Script Library</div>
+        <div class="lib-sidebar-title">AviaRigg</div>
+        <div class="lib-sidebar-sub">Maya Rigging Toolkit</div>
+      </div>
+      <div class="lib-search-wrap">
+        <input id="lib-sidebar-search" class="lib-search" type="text" placeholder="Search scripts..."
+          oninput="libSyncSearch(this.value)">
+      </div>
+      <nav class="lib-nav" id="lib-nav">
+        <div style="padding:20px 16px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);">// Loading...</div>
+      </nav>
+      <div class="lib-sidebar-footer">
+        <a href="/pages/about" class="lib-about-link"><span style="color:var(--accent2);">◈</span> About Paul</a>
+        <div class="lib-version">AviaRigg v1.0 · Maya 2022+ // Python 3</div>
+      </div>
     </div>
   </aside>
 
@@ -298,51 +105,55 @@ document.addEventListener('DOMContentLoaded', async function() {
     </div>
 
     <!-- HOME VIEW -->
-    <div id="lib-view-home" style="padding:40px 40px 60px;">
-      <div class="lib-hero-title">MAYA <span>SCRIPT</span><br>LIBRARY</div>
-      <div class="lib-hero-sub">// AviaRigg Personal Reference &mdash; Maya 2026 // Python 3</div>
+    <div id="lib-view-home">
+      <div class="lib-home-content">
 
-      <div class="lib-stats">
-        <div class="lib-stat">
-          <div class="lib-stat-icon">II</div>
-          <div class="lib-stat-value" id="stat-count">—</div>
-          <div class="lib-stat-label">Total Scripts</div>
-        </div>
-        <div class="lib-stat">
-          <div class="lib-stat-icon">◆</div>
-          <div class="lib-stat-value">Python 3</div>
-          <div class="lib-stat-label">Language</div>
-        </div>
-        <div class="lib-stat">
-          <div class="lib-stat-icon">○</div>
-          <div class="lib-stat-value">2022+</div>
-          <div class="lib-stat-label">Maya Version</div>
-        </div>
-      </div>
+        <div class="lib-hero-title">MAYA <span>SCRIPT</span><br>LIBRARY</div>
+        <div class="lib-hero-sub">// AviaRigg Personal Reference &mdash; Maya 2026 // Python 3</div>
 
-      <div class="lib-controls">
-        <div class="lib-sort-wrap">
-          <span class="lib-sort-label">Sort</span>
-          <button class="lib-sort-btn active" onclick="libSetSort('newest',this)">Newest</button>
-          <button class="lib-sort-btn" onclick="libSetSort('oldest',this)">Oldest</button>
-          <button class="lib-sort-btn" onclick="libSetSort('name-az',this)">A → Z</button>
-          <button class="lib-sort-btn" onclick="libSetSort('name-za',this)">Z → A</button>
-          <button class="lib-sort-btn" onclick="libSetSort('category',this)">Category</button>
+        <div class="lib-stats">
+          <div class="lib-stat">
+            <div class="lib-stat-icon">II</div>
+            <div class="lib-stat-value" id="stat-count">—</div>
+            <div class="lib-stat-label">Total Scripts</div>
+          </div>
+          <div class="lib-stat">
+            <div class="lib-stat-icon">◆</div>
+            <div class="lib-stat-value">Python 3</div>
+            <div class="lib-stat-label">Language</div>
+          </div>
+          <div class="lib-stat">
+            <div class="lib-stat-icon">○</div>
+            <div class="lib-stat-value">2022+</div>
+            <div class="lib-stat-label">Maya Version</div>
+          </div>
         </div>
-        <div class="lib-home-search-wrap">
-          <div class="lib-search-icon">⌕</div>
-          <input id="lib-home-search" class="lib-home-search" type="text"
-            placeholder="Search scripts..."
-            oninput="libSyncSearch(this.value)">
-        </div>
-      </div>
 
-      <div class="lib-index-header">
-        <div class="lib-index-label">// Script Index</div>
-        <div class="lib-index-meta" id="lib-index-meta"></div>
-      </div>
-      <div class="lib-index" id="lib-index">
-        <div style="padding:32px 20px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--text-dim,#6a6a8a);text-align:center;">// Loading scripts...</div>
+        <div class="lib-controls">
+          <div class="lib-sort-wrap">
+            <span class="lib-sort-label">Sort</span>
+            <button class="lib-sort-btn active" onclick="libSetSort('newest',this)">Newest</button>
+            <button class="lib-sort-btn" onclick="libSetSort('oldest',this)">Oldest</button>
+            <button class="lib-sort-btn" onclick="libSetSort('name-az',this)">A → Z</button>
+            <button class="lib-sort-btn" onclick="libSetSort('name-za',this)">Z → A</button>
+            <button class="lib-sort-btn" onclick="libSetSort('category',this)">Category</button>
+          </div>
+          <div class="lib-home-search-wrap">
+            <div class="lib-search-icon">⌕</div>
+            <input id="lib-home-search" class="lib-home-search" type="text"
+              placeholder="Search scripts..."
+              oninput="libSyncSearch(this.value)">
+          </div>
+        </div>
+
+        <div class="lib-index-header">
+          <div class="lib-index-label">// Script Index</div>
+          <div class="lib-index-meta" id="lib-index-meta"></div>
+        </div>
+        <div class="lib-index" id="lib-index">
+          <div style="padding:32px 20px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.3);text-align:center;">// Loading scripts...</div>
+        </div>
+
       </div>
     </div>
 
