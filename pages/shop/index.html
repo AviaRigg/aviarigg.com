@@ -1679,8 +1679,8 @@ function swapHeroCard(cardEl) {
   // Build price HTML
   function buildHeroPriceHtml(price, salePrice, priceSub) {
     if (salePrice && salePrice.trim()) {
-      const parseNum = s => parseFloat(String(s || '').replace(/[^0-9.]/g, '')) || 0;
-      const p = parseNum(price), s = parseNum(salePrice);
+      const normalize = s => String(s || '').replace(',', '.').replace(/[^0-9.]/g, '');
+      const p = parseFloat(normalize(price)), s = parseFloat(normalize(salePrice));
       const pct = (p && s && s < p) ? Math.round((1 - s/p)*100) : 0;
       return `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <div>
@@ -1780,48 +1780,62 @@ function updateScanHeights() {
 window.addEventListener('resize', updateScanHeights);
 // ── PRICE / DISCOUNT HELPERS ──
 function calcDiscount(price, salePrice) {
-  // Parse numeric value from strings like "€19.99" or "19.99"
-  const parseNum = s => parseFloat(String(s || '').replace(/[^0-9.]/g, '')) || 0;
+  // Handle commas as decimal separator (19,99 → 19.99), strip everything else except digits and dot
+  const normalize = s => String(s || '').replace(',', '.').replace(/[^0-9.]/g, '');
+  const parseNum = s => parseFloat(normalize(s)) || 0;
   const p = parseNum(price), s = parseNum(salePrice);
   if (!p || !s || s >= p) return 0;
   return Math.round((1 - s / p) * 100);
 }
 
 function applyPriceToCard(card, price, salePrice) {
-  const footer = card.querySelector('.pc-footer');
-  if (!footer) return;
-  const priceEl = footer.querySelector('.pc-price');
-  if (!priceEl) return;
+  try {
+    const footer = card.querySelector('.pc-footer');
+    if (!footer) return;
+    const priceEl = footer.querySelector('.pc-price');
+    if (!priceEl) return; // Coming Soon cards have no price element — skip safely
 
-  if (salePrice && salePrice.trim()) {
-    const pct = calcDiscount(price, salePrice);
-    const badgeHtml = pct > 0 ? `<span class="pc-sale-badge">-${pct}%</span>` : '';
-    priceEl.outerHTML = `<div class="pc-price-wrap">
-      <div class="pc-price-original">${price || ''}</div>
-      <div class="pc-price-sale">${salePrice}</div>
-      ${badgeHtml}
-    </div>`;
-  } else if (price && price.trim()) {
-    // Normal price — just update text
-    priceEl.textContent = price;
+    if (salePrice && String(salePrice).trim()) {
+      const pct = calcDiscount(price, salePrice);
+      const badgeHtml = pct > 0 ? `<span class="pc-sale-badge">-${pct}%</span>` : '';
+      // Use insertAdjacentHTML instead of outerHTML to avoid DOM detachment issues
+      const wrapper = document.createElement('div');
+      wrapper.className = 'pc-price-wrap';
+      wrapper.innerHTML = `
+        <div class="pc-price-original">${price || ''}</div>
+        <div class="pc-price-sale">${salePrice}</div>
+        ${badgeHtml}`;
+      priceEl.replaceWith(wrapper);
+    } else if (price && String(price).trim()) {
+      priceEl.textContent = price;
+    }
+  } catch(e) {
+    console.warn('applyPriceToCard error for', card?.dataset?.productId, e);
   }
 }
 
 function applyHeroPrice(price, salePrice) {
-  const heroPriceEl = document.querySelector('.hero-price');
-  if (!heroPriceEl) return;
-  if (salePrice && salePrice.trim()) {
-    const pct = calcDiscount(price, salePrice);
-    const badgeHtml = pct > 0 ? `<span class="hero-sale-badge">-${pct}%</span>` : '';
-    heroPriceEl.outerHTML = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <div>
+  try {
+    // Hero price element may have been replaced already — use a broader selector
+    const heroFooter = document.querySelector('.hero-footer');
+    if (!heroFooter) return;
+    // Find the price container — could be .hero-price or a replaced div
+    const priceContainer = heroFooter.querySelector('.hero-price, .hero-price-sale, .hero-price-original');
+    const targetEl = priceContainer ? priceContainer.closest('div') || priceContainer : heroFooter.querySelector('div');
+    if (!targetEl) return;
+
+    if (salePrice && String(salePrice).trim()) {
+      const pct = calcDiscount(price, salePrice);
+      const badgeHtml = pct > 0 ? `<span class="hero-sale-badge">-${pct}%</span>` : '';
+      targetEl.innerHTML = `
         <div class="hero-price-original">${price || ''}</div>
         <div class="hero-price-sale">${salePrice}</div>
-      </div>
-      ${badgeHtml}
-    </div>`;
-  } else if (price && price.trim()) {
-    heroPriceEl.textContent = price;
+        ${badgeHtml}`;
+    } else if (price && String(price).trim()) {
+      targetEl.innerHTML = `<div class="hero-price">${price}</div>`;
+    }
+  } catch(e) {
+    console.warn('applyHeroPrice error:', e);
   }
 }
 
@@ -1861,10 +1875,14 @@ async function loadProductStatuses() {
         }
       }
       // Update price/sale_price from Supabase
-      if (price) card.dataset.price = price;
-      if (sale_price) card.dataset.salePrice = sale_price;
-      else delete card.dataset.salePrice;
-      applyPriceToCard(card, price, sale_price);
+      try {
+        if (price) card.dataset.price = price;
+        if (sale_price) card.dataset.salePrice = sale_price;
+        else delete card.dataset.salePrice;
+        applyPriceToCard(card, price, sale_price);
+      } catch(e) {
+        console.warn('Price apply failed for', id, e);
+      }
     });
   }
 
