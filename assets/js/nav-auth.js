@@ -264,63 +264,42 @@ async function _submitRedeemKey() {
   status.textContent = '';
 
   try {
-    // 1. Look up the key
-    const { data: keyRow, error: keyErr } = await _navSb
-      .from('license_keys')
-      .select('key, redeemed, redeemed_by')
-      .eq('key', key)
-      .single();
+    // Single edge function call — handles key check, mark redeemed, role upgrade
+    // all server-side with service role key (bypasses RLS on profiles)
+    const { data, error } = await _navSb.functions.invoke('redeem-key', {
+      body: { key }
+    })
 
-    if (keyErr || !keyRow) {
-      _redeemError(status, btn, input, '// Key not found — check for typos');
-      return;
+    if (error) {
+      _redeemError(status, btn, input, '// Server error — email contact@aviarigg.com')
+      console.error('redeem-key fn error:', error)
+      return
     }
 
-    if (keyRow.redeemed) {
-      // Check if it was redeemed by THIS user (already a buyer)
-      if (keyRow.redeemed_by === _navUser.id) {
-        _redeemError(status, btn, input, '// You already redeemed this key');
-      } else {
-        _redeemError(status, btn, input, '// This key has already been used');
-      }
-      return;
+    // Map server error codes to friendly messages
+    const errMap = {
+      key_not_found:         '// Key not found — check for typos',
+      already_redeemed:      '// This key has already been used',
+      already_redeemed_self: '// You already redeemed this key',
+      already_buyer:         '// Your account already has Buyer access',
+      role_upgrade_failed:   '// Upgrade failed — email contact@aviarigg.com',
+      server_error:          '// Server error — email contact@aviarigg.com',
     }
 
-    // 2. Mark key as redeemed
-    const { error: updateErr } = await _navSb
-      .from('license_keys')
-      .update({
-        redeemed: true,
-        redeemed_by: _navUser.id,
-        redeemed_at: new Date().toISOString()
-      })
-      .eq('key', key)
-      .eq('redeemed', false); // extra safety — prevents race condition
-
-    if (updateErr) {
-      _redeemError(status, btn, input, '// Redemption failed — try again');
-      console.error('Key update error:', updateErr);
-      return;
+    if (data?.error) {
+      _redeemError(status, btn, input, errMap[data.error] || '// Error — email contact@aviarigg.com')
+      return
     }
 
-    // 3. Upgrade user role to buyer
-    const { error: roleErr } = await _navSb
-      .from('profiles')
-      .update({ role: 'buyer', updated_at: new Date().toISOString() })
-      .eq('id', _navUser.id);
-
-    if (roleErr) {
-      _redeemError(status, btn, input, '// Role upgrade failed — contact support');
-      console.error('Role update error:', roleErr);
-      return;
+    if (data?.success) {
+      _redeemSuccess(status, btn, input)
+    } else {
+      _redeemError(status, btn, input, '// Unexpected response — email contact@aviarigg.com')
     }
-
-    // 4. Success!
-    _redeemSuccess(status, btn, input);
 
   } catch (err) {
     console.error('Redeem error:', err);
-    _redeemError(status, btn, input, '// Unexpected error — try again');
+    _redeemError(status, btn, input, '// Unexpected error — email contact@aviarigg.com');
   }
 }
 
