@@ -44,15 +44,29 @@ let _randomSeed = []; // persists random order for current session
 // ── INIT ──
 
 async function libInit() {
-  // Wait for nav-auth to resolve
-  await new Promise(resolve => {
-    if (typeof _navUser !== 'undefined') { resolve(); return; }
-    document.addEventListener('navAuthReady', resolve, { once: true });
-    setTimeout(resolve, 2000); // fallback
-  });
-
-  _isAdmin = window._navIsAdmin || false;
-  _isBuyer = window._navIsBuyer || false;
+  // Read role — navAuthReady may have already fired by the time libInit() is called
+  // so always prefer the globals which are set synchronously before the event
+  if (typeof window._navIsBuyer !== 'undefined') {
+    // Event already fired — globals are up to date
+    _isAdmin = window._navIsAdmin || false;
+    _isBuyer = window._navIsBuyer || false;
+  } else {
+    // Wait for it
+    await new Promise(resolve => {
+      document.addEventListener('navAuthReady', (e) => {
+        if (e.detail) {
+          _isAdmin = e.detail.isAdmin || false;
+          _isBuyer = e.detail.isBuyer || false;
+        }
+        resolve();
+      }, { once: true });
+      setTimeout(() => {
+        _isAdmin = window._navIsAdmin || false;
+        _isBuyer = window._navIsBuyer || false;
+        resolve();
+      }, 3000);
+    });
+  }
   console.log('[lib] init — isAdmin:', _isAdmin, 'isBuyer:', _isBuyer, '_navSb:', typeof _navSb);
 
   _sb = _navSb; // always use the shared nav-auth client — never create a new one
