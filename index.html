@@ -9,6 +9,73 @@
 <style>
   .page { display: block !important; }
   .nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
+  /* ── Shop card thumbnail ── */
+  .work-card-graphic--shop-thumb {
+    position: relative;
+    width: 100%;
+    flex: 1;
+    overflow: hidden;
+    background: #0a0a0f;
+  }
+  .wcg-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .work-card--has-thumb:hover .wcg-thumb-img {
+    transform: scale(1.04);
+  }
+  .wcg-thumb-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.15) 0%,
+      rgba(0,0,0,0.05) 40%,
+      rgba(0,0,0,0.55) 100%
+    );
+  }
+  .wcg-thumb-badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 6px;
+  }
+  .wcg-thumb-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(8px, 0.6vw, 10px);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border: 1px solid;
+  }
+  .wcg-thumb-badge--store {
+    color: var(--accent);
+    border-color: rgba(139,79,200,0.6);
+    background: rgba(139,79,200,0.15);
+  }
+  .wcg-thumb-badge--type {
+    color: var(--text-dim);
+    border-color: rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.4);
+  }
+  .wcg-thumb-price {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(9px, 0.75vw, 12px);
+    letter-spacing: 2px;
+    color: var(--text-bright);
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 3px 10px;
+  }
+
   #lib-mobile-toast {
     position: fixed;
     bottom: 32px;
@@ -125,19 +192,19 @@
       </a>
 
       <!-- Card 2: Shop -->
-      <a class="work-card" href="/pages/shop">
+      <a class="work-card work-card--has-thumb" href="/pages/shop">
         <div class="work-top">
           <div class="work-num">02</div>
           <div class="work-cat">Store</div>
         </div>
-        <div class="work-card-graphic work-card-graphic--shop">
-          <div class="wcg-code">
-            <div class="wcg-code-line"><span class="wcg-kw">def</span> <span class="wcg-fn">build_rig</span>(geo):</div>
-            <div class="wcg-code-line wcg-indent"><span class="wcg-kw">ctrl</span> = create_control()</div>
-            <div class="wcg-code-line wcg-indent"><span class="wcg-kw">skin</span> = bind_skin(geo)</div>
-            <div class="wcg-code-line wcg-indent wcg-dim"># automate pipeline</div>
-            <div class="wcg-code-line wcg-indent"><span class="wcg-kw">return</span> <span class="wcg-fn">ctrl</span></div>
+        <div class="work-card-graphic work-card-graphic--shop-thumb">
+          <img class="wcg-thumb-img" src="/projects/f1_SF26/images/SF26_Rendered.png" alt="SF-26 Rig" onerror="this.style.display='none'">
+          <div class="wcg-thumb-overlay"></div>
+          <div class="wcg-thumb-badges">
+            <span class="wcg-thumb-badge wcg-thumb-badge--store">&#9632; Store</span>
+            <span class="wcg-thumb-badge wcg-thumb-badge--type">Maya Rig</span>
           </div>
+          <div class="wcg-thumb-price">from €19</div>
         </div>
         <div class="work-bottom">
           <div class="work-bar-wrap"><div class="work-bar" style="width:60%"></div></div>
