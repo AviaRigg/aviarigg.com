@@ -329,7 +329,7 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
     _getShopSb().then(sb => {
       sb.from('shop_products')
         .upsert({ id: productId, status: newStatus, updated_at: new Date().toISOString() })
-        .then(({ error }) => { if (error) console.error('Save error:', error); });
+        .then(({ error }) => { if (error) console.error('Status save error for', productId, error); else console.log('Status saved:', productId, '->', newStatus); });
     });
   }
 
@@ -392,12 +392,15 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
     cardEl.setAttribute('data-onclick-disabled', cardEl.getAttribute('onclick') || '');
     cardEl.removeAttribute('onclick');
     cardEl.querySelectorAll('.shop-buy-btn, .comm-btn-primary, .comm-btn-outline[href*="payhip"]').forEach(btn => {
-      btn.setAttribute('data-real-href', btn.href || btn.getAttribute('onclick') || '');
-      btn.setAttribute('onclick', "event.preventDefault();event.stopPropagation();window.location.href='/pages/not-available?reason=draft'");
+      btn.setAttribute('data-real-onclick', btn.getAttribute('onclick') || '');
+      btn.setAttribute('data-real-href', btn.href || '');
+      btn.removeAttribute('onclick');
       btn.href = '#';
-      btn.style.opacity = '0.4';
+      btn.style.opacity = '0.35';
       btn.style.cursor = 'not-allowed';
+      btn.style.pointerEvents = 'none';
     });
+
   } else if (newStatus === 'hidden') {
     cardEl.dataset.cat = originalCat;
     cardEl.classList.remove('dim');
@@ -487,7 +490,28 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
     cardEl.style.cursor = '';
     const savedOnclick = cardEl.getAttribute('data-onclick-disabled');
     if (savedOnclick) { cardEl.setAttribute('onclick', savedOnclick); cardEl.removeAttribute('data-onclick-disabled'); }
+    else if (cardEl.dataset.href && cardEl.dataset.href !== '#') cardEl.setAttribute('onclick', `window.location.href='${cardEl.dataset.href}'`);
     cardEl.querySelectorAll('.shop-buy-btn').forEach(btn => { btn.style.opacity = ''; btn.style.cursor = ''; });
+    // Restore buy button — undo draft greying
+    const footer = cardEl.querySelector('.pc-footer');
+    if (footer) {
+      const buyBtn = footer.querySelector('.shop-buy-btn');
+      const buyUrl = cardEl.dataset.buyUrl;
+      if (buyBtn) {
+        buyBtn.style.opacity = '';
+        buyBtn.style.cursor = '';
+        buyBtn.style.pointerEvents = '';
+        if (buyUrl && buyUrl !== '#') {
+          buyBtn.href = buyUrl;
+          buyBtn.setAttribute('onclick', `event.preventDefault();event.stopPropagation();openCheckout('${buyUrl}')`);
+        } else {
+          // No URL yet — keep greyed
+          buyBtn.style.opacity = '0.35';
+          buyBtn.style.cursor = 'not-allowed';
+          buyBtn.style.pointerEvents = 'none';
+        }
+      }
+    }
     if (wasFeatured) {
       const stillFeatured = document.querySelector('[data-product-id][data-status="featured"]');
       if (!stillFeatured) showHeroEmpty();

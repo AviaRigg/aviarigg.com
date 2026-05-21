@@ -152,7 +152,7 @@ function buildProductCard({ id, name, cat, catSlug, status, price, salePrice, bu
 
   const buyHtml = buyUrl && buyUrl !== '#'
     ? `<a href="${buyUrl}" class="shop-buy-btn" onclick="event.preventDefault();event.stopPropagation();openCheckout('${buyUrl}')">Buy &#8594;</a>`
-    : `<span class="pc-badge">Coming Soon</span>`;
+    : `<a href="#" class="shop-buy-btn" style="opacity:0.35;cursor:not-allowed;pointer-events:none;">Buy &#8594;</a>`;
 
   const div = document.createElement('div');
   div.className = 'product-card';
