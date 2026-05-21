@@ -239,7 +239,7 @@ async function loadProductStatuses() {
   const sb = await _getShopSb();
   const { data: products } = await sb
     .from('shop_products')
-    .select('id, status, position, cat, name, price, sale_price')
+    .select('id, status, position, cat, name, price, sale_price, buy_url, img, href')
     .order('position', { ascending: true, nullsFirst: false })
     .order('id');
   if (!products) return;
@@ -251,11 +251,23 @@ async function loadProductStatuses() {
   };
 
   if (grid) {
-    products.forEach(({ id, cat, name, status, price, sale_price }) => {
+    products.forEach(({ id, cat, name, status, price, sale_price, buy_url, img, href }) => {
       if (id === 'hero-featured') return;
-      const card = document.querySelector(`[data-product-id="${id}"]`);
-      if (!card) return;
-      grid.appendChild(card);
+      let card = document.querySelector(`[data-product-id="${id}"]`);
+      // Card not in HTML — was added via modal; rebuild it from DB data
+      if (!card) {
+        if (typeof buildProductCard !== 'function') return;
+        const catSlug = catSlugMap[cat] || 'tool';
+        card = buildProductCard({
+          id, name: name || id, cat: cat || 'Maya Rig', catSlug,
+          status: status || 'draft',
+          price: price || '', salePrice: sale_price || '',
+          buyUrl: buy_url || '', img: img || '', href: href || '', desc: ''
+        });
+        grid.appendChild(card);
+      } else {
+        grid.appendChild(card);
+      }
       if (name) {
         const titleEl = card.querySelector('.pc-title');
         if (titleEl) titleEl.textContent = name;
@@ -281,6 +293,10 @@ async function loadProductStatuses() {
       } catch(e) {
         console.warn('Price apply failed for', id, e);
       }
+      // Sync URL fields from DB onto existing hardcoded cards too
+      if (buy_url) { card.dataset.buyUrl = buy_url; const btn = card.querySelector('.shop-buy-btn'); if (btn) { btn.href = buy_url; btn.setAttribute('onclick', `event.preventDefault();event.stopPropagation();openCheckout('${buy_url}')`); } }
+      if (img)     { card.dataset.img = img; const imgEl = card.querySelector('.pc-img'); if (imgEl) imgEl.src = img; }
+      if (href)    { card.dataset.href = href; if (!card.getAttribute('onclick')?.includes('disabled')) card.setAttribute('onclick', `window.location.href='${href}'`); }
     });
   }
 
