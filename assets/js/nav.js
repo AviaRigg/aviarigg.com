@@ -111,9 +111,6 @@ async function checkMaintenanceMode() {
     const isOn = map['maintenance_mode'] === 'true';
 
     if (isOn) {
-      // Grey out nav links for shop + portfolio
-      applyMaintenanceNav(true);
-
       // Show splash if on a maintenance page
       const path = window.location.pathname;
       const isRestricted = MAINTENANCE_PAGES.some(p => path.startsWith(p));
@@ -124,24 +121,6 @@ async function checkMaintenanceMode() {
   } catch(e) {
     console.warn('Maintenance check failed:', e);
   }
-}
-
-function applyMaintenanceNav(on) {
-  MAINTENANCE_PAGES.forEach(href => {
-    document.querySelectorAll(`[data-nav-key="${href}"]`).forEach(el => {
-      if (on) {
-        el.style.opacity = '0.35';
-        el.style.pointerEvents = 'none';
-        el.style.cursor = 'not-allowed';
-        el.title = 'Under maintenance';
-      } else {
-        el.style.opacity = '';
-        el.style.pointerEvents = '';
-        el.style.cursor = '';
-        el.title = '';
-      }
-    });
-  });
 }
 
 function showMaintenanceSplash(sinceIso) {
