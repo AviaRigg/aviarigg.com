@@ -794,7 +794,34 @@
     }
     body.edit-mode .product-card { overflow: visible !important; }
     body.edit-mode .product-card::before { display: none; }
-    .pc-thumb { position: relative; }
+    /* ── COMING SOON WATERMARK (draft cards with thumbnails) ── */
+  .shop-coming-soon-watermark {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px;
+    pointer-events: none; z-index: 4;
+    background: rgba(0,0,0,0.55);
+  }
+  .shop-coming-soon-watermark-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(16px, 2vw, 28px);
+    font-weight: 700; letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.9);
+    text-shadow: 0 2px 20px rgba(0,0,0,0.9);
+    border: 2px solid rgba(255,255,255,0.3);
+    padding: 6px 20px;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(3px);
+  }
+  .shop-coming-soon-watermark-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(8px, 0.65vw, 10px);
+    letter-spacing: 4px; text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .pc-thumb { position: relative; }
     /* Ensure dropdown appears above everything */
     .admin-status-dropdown {
       position: relative; z-index: 200;
@@ -1267,8 +1294,12 @@
           <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('f1-sf26-rig','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button><button class="admin-status-option opt-early" onclick="event.stopPropagation();setProductStatus('f1-sf26-rig','early',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">EARLY</button>
           </div>
         </div>
-          <div class="pc-thumb">
-            <div class="admin-placeholder" style="display:flex;align-items:center;justify-content:center;height:100%;font-family:'Share Tech Mono',monospace;font-size:clamp(11px,1vw,14px);letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);">// Coming Soon</div>
+          <div class="pc-thumb" style="position:relative;">
+            <img class="pc-img" src="/projects/SF26/images/SF26ComingSoonThumbnail.png" alt="Formula 1 SF-26 Rig" style="width:100%;height:100%;object-fit:cover;display:block;">
+            <div class="shop-coming-soon-watermark">
+              <div class="shop-coming-soon-watermark-text">Coming Soon</div>
+              <div class="shop-coming-soon-watermark-sub">// Stay tuned</div>
+            </div>
             <div class="pc-tag">// Hard Surface</div>
           </div>
           <div class="pc-body">
@@ -1293,8 +1324,12 @@
           <button class="admin-status-option opt-featured" onclick="event.stopPropagation();setProductStatus('f1-sf26-model','featured',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">FEATURED</button><button class="admin-status-option opt-early" onclick="event.stopPropagation();setProductStatus('f1-sf26-model','early',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">EARLY</button>
           </div>
         </div>
-          <div class="pc-thumb">
-            <div class="admin-placeholder" style="display:flex;align-items:center;justify-content:center;height:100%;font-family:'Share Tech Mono',monospace;font-size:clamp(11px,1vw,14px);letter-spacing:3px;text-transform:uppercase;color:var(--text-dim,#6a6a8a);">// Coming Soon</div>
+          <div class="pc-thumb" style="position:relative;">
+            <img class="pc-img" src="/projects/SF26/images/SF26ComingSoonThumbnail.png" alt="Formula 1 SF-26 Model" style="width:100%;height:100%;object-fit:cover;display:block;">
+            <div class="shop-coming-soon-watermark">
+              <div class="shop-coming-soon-watermark-text">Coming Soon</div>
+              <div class="shop-coming-soon-watermark-sub">// Stay tuned</div>
+            </div>
             <div class="pc-tag">// Hard Surface</div>
           </div>
           <div class="pc-body">
@@ -1932,6 +1967,21 @@ async function loadProductStatuses() {
       } catch(e) {
         console.warn('Price apply failed for', id, e);
       }
+
+      // Grey out buy button if no payhip link
+      const buyUrl = card.dataset.buyUrl || '';
+      const hasPayLink = buyUrl && buyUrl !== '#' && buyUrl.includes('payhip');
+      const buyBtn = card.querySelector('.shop-buy-btn');
+      if (buyBtn && !hasPayLink) {
+        buyBtn.style.opacity = '0.35';
+        buyBtn.style.cursor = 'not-allowed';
+        buyBtn.style.pointerEvents = 'none';
+        buyBtn.textContent = 'Coming Soon';
+      } else if (buyBtn && hasPayLink) {
+        buyBtn.style.opacity = '';
+        buyBtn.style.cursor = '';
+        buyBtn.style.pointerEvents = '';
+      }
     });
   }
 
@@ -1993,19 +2043,39 @@ function applyStatusToCard(productId, newStatus, cardEl, save = true) {
   const thumb = cardEl.querySelector('.pc-thumb');
   if (thumb) {
     const img = thumb.querySelector('.pc-img');
-    const placeholder = thumb.querySelector('.pc-placeholder');
     if (newStatus === 'draft') {
-      if (img) { img.dataset.realSrc = img.dataset.realSrc || img.src; img.style.display = 'none'; }
-      if (!thumb.querySelector('.admin-placeholder')) {
-        const ph = document.createElement('div');
-        ph.className = 'pc-placeholder admin-placeholder';
-        ph.textContent = '// Coming Soon';
-        thumb.appendChild(ph);
+      const hasRealImg = cardEl.dataset.img && cardEl.dataset.img.trim() !== '' && cardEl.dataset.img !== '#';
+      if (hasRealImg) {
+        // Has thumbnail — show it but add Coming Soon watermark on top
+        if (img) { if (img.dataset.realSrc) img.src = img.dataset.realSrc; img.style.display = ''; }
+        if (!thumb.querySelector('.shop-coming-soon-watermark')) {
+          const wm = document.createElement('div');
+          wm.className = 'shop-coming-soon-watermark';
+          wm.innerHTML = `
+            <div class="shop-coming-soon-watermark-text">Coming Soon</div>
+            <div class="shop-coming-soon-watermark-sub">// Stay tuned</div>`;
+          thumb.appendChild(wm);
+        }
+        // Hide old text placeholder if present
+        const ph = thumb.querySelector('.admin-placeholder');
+        if (ph) ph.style.display = 'none';
+      } else {
+        // No thumbnail — hide image and show text
+        if (img) { img.dataset.realSrc = img.dataset.realSrc || img.src; img.style.display = 'none'; }
+        if (!thumb.querySelector('.admin-placeholder')) {
+          const ph = document.createElement('div');
+          ph.className = 'pc-placeholder admin-placeholder';
+          ph.textContent = '// Coming Soon';
+          thumb.appendChild(ph);
+        }
       }
     } else {
       if (img) { if (img.dataset.realSrc) img.src = img.dataset.realSrc; img.style.display = ''; }
       const ph = thumb.querySelector('.admin-placeholder');
       if (ph) ph.style.display = 'none';
+      const wm = thumb.querySelector('.shop-coming-soon-watermark');
+      if (wm) wm.remove();
+      const placeholder = thumb.querySelector('.pc-placeholder');
       if (placeholder && !placeholder.classList.contains('admin-placeholder')) placeholder.style.display = 'none';
     }
   }
