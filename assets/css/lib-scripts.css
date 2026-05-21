@@ -17,6 +17,12 @@
   }
 }
 
+/* ── OVERRIDE global .page padding on library ── */
+#page-library {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
 /* ── GATE ── */
 #lib-gate {
   position: fixed; inset: 0; z-index: 9998;
@@ -30,6 +36,16 @@
   display: flex; width: 100%;
   height: calc(100vh - var(--nav-h, 60px));
   overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Force sidebar to start at very top of lib-page */
+.lib-sidebar {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  align-self: flex-start;
+  height: 100%;
 }
 
 /* ── SIDEBAR ── */
@@ -42,6 +58,7 @@
   overflow: visible;
   transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
   position: relative;
+  height: 100%;
 }
 .lib-sidebar.collapsed {
   width: 0 !important;
