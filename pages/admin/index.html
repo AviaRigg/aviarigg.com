@@ -215,6 +215,8 @@
 
   /* ── ITEM ROWS (products / portfolio) ── */
   .item-list { display: flex; flex-direction: column; gap: 1px; }
+  /* Transparent wrapper on desktop — children slot directly into the grid */
+  .item-row-footer { display: contents; }
   /* ── DRAG HANDLE ── */
   .drag-handle {
     cursor: grab; color: var(--text-dim); font-size: 14px;
@@ -478,7 +480,168 @@
     .item-price, .item-sale-price { font-size: 32px; }
   }
 
-  /* ── HINT TEXT ── */
+  /* ════════════════════════════════════════════
+     MOBILE ADMIN — max-width: 768px
+     ════════════════════════════════════════════ */
+  @media (max-width: 768px) {
+
+    /* ── Wrap & header ── */
+    .admin-wrap { width: 100%; padding: 20px 16px 60px; }
+    .admin-header { margin-bottom: 28px; gap: 12px; }
+    .admin-last-updated { display: none; }
+    .section-h { font-size: clamp(28px, 8vw, 40px) !important; }
+
+    /* ── Stats ── */
+    .admin-stats-grid { grid-template-columns: repeat(2,1fr); gap: 1px; }
+    .stat-value { font-size: clamp(26px, 6vw, 36px); }
+    .stat-label { font-size: 8px; }
+
+    /* ── Section labels ── */
+    .admin-section-label { font-size: 9px; letter-spacing: 3px; padding: 10px 0; }
+
+    /* ── 2-col panels → single col ── */
+    .admin-row { grid-template-columns: 1fr; }
+    .admin-panel { padding: 16px; }
+    .admin-full { padding: 0; }
+    .admin-gap { height: 24px; }
+
+    /* ── Toggle rows ── */
+    .toggle-row-name { font-size: 15px; }
+    .toggle-row-desc { font-size: 8px; }
+
+    /* ══ PRODUCT / PORTFOLIO ROWS ══
+       Collapse 7-col grid → stacked card layout */
+    .item-list-header { display: none; } /* hide column headers on mobile */
+
+    .item-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-top: none;
+      background: var(--surface2);
+    }
+    .item-row:first-child { border-top: 1px solid var(--border); }
+
+    /* Top bar: drag + number + cat + status pill + link */
+    .item-row > * { padding: 0; }
+    .item-row > .drag-handle { display: none; } /* hide drag on mobile */
+    .item-row > .item-num { display: none; }
+
+    /* Reorder children via order property */
+    .cat-wrap   { order: 1; }
+    .item-name  { order: 2; }
+    .item-price-wrap { order: 3; }
+    .pill-wrap  { order: 4; }
+    .item-link  { order: 5; }
+
+    /* Cat: small top label */
+    .cat-wrap {
+      padding: 8px 12px 4px;
+      border-bottom: none;
+    }
+    .item-cat {
+      font-size: 8px; letter-spacing: 3px;
+      color: var(--accent2);
+    }
+
+    /* Name: prominent */
+    .item-name {
+      font-size: 16px; font-weight: 700;
+      padding: 2px 12px 10px;
+      white-space: normal;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Price fields: side by side, full width */
+    .item-price-wrap {
+      display: flex; flex-direction: row;
+      margin: 0; height: auto;
+      border-bottom: 1px solid var(--border);
+    }
+    .item-price-field {
+      flex: 1; padding: 8px 12px; gap: 2px;
+      border-left: none;
+    }
+    .item-price-field + .item-price-field {
+      border-left: 1px solid var(--border);
+    }
+    .item-price-label { font-size: 7px; letter-spacing: 2px; }
+    .item-price, .item-sale-price { font-size: 17px; }
+
+    /* Bottom bar: status pill + link arrow side by side */
+    .item-row-footer {
+      display: flex; align-items: stretch;
+      border-top: 1px solid var(--border);
+    }
+    .pill-wrap {
+      flex: 1; display: flex; align-items: center;
+      padding: 10px 12px;
+    }
+    .item-link {
+      padding: 10px 16px;
+      border-left: 1px solid var(--border);
+      font-size: 14px; display: flex; align-items: center;
+    }
+
+    /* pill dropdowns */
+    .pill-dropdown, .cat-dropdown {
+      left: 0; right: auto;
+      min-width: 120px;
+    }
+
+    /* ══ USER TABLE → stacked cards ══ */
+    .user-table thead { display: none; }
+    .user-table, .user-table tbody,
+    .user-table tr, .user-table td {
+      display: block; width: 100%;
+    }
+    .user-table tr {
+      border: 1px solid var(--border);
+      border-top: none;
+      padding: 12px 14px;
+      display: flex; flex-wrap: wrap;
+      align-items: center; gap: 8px;
+      background: var(--surface2);
+    }
+    .user-table tr:first-child { border-top: 1px solid var(--border); }
+    .user-table tr:hover td { background: transparent; }
+    .user-table td {
+      padding: 0; border: none;
+      background: transparent !important;
+    }
+    /* Username takes full row */
+    .user-table td:first-child { width: 100%; }
+    /* Role, key, date, action inline */
+    .user-table td:not(:first-child) { flex-shrink: 0; }
+    .user-email-sub { font-size: 9px; }
+    .user-date { font-size: 9px; letter-spacing: 1px; }
+    .user-del-btn { padding: 4px 10px; font-size: 8px; letter-spacing: 2px; }
+
+    /* License key on mobile — truncate */
+    .user-table td:nth-child(4) span {
+      font-size: 7px !important;
+      letter-spacing: 0.5px !important;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+    }
+
+    /* ── Mass email textarea ── */
+    #email-body { min-height: 120px; }
+
+    /* ── Toast ── */
+    .admin-toast { bottom: 16px; right: 16px; left: 16px; text-align: center; }
+  }
+
+  /* Extra small — 375px */
+  @media (max-width: 400px) {
+    .admin-stats-grid { grid-template-columns: 1fr; }
+    .item-price, .item-sale-price { font-size: 15px; }
+  }
   .admin-hint {
     font-family: 'Share Tech Mono', monospace;
     font-size: 9px; letter-spacing: 1.5px;
@@ -1009,11 +1172,13 @@
             <span class="item-sale-price" contenteditable="true" spellcheck="false" title="Sale price — leave empty for no discount" onblur="savePrice(this,'shop_products','sale_price')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displaySalePrice}</span>
           </div>
         </div>
-        <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
-          <span class="status-pill pill-${status}">${status.toUpperCase()} ▾</span>
-          <div class="pill-dropdown">${shopStatusOpts}</div>
-        </span>
-        <a class="item-link" href="${m.href}">→</a>
+        <div class="item-row-footer">
+          <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
+            <span class="status-pill pill-${status}">${status.toUpperCase()} ▾</span>
+            <div class="pill-dropdown">${shopStatusOpts}</div>
+          </span>
+          <a class="item-link" href="${m.href}">→</a>
+        </div>
       </div>`;
     }).join('');
     initDrag(el, 'shop_products');
@@ -1058,11 +1223,13 @@
           <div class="cat-dropdown">${portCatOpts}</div>
         </span>
         <span class="item-name" contenteditable="true" spellcheck="false" onblur="saveName(this,'portfolio_projects')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayName}</span>
-        <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
-          <span class="status-pill pill-${status}">${status.toUpperCase()} ▾</span>
-          <div class="pill-dropdown">${portStatusOpts}</div>
-        </span>
-        <a class="item-link" href="${m.href}">→</a>
+        <div class="item-row-footer">
+          <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
+            <span class="status-pill pill-${status}">${status.toUpperCase()} ▾</span>
+            <div class="pill-dropdown">${portStatusOpts}</div>
+          </span>
+          <a class="item-link" href="${m.href}">→</a>
+        </div>
       </div>`;
     }).join('');
     initDrag(el, 'portfolio_projects');
