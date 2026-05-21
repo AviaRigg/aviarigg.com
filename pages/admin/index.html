@@ -226,16 +226,6 @@
   .item-row.dragging { opacity: 0.4; }
   .item-row.drag-over { border-top: 2px solid var(--accent) !important; }
 
-  /* Editable name */
-  .item-name {
-    flex: 1; font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 600;
-    color: var(--text-bright); cursor: text; border-bottom: 1px solid transparent;
-    transition: border-color 0.2s; padding: 2px 4px; border-radius: 2px;
-    background: transparent; outline: none;
-  }
-  .item-name:hover { border-bottom-color: rgba(139,79,200,0.3); }
-  .item-name:focus { border-bottom-color: var(--accent); background: rgba(139,79,200,0.05); }
-
   /* Inline editable pills */
   .pill-wrap { position: relative; display: inline-flex; }
   .pill-dropdown {
@@ -268,35 +258,73 @@
   .cat-opt.active { color: var(--accent2); }
 
   .item-row {
-    display: flex; align-items: center;
-    gap: 14px; padding: 12px 14px;
+    display: grid;
+    grid-template-columns: 20px 28px 130px 1fr 240px 110px 24px;
+    align-items: center;
+    gap: 0; padding: 0;
     background: var(--surface2); border: 1px solid var(--border); border-top: none;
     transition: background 0.15s;
   }
   .item-row:first-child { border-top: 1px solid var(--border); }
   .item-row:hover { background: rgba(139,79,200,0.06); }
+  .item-row > * { padding: 12px 10px; }
+  .item-row > .drag-handle { padding: 12px 6px 12px 10px; }
+  .item-row > .item-link { padding: 12px 10px 12px 6px; text-align: center; }
+
+  /* Column header for product/portfolio lists */
+  .item-list-header {
+    display: grid;
+    grid-template-columns: 20px 28px 130px 1fr 240px 110px 24px;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    background: var(--surface);
+  }
+  .item-list-header > span {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-dim); padding: 7px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
   .item-num {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 9px; letter-spacing: 2px; color: var(--text-dim); flex-shrink: 0; width: 24px;
+    font-size: 9px; letter-spacing: 2px; color: var(--text-dim);
   }
   .item-name {
     font-family: 'Rajdhani', sans-serif;
     font-size: clamp(14px,1.3vw,17px); font-weight: 600;
-    color: var(--text-bright); flex: 1; min-width: 0;
+    color: var(--text-bright);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
+  .item-name:hover { border-bottom-color: rgba(139,79,200,0.3); }
+  .item-name:focus { border-bottom-color: var(--accent); background: rgba(139,79,200,0.05); }
   .item-cat {
     font-family: 'Share Tech Mono', monospace;
     font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--text-dim); flex-shrink: 0;
+    color: var(--text-dim);
   }
   .item-link {
     font-family: 'Share Tech Mono', monospace;
     font-size: 10px; letter-spacing: 2px; color: var(--accent2);
-    text-decoration: none; flex-shrink: 0;
+    text-decoration: none;
     transition: color 0.15s;
   }
   .item-link:hover { color: var(--accent3); }
+
+  /* 4K overrides */
+  @media (min-width: 2560px) {
+    .item-row { grid-template-columns: 24px 36px 180px 1fr 320px 140px 30px; }
+    .item-list-header { grid-template-columns: 24px 36px 180px 1fr 320px 140px 30px; }
+    .item-list-header > span { font-size: 12px; letter-spacing: 4px; padding: 10px 14px; }
+    .item-row > * { padding: 16px 14px; }
+  }
+  @media (min-width: 3840px) {
+    .item-row { grid-template-columns: 28px 44px 220px 1fr 400px 170px 36px; }
+    .item-list-header { grid-template-columns: 28px 44px 220px 1fr 400px 170px 36px; }
+    .item-list-header > span { font-size: 15px; letter-spacing: 5px; padding: 13px 18px; }
+    .item-row > * { padding: 20px 18px; }
+  }
 
   /* ── USER TABLE ── */
   .user-table { width: 100%; border-collapse: collapse; }
@@ -402,16 +430,15 @@
 
   /* ── PRICE FIELDS ── */
   .item-price-wrap {
-    display: flex; align-items: center; gap: 0;
-    flex-shrink: 0;
+    display: flex; align-items: stretch; gap: 0;
+    height: 100%; margin: -12px -10px; /* pull back to grid edges */
   }
   .item-price-field {
-    display: flex; flex-direction: column; gap: 3px;
-    padding: 4px 10px;
+    display: flex; flex-direction: column; justify-content: center; gap: 3px;
+    padding: 8px 12px; flex: 1;
     border-left: 1px solid var(--border);
-    min-width: 110px;
   }
-  .item-price-field:last-child { border-right: 1px solid var(--border); }
+  .item-price-field:last-child { border-right: none; }
   .item-price-label {
     font-family: 'Share Tech Mono', monospace;
     font-size: 8px; letter-spacing: 3px; text-transform: uppercase;
@@ -422,8 +449,7 @@
     color: var(--text-bright); cursor: text;
     border-bottom: 1px solid transparent;
     transition: border-color 0.2s; padding: 1px 2px;
-    background: transparent; outline: none;
-    min-width: 80px; width: 100%;
+    background: transparent; outline: none; width: 100%;
   }
   .item-price:hover { border-bottom-color: rgba(139,79,200,0.3); }
   .item-price:focus { border-bottom-color: var(--accent); background: rgba(139,79,200,0.05); }
@@ -433,25 +459,23 @@
     color: #00e87a; cursor: text;
     border-bottom: 1px solid transparent;
     transition: border-color 0.2s; padding: 1px 2px;
-    background: transparent; outline: none;
-    min-width: 80px; width: 100%;
+    background: transparent; outline: none; width: 100%;
   }
   .item-sale-price:empty::before { content: '—'; color: var(--text-dim); font-weight: 400; }
   .item-sale-price:hover { border-bottom-color: rgba(0,232,122,0.3); }
   .item-sale-price:focus { border-bottom-color: #00e87a; background: rgba(0,232,122,0.05); }
 
-  /* 4K overrides for price fields */
   @media (min-width: 2560px) {
-    .item-price-field   { min-width: 160px; padding: 6px 16px; gap: 5px; }
-    .item-price-label   { font-size: 12px; letter-spacing: 4px; }
-    .item-price,
-    .item-sale-price    { font-size: 26px; }
+    .item-price-wrap { margin: -16px -14px; }
+    .item-price-field { padding: 10px 16px; gap: 5px; }
+    .item-price-label { font-size: 12px; letter-spacing: 4px; }
+    .item-price, .item-sale-price { font-size: 26px; }
   }
   @media (min-width: 3840px) {
-    .item-price-field   { min-width: 200px; padding: 8px 20px; }
-    .item-price-label   { font-size: 15px; }
-    .item-price,
-    .item-sale-price    { font-size: 32px; }
+    .item-price-wrap { margin: -20px -18px; }
+    .item-price-field { padding: 14px 20px; }
+    .item-price-label { font-size: 15px; }
+    .item-price, .item-sale-price { font-size: 32px; }
   }
 
   /* ── HINT TEXT ── */
@@ -728,6 +752,14 @@
     </div>
     <div class="admin-full">
       <div class="admin-panel-title">Products</div>
+      <div class="item-list-header">
+        <span></span><span></span>
+        <span>Category</span>
+        <span>Name</span>
+        <span>Price &nbsp;/&nbsp; Sale Price</span>
+        <span>Status</span>
+        <span></span>
+      </div>
       <div class="item-list" id="product-list">
         <div class="table-empty skeleton" style="height:48px;"></div>
         <div class="table-empty skeleton" style="height:48px;opacity:0.6;"></div>
@@ -742,6 +774,14 @@
     </div>
     <div class="admin-full">
       <div class="admin-panel-title">Projects</div>
+      <div class="item-list-header">
+        <span></span><span></span>
+        <span>Category</span>
+        <span>Name</span>
+        <span></span>
+        <span>Status</span>
+        <span></span>
+      </div>
       <div class="item-list" id="port-list">
         <div class="table-empty skeleton" style="height:48px;"></div>
         <div class="table-empty skeleton" style="height:48px;opacity:0.6;"></div>
