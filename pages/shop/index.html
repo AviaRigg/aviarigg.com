@@ -1971,23 +1971,6 @@ async function loadProductStatuses() {
       } catch(e) {
         console.warn('Price apply failed for', id, e);
       }
-
-      // Grey out buy button if no payhip link
-      const buyUrl = card.dataset.buyUrl || '';
-      const hasPayLink = buyUrl && buyUrl !== '#' && buyUrl.includes('payhip');
-      const buyBtn = card.querySelector('.shop-buy-btn');
-      if (buyBtn && buyUrl && !hasPayLink) {
-        // Has a buy-url set but it's not a real payhip link — grey it out
-        buyBtn.style.opacity = '0.35';
-        buyBtn.style.cursor = 'not-allowed';
-        buyBtn.style.pointerEvents = 'none';
-        buyBtn.textContent = 'Coming Soon';
-      } else if (buyBtn && hasPayLink) {
-        // Has real payhip link — make sure it's active
-        buyBtn.style.opacity = '';
-        buyBtn.style.cursor = '';
-        buyBtn.style.pointerEvents = '';
-      }
     });
   }
 
