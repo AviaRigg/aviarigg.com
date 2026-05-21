@@ -633,6 +633,8 @@
       display: inline-block;
     }
 
+    /* ── Mass email two-col → single col ── */
+    #email-preview-shell { display: none; } /* hide preview on mobile, space is tight */
     /* ── Mass email textarea ── */
     #email-body { min-height: 120px; }
 
@@ -989,25 +991,67 @@
     </div>
     <div class="admin-full">
       <div class="admin-panel-title">Send to All Users</div>
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <div>
-          <div class="field-label">Subject Line</div>
-          <input type="text" class="admin-input" id="email-subject"
-            placeholder="e.g. New rig pack just dropped">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);">
+
+        <!-- LEFT: Live Preview -->
+        <div style="background:var(--surface2);padding:clamp(16px,2vw,28px);display:flex;flex-direction:column;gap:12px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;">// Preview</div>
+
+          <!-- Mini email shell -->
+          <div id="email-preview-shell" style="background:#0a0a10;border:1px solid rgba(255,255,255,0.07);font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;line-height:1.7;overflow:hidden;">
+
+            <!-- Header -->
+            <div style="background:#0d0d18;border-bottom:2px solid #8b4fc8;padding:18px 24px;text-align:center;">
+              <div style="font-size:9px;letter-spacing:5px;text-transform:uppercase;color:#8b4fc8;margin-bottom:4px;">// AviaRigg</div>
+              <div id="preview-subject" style="font-size:17px;font-weight:700;color:#eeeef8;letter-spacing:0.5px;transition:color 0.2s;">Your subject line</div>
+            </div>
+
+            <!-- Body -->
+            <div style="padding:24px 24px 18px;border:1px solid rgba(255,255,255,0.05);border-top:none;">
+              <div id="preview-body" style="font-size:13px;line-height:1.8;color:#b0b0c8;min-height:80px;transition:all 0.2s;">
+                <span style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;">// message will appear here...</span>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="padding:14px 24px;border:1px solid rgba(255,255,255,0.05);border-top:none;text-align:center;">
+              <div style="font-size:9px;letter-spacing:2px;color:#3a3a5a;text-transform:uppercase;">
+                Paul Chedozeau — AviaRigg &nbsp;·&nbsp;
+                <span style="color:#8b4fc8;">aviarigg.com</span>
+                &nbsp;·&nbsp;
+                <span style="color:#3a3a5a;">Unsubscribe</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="admin-hint" style="color:var(--text-dim);margin-top:2px;">// Live preview — updates as you type</div>
         </div>
-        <div>
-          <div class="field-label">Body — supports HTML</div>
-          <textarea class="admin-input" id="email-body" rows="7"
-            placeholder="Write your message here...&#10;&#10;Supports HTML tags:&#10;&lt;b&gt;bold&lt;/b&gt;  &lt;em&gt;italic&lt;/em&gt;  &lt;a href=&quot;...&quot;&gt;link&lt;/a&gt;  &lt;br&gt; for new lines&#10;&lt;h2&gt;Heading&lt;/h2&gt;"></textarea>
+
+        <!-- RIGHT: Form -->
+        <div style="background:var(--surface);padding:clamp(16px,2vw,28px);display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <div class="field-label">Subject Line</div>
+            <input type="text" class="admin-input" id="email-subject"
+              placeholder="e.g. New rig pack just dropped"
+              oninput="updateEmailPreview()">
+          </div>
+          <div>
+            <div class="field-label">Body — supports HTML</div>
+            <textarea class="admin-input" id="email-body" rows="7"
+              placeholder="Write your message here...&#10;&#10;Supports HTML tags:&#10;&lt;b&gt;bold&lt;/b&gt;  &lt;em&gt;italic&lt;/em&gt;  &lt;a href=&quot;...&quot;&gt;link&lt;/a&gt;  &lt;br&gt; for new lines&#10;&lt;h2&gt;Heading&lt;/h2&gt;"
+              oninput="updateEmailPreview()"></textarea>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+            <button class="admin-btn admin-btn-primary" onclick="sendMassEmail()">Send Email</button>
+            <span id="email-status" class="admin-hint" style="color:var(--text-dim);"></span>
+          </div>
+          <div class="admin-hint admin-hint-box">
+            // Emails are sent from <strong style="color:var(--accent2);">contact@aviarigg.com</strong> with your branded template + signature.<br>
+            // Body supports HTML: &lt;b&gt; &lt;em&gt; &lt;a&gt; &lt;br&gt; &lt;h2&gt; &lt;p&gt; — sent to all registered users.
+          </div>
         </div>
-        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-          <button class="admin-btn admin-btn-primary" onclick="sendMassEmail()">Send Email</button>
-          <span id="email-status" class="admin-hint" style="color:var(--text-dim);"></span>
-        </div>
-        <div class="admin-hint admin-hint-box">
-          // Emails are sent from <strong style="color:var(--accent2);">contact@aviarigg.com</strong> with your branded template + signature.<br>
-          // Body supports HTML: &lt;b&gt; &lt;em&gt; &lt;a&gt; &lt;br&gt; &lt;h2&gt; &lt;p&gt; — sent to all registered users.
-        </div>
+
       </div>
     </div>
 
@@ -1555,6 +1599,29 @@
     if (input) input.value = '';
     updateBannerPreview();
     await saveBanner();
+  }
+
+  // ── EMAIL PREVIEW ──
+  function updateEmailPreview() {
+    const subject = document.getElementById('email-subject')?.value?.trim();
+    const body    = document.getElementById('email-body')?.value?.trim();
+
+    const subjectEl = document.getElementById('preview-subject');
+    const bodyEl    = document.getElementById('preview-body');
+
+    if (subjectEl) {
+      subjectEl.textContent = subject || 'Your subject line';
+      subjectEl.style.color = subject ? '#eeeef8' : 'rgba(238,238,248,0.3)';
+    }
+
+    if (bodyEl) {
+      if (!body) {
+        bodyEl.innerHTML = '<span style="color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:9px;letter-spacing:2px;">// message will appear here...</span>';
+      } else {
+        const isHtml = body.includes('<') && body.includes('>');
+        bodyEl.innerHTML = isHtml ? body : body.replace(/\n/g, '<br>');
+      }
+    }
   }
 
   // ── MASS EMAIL ──
