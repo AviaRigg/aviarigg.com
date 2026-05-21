@@ -159,52 +159,51 @@ function _injectRedeemModal() {
   const el = document.createElement('div');
   el.innerHTML = `
     <div id="redeem-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
-      <div style="position:relative;width:min(480px,94vw);background:#0d0d12;border:1px solid rgba(255,255,255,0.1);border-top:2px solid #8b4fc8;box-shadow:0 0 60px rgba(139,79,200,0.2);padding:32px 28px 28px;">
+      <div style="position:relative;width:min(540px,94vw);background:#0d0d12;border:1px solid rgba(255,255,255,0.1);border-top:2px solid #8b4fc8;box-shadow:0 0 60px rgba(139,79,200,0.2);padding:clamp(24px,3vw,48px) clamp(22px,2.5vw,40px) clamp(20px,2.5vw,36px);">
 
         <!-- Close -->
-        <button onclick="_closeRedeemModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#555570;font-size:20px;cursor:pointer;line-height:1;transition:color 0.2s;" onmouseover="this.style.color='#eeeef8'" onmouseout="this.style.color='#555570'">&#10005;</button>
+        <button onclick="_closeRedeemModal()" style="position:absolute;top:clamp(10px,1.2vw,18px);right:clamp(12px,1.4vw,20px);background:none;border:none;color:#555570;font-size:clamp(16px,1.4vw,24px);cursor:pointer;line-height:1;transition:color 0.2s;" onmouseover="this.style.color='#eeeef8'" onmouseout="this.style.color='#555570'">&#10005;</button>
 
         <!-- Header -->
-        <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#8b4fc8;margin-bottom:10px;">// Early Access</div>
-        <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(22px,3vw,30px);font-weight:700;color:#eeeef8;letter-spacing:1px;margin-bottom:6px;">Redeem Key</div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:#6a6a8a;margin-bottom:28px;line-height:1.7;">Enter your key to unlock Buyer access —<br>early releases, gated products, and more.</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:clamp(10px,0.8vw,14px);letter-spacing:4px;text-transform:uppercase;color:#8b4fc8;margin-bottom:clamp(8px,0.8vw,14px);">// Early Access</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(26px,2.8vw,48px);font-weight:700;color:#eeeef8;letter-spacing:1px;margin-bottom:clamp(6px,0.6vw,10px);">Redeem Key</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:clamp(11px,0.85vw,15px);letter-spacing:1px;color:#6a6a8a;margin-bottom:clamp(22px,2.2vw,36px);line-height:1.7;">Enter your key to unlock Buyer access —<br>early releases, gated products, and more.</div>
+
+        <!-- Input label -->
+        <div style="font-family:'Share Tech Mono',monospace;font-size:clamp(10px,0.75vw,13px);letter-spacing:3px;text-transform:uppercase;color:#6a6a8a;margin-bottom:clamp(6px,0.6vw,10px);">License Key</div>
 
         <!-- Input -->
-        <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#6a6a8a;margin-bottom:6px;">License Key</div>
         <input id="redeem-key-input"
           type="text"
           placeholder="AVIA-XXXX-XXXX-XXXX"
           autocomplete="off"
           spellcheck="false"
-          style="width:100%;box-sizing:border-box;font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#eeeef8;background:#0a0a10;border:1px solid rgba(255,255,255,0.1);padding:12px 14px;outline:none;transition:border-color 0.2s;margin-bottom:16px;"
+          style="width:100%;box-sizing:border-box;font-family:'Share Tech Mono',monospace;font-size:clamp(13px,1.1vw,20px);letter-spacing:3px;text-transform:uppercase;color:#eeeef8;background:#0a0a10;border:1px solid rgba(255,255,255,0.1);padding:clamp(10px,1vw,16px) clamp(12px,1.2vw,20px);outline:none;transition:border-color 0.2s;margin-bottom:clamp(12px,1.2vw,20px);"
           oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9-]/g,'')"
           onfocus="this.style.borderColor='#8b4fc8'"
           onblur="this.style.borderColor='rgba(255,255,255,0.1)'"
           onkeydown="if(event.key==='Enter')_submitRedeemKey()">
 
         <!-- Status -->
-        <div id="redeem-status" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;min-height:18px;margin-bottom:16px;"></div>
+        <div id="redeem-status" style="font-family:'Share Tech Mono',monospace;font-size:clamp(11px,0.85vw,15px);letter-spacing:2px;min-height:clamp(16px,1.4vw,22px);margin-bottom:clamp(12px,1.2vw,20px);line-height:1.5;"></div>
 
         <!-- Button -->
         <button id="redeem-submit-btn" onclick="_submitRedeemKey()"
-          style="width:100%;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#fff;background:#8b4fc8;border:none;padding:13px 20px;cursor:pointer;transition:background 0.2s;">
+          style="width:100%;font-family:'Share Tech Mono',monospace;font-size:clamp(11px,0.9vw,16px);letter-spacing:4px;text-transform:uppercase;color:#fff;background:#8b4fc8;border:none;padding:clamp(12px,1.2vw,18px) 20px;cursor:pointer;transition:background 0.2s;">
           Redeem &#9670;
         </button>
 
         <!-- Fine print -->
-        <div style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1.5px;color:#3a3a5a;text-align:center;margin-top:14px;line-height:1.8;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:clamp(9px,0.7vw,12px);letter-spacing:1.5px;color:#3a3a5a;text-align:center;margin-top:clamp(10px,1vw,18px);line-height:1.8;">
           // Each key is single-use · Tied to your account · Cannot be transferred
         </div>
       </div>
     </div>`;
   document.body.appendChild(el.firstElementChild);
 
-  // Close on backdrop click
   document.getElementById('redeem-modal').addEventListener('click', function(e) {
     if (e.target === this) _closeRedeemModal();
   });
-
-  // Close on Escape
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') _closeRedeemModal();
   });
@@ -264,19 +263,18 @@ async function _submitRedeemKey() {
   status.textContent = '';
 
   try {
-    // Single edge function call — handles key check, mark redeemed, role upgrade
-    // all server-side with service role key (bypasses RLS on profiles)
     const { data, error } = await _navSb.functions.invoke('redeem-key', {
       body: { key }
     })
 
-    if (error) {
+    // functions.invoke puts network/auth failures in error,
+    // and the function's own JSON response always in data
+    if (error && !data) {
       _redeemError(status, btn, input, '// Server error — email contact@aviarigg.com')
-      console.error('redeem-key fn error:', error)
+      console.error('redeem-key invoke error:', error)
       return
     }
 
-    // Map server error codes to friendly messages
     const errMap = {
       key_not_found:         '// Key not found — check for typos',
       already_redeemed:      '// This key has already been used',
