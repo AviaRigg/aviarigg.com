@@ -256,7 +256,5 @@ async function saveDragOrder() {
 /* ── DOMContentLoaded ── */
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('add-product-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeAddProductModal();
-  });
+  // Backdrop click disabled — prevents accidental dismissal while filling the form
 });
