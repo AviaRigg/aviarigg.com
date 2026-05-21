@@ -208,5 +208,78 @@
 
 </div>
 
+<!-- UNSUBSCRIBE MODAL -->
+<div id="unsub-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="position:relative;width:min(480px,92vw);background:#0d0d12;border:1px solid rgba(255,255,255,0.08);border-top:2px solid #ff5050;box-shadow:0 0 60px rgba(255,80,80,0.15);padding:clamp(24px,3vw,40px);">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#ff5050;margin-bottom:10px;">// Unsubscribe</div>
+    <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(22px,2.8vw,32px);font-weight:700;color:#eeeef8;margin-bottom:12px;">Hold on — you'll miss out.</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:clamp(10px,0.85vw,13px);letter-spacing:1px;color:#6a6a8a;line-height:1.8;margin-bottom:28px;">
+      Early access drops, new rigs, Maya tools and free releases — all go to this list first.<br><br>
+      Are you sure you want to unsubscribe?
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button onclick="_unsubConfirm()" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#ff5050;background:none;border:1px solid rgba(255,80,80,0.4);padding:11px 20px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,80,80,0.1)'" onmouseout="this.style.background='none'">Yes, unsubscribe</button>
+      <button onclick="_unsubCancel()" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#fff;background:#8b4fc8;border:none;padding:11px 24px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#7a3fb0'" onmouseout="this.style.background='#8b4fc8'">Keep me subscribed ◆</button>
+    </div>
+    <div id="unsub-status" style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:#6a6a8a;margin-top:16px;min-height:16px;"></div>
+  </div>
+</div>
+
+<script>
+  // ── UNSUBSCRIBE FLOW ──
+  let _unsubUserId = null;
+
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get('unsubscribe');
+    if (!userId) return;
+    _unsubUserId = userId;
+    // Show modal after a short delay so page renders first
+    setTimeout(() => {
+      const modal = document.getElementById('unsub-modal');
+      if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+    }, 400);
+    // Clean URL so refreshing doesn't retrigger
+    window.history.replaceState({}, '', window.location.pathname);
+  })();
+
+  function _unsubCancel() {
+    const modal = document.getElementById('unsub-modal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  async function _unsubConfirm() {
+    if (!_unsubUserId) return;
+    const statusEl = document.getElementById('unsub-status');
+    const btns = document.querySelectorAll('#unsub-modal button');
+    btns.forEach(b => b.disabled = true);
+    statusEl.textContent = '// Processing...';
+    statusEl.style.color = '#6a6a8a';
+
+    try {
+      // Wait for _navSb to be available
+      let n = 0;
+      while (typeof _navSb === 'undefined' && n++ < 40) await new Promise(r => setTimeout(r, 50));
+
+      const { data, error } = await _navSb.functions.invoke('unsubscribe-user', {
+        body: { userId: _unsubUserId }
+      });
+
+      if (error || data?.error) throw error || data.error;
+
+      statusEl.textContent = '// You have been unsubscribed.';
+      statusEl.style.color = '#00e87a';
+      // Auto close after 2 seconds
+      setTimeout(_unsubCancel, 2500);
+    } catch (err) {
+      console.error('Unsubscribe error:', err);
+      statusEl.textContent = '// Error — email contact@aviarigg.com';
+      statusEl.style.color = '#ff5050';
+      btns.forEach(b => b.disabled = false);
+    }
+  }
+</script>
+
 </body>
 </html>
