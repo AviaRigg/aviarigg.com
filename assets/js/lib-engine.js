@@ -369,6 +369,9 @@ function renderScript(row, s) {
 
   let html = '';
 
+  // Back button
+  html += `<div class="lib-back-btn" onclick="libGoHome()">&#8592; Script Index</div>`;
+
   // Admin controls bar
   if (_isAdmin) {
     html += `<div class="lib-admin-bar">
