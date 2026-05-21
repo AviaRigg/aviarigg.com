@@ -30,7 +30,7 @@
 .lib-page{display:flex;width:100%;height:calc(100vh - var(--nav-h,60px));overflow:hidden;}
 
 /* ── SIDEBAR ── */
-.lib-sidebar{width:clamp(240px,18vw,360px);flex-shrink:0;background:rgba(255,255,255,0.015);border-right:1px solid var(--border,rgba(255,255,255,0.07));display:flex;flex-direction:column;overflow:hidden;}
+.lib-sidebar{width:240px;flex-shrink:0;background:rgba(255,255,255,0.015);border-right:1px solid var(--border,rgba(255,255,255,0.07));display:flex;flex-direction:column;overflow:hidden;}
 .lib-sidebar-header{padding:20px 16px 14px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));flex-shrink:0;}
 .lib-sidebar-eyebrow{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--accent,#8b4fc8);margin-bottom:4px;}
 .lib-sidebar-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--text-bright,#eeeef8);letter-spacing:2px;text-transform:uppercase;}
@@ -185,6 +185,30 @@
 .cat-shape{background:rgba(0,200,255,0.08);color:#00c8ff;border-color:rgba(0,200,255,0.2);}
 .cat-uvs{background:rgba(0,180,255,0.08);color:#00b4ff;border-color:rgba(0,180,255,0.2);}
 .cat-reference{background:rgba(255,255,255,0.04);color:#888899;border-color:rgba(255,255,255,0.12);}
+  /* 4K scaling — base font grows with viewport */
+  @media (min-width: 2560px) {
+    .lib-hero-title { font-size: clamp(64px, 4vw, 120px) !important; }
+    .lib-stats { max-width: 900px !important; }
+    .lib-stat-value { font-size: clamp(32px, 2.5vw, 48px) !important; }
+    .lib-index-name { font-size: clamp(18px, 1.2vw, 28px) !important; }
+    .lib-index-cat-badge { font-size: clamp(9px, 0.6vw, 14px) !important; min-width: 100px !important; }
+    .lib-index-desc { font-size: clamp(11px, 0.7vw, 16px) !important; }
+    .lib-index-row { padding: 18px 28px !important; }
+    .lib-sidebar-title { font-size: clamp(22px, 1.4vw, 32px) !important; }
+    .lib-sidebar { width: clamp(260px, 14vw, 420px) !important; }
+    .lib-cat-label { font-size: clamp(9px, 0.55vw, 14px) !important; }
+    .lib-nav-item { font-size: clamp(11px, 0.7vw, 16px) !important; padding: 8px 20px 8px 28px !important; }
+    .lib-home-btn { font-size: clamp(11px, 0.7vw, 16px) !important; padding: 10px 20px !important; }
+    .lib-sort-btn { font-size: clamp(9px, 0.6vw, 14px) !important; padding: 6px 14px !important; }
+    .lib-home-search { font-size: clamp(12px, 0.75vw, 18px) !important; }
+    #lib-view-home { padding: clamp(48px, 4vw, 80px) clamp(48px, 5vw, 100px) 100px !important; }
+  }
+  @media (min-width: 3840px) {
+    .lib-hero-title { font-size: clamp(80px, 3.5vw, 160px) !important; }
+    .lib-stat-value { font-size: clamp(40px, 2vw, 64px) !important; }
+    .lib-sidebar { width: clamp(320px, 12vw, 480px) !important; }
+    .lib-index-name { font-size: clamp(22px, 1vw, 36px) !important; }
+  }
 </style>
 
 <script src="/assets/js/status.js"></script>
