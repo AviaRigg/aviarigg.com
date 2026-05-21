@@ -385,6 +385,26 @@
   font-size: clamp(10px, 0.7vw, 13px); letter-spacing: 3px;
   color: #8080a0; text-align: center;
 }
+.lib-index-footer {
+  padding: clamp(14px,1.2vw,22px) clamp(16px,1.4vw,28px);
+  border-top: 1px solid var(--border, rgba(255,255,255,0.07));
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(9px, 0.6vw, 12px); letter-spacing: 3px;
+  color: #6060808; text-align: center;
+}
+.lib-load-more {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(9px, 0.65vw, 12px); letter-spacing: 3px;
+  text-transform: uppercase; color: var(--accent2, #c084fc);
+  background: none; border: 1px solid rgba(139,79,200,0.3);
+  padding: clamp(8px,0.7vw,12px) clamp(20px,2vw,36px);
+  cursor: pointer; transition: all 0.2s; display: inline-block;
+}
+.lib-load-more:hover {
+  background: rgba(139,79,200,0.08);
+  border-color: rgba(139,79,200,0.6);
+  color: #eeeef8;
+}
 
 /* Admin badges */
 .lib-admin-status {

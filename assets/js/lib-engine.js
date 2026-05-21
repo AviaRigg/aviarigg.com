@@ -34,8 +34,12 @@ let _rows = [];       // Supabase rows
 let _scripts = {};    // loaded script data keyed by id
 let _isAdmin = false;
 let _isBuyer = false;
-let _currentSort = 'newest';
+let _currentSort = 'random';
 let _searchQ = '';
+let _currentPage = 1;
+const PAGE_SIZE = 10;
+const PAGE_MAX  = 3; // max 30 results
+let _randomSeed = []; // persists random order for current session
 
 // ── INIT ──
 
@@ -75,6 +79,7 @@ async function libFetchAndRender() {
   _rows = data || [];
   console.log('[lib] rows loaded:', _rows.length);
   await libLoadScriptData();
+  _randomSeed = libShuffled(_rows); // seed random on load
   libRenderSidebar();
   libRenderIndex();
   libUpdateStats();
@@ -112,9 +117,20 @@ async function libLoadScriptData() {
 
 function libSetSort(val, el) {
   _currentSort = val;
+  _currentPage = 1;
+  if (val === 'random') _randomSeed = libShuffled(_rows.filter(r => matchesSearch(r)));
   document.querySelectorAll('.lib-sort-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   libRenderIndex();
+}
+
+function libShuffled(rows) {
+  const r = [...rows];
+  for (let i = r.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [r[i], r[j]] = [r[j], r[i]];
+  }
+  return r;
 }
 
 function libSorted(rows) {
@@ -125,6 +141,7 @@ function libSorted(rows) {
     case 'name-az':  return r.sort((a,b) => a.name.localeCompare(b.name));
     case 'name-za':  return r.sort((a,b) => b.name.localeCompare(a.name));
     case 'category': return r.sort((a,b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
+    case 'random':   return _randomSeed.length ? _randomSeed : libShuffled(r);
     default:         return r;
   }
 }
@@ -133,12 +150,16 @@ function libSorted(rows) {
 
 function libFilter(q) {
   _searchQ = q.toLowerCase().trim();
+  _currentPage = 1;
+  _randomSeed = []; // re-shuffle on new search in random mode
   libRenderIndex();
   libRenderSidebar();
 }
 
 function libSyncSearch(val) {
   _searchQ = val.toLowerCase().trim();
+  _currentPage = 1;
+  _randomSeed = [];
   document.getElementById('lib-sidebar-search').value = val;
   document.getElementById('lib-home-search').value = val;
   libRenderIndex();
@@ -191,16 +212,29 @@ function libRenderSidebar() {
 
 // ── INDEX ──
 
+function libLoadMore() {
+  _currentPage = Math.min(_currentPage + 1, PAGE_MAX);
+  libRenderIndex();
+}
+
 function libRenderIndex() {
   const index = document.getElementById('lib-index');
   if (!index) return;
 
-  const sorted = libSorted(_rows);
+  const isRandom = _currentSort === 'random';
+  const filtered = _rows.filter(r => matchesSearch(r));
+  const sorted   = isRandom
+    ? (_randomSeed.length ? _randomSeed : (_randomSeed = libShuffled(filtered)))
+    : libSorted(filtered);
+
+  const limit    = isRandom ? 10 : PAGE_SIZE * _currentPage;
+  const visible  = sorted.slice(0, limit);
+  const hasMore  = !isRandom && sorted.length > limit && _currentPage < PAGE_MAX;
   let html = '';
   let visCount = 0;
 
-  sorted.forEach(row => {
-    if (!matchesSearch(row)) return;
+  visible.forEach(row => {
+    const matchOk = true; // already filtered above
     const s = _scripts[row.id] || {};
     const access = row.access || 'logged_in';
     const status = row.status || 'published';
@@ -240,7 +274,18 @@ function libRenderIndex() {
     visCount++;
   });
 
-  index.innerHTML = html || `<div class="lib-no-results">// No scripts match "${_searchQ}"</div>`;
+  if (!html) {
+    index.innerHTML = `<div class="lib-no-results">// No scripts match "${_searchQ}"</div>`;
+  } else {
+    const footer = isRandom
+      ? `<div class="lib-index-footer">// Showing 10 random scripts &mdash; use the sidebar or search to find more</div>`
+      : hasMore
+        ? `<div class="lib-index-footer"><button class="lib-load-more" onclick="libLoadMore()">// Load More &nbsp;&#8595;&nbsp; (showing ${limit} of ${sorted.length})</button></div>`
+        : sorted.length > PAGE_SIZE
+          ? `<div class="lib-index-footer">// Showing all ${sorted.length} results</div>`
+          : '';
+    index.innerHTML = html + footer;
+  }
   document.getElementById('lib-count')?.setAttribute('data-count', visCount);
 }
 
