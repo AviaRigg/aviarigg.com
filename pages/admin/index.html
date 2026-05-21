@@ -402,34 +402,56 @@
 
   /* ── PRICE FIELDS ── */
   .item-price-wrap {
-    display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
-    flex-shrink: 0; min-width: 80px;
+    display: flex; align-items: center; gap: 0;
+    flex-shrink: 0;
+  }
+  .item-price-field {
+    display: flex; flex-direction: column; gap: 3px;
+    padding: 4px 10px;
+    border-left: 1px solid var(--border);
+    min-width: 110px;
+  }
+  .item-price-field:last-child { border-right: 1px solid var(--border); }
+  .item-price-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-dim);
   }
   .item-price {
-    font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700;
+    font-family: 'Rajdhani', sans-serif; font-size: clamp(15px,1.4vw,20px); font-weight: 700;
     color: var(--text-bright); cursor: text;
     border-bottom: 1px solid transparent;
-    transition: border-color 0.2s; padding: 2px 4px;
-    background: transparent; outline: none; text-align: right;
-    min-width: 60px; max-width: 90px;
+    transition: border-color 0.2s; padding: 1px 2px;
+    background: transparent; outline: none;
+    min-width: 80px; width: 100%;
   }
   .item-price:hover { border-bottom-color: rgba(139,79,200,0.3); }
   .item-price:focus { border-bottom-color: var(--accent); background: rgba(139,79,200,0.05); }
+  .item-price:empty::before { content: '—'; color: var(--text-dim); font-weight: 400; }
   .item-sale-price {
-    font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 600;
+    font-family: 'Rajdhani', sans-serif; font-size: clamp(15px,1.4vw,20px); font-weight: 700;
     color: #00e87a; cursor: text;
     border-bottom: 1px solid transparent;
-    transition: border-color 0.2s; padding: 2px 4px;
-    background: transparent; outline: none; text-align: right;
-    min-width: 60px; max-width: 90px;
+    transition: border-color 0.2s; padding: 1px 2px;
+    background: transparent; outline: none;
+    min-width: 80px; width: 100%;
   }
-  .item-sale-price:empty::before { content: 'sale...'; color: var(--text-dim); font-weight: 400; font-size: 11px; }
+  .item-sale-price:empty::before { content: '—'; color: var(--text-dim); font-weight: 400; }
   .item-sale-price:hover { border-bottom-color: rgba(0,232,122,0.3); }
   .item-sale-price:focus { border-bottom-color: #00e87a; background: rgba(0,232,122,0.05); }
-  .item-price-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--text-dim); text-align: right;
+
+  /* 4K overrides for price fields */
+  @media (min-width: 2560px) {
+    .item-price-field   { min-width: 160px; padding: 6px 16px; gap: 5px; }
+    .item-price-label   { font-size: 12px; letter-spacing: 4px; }
+    .item-price,
+    .item-sale-price    { font-size: 26px; }
+  }
+  @media (min-width: 3840px) {
+    .item-price-field   { min-width: 200px; padding: 8px 20px; }
+    .item-price-label   { font-size: 15px; }
+    .item-price,
+    .item-sale-price    { font-size: 32px; }
   }
 
   /* ── HINT TEXT ── */
@@ -937,9 +959,14 @@
         </span>
         <span class="item-name" contenteditable="true" spellcheck="false" onblur="saveName(this,'shop_products')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayName}</span>
         <div class="item-price-wrap">
-          <div class="item-price-label">price / sale</div>
-          <span class="item-price" contenteditable="true" spellcheck="false" title="Regular price (e.g. €19.99)" onblur="savePrice(this,'shop_products','price')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayPrice}</span>
-          <span class="item-sale-price" contenteditable="true" spellcheck="false" title="Sale price — leave empty for no discount" onblur="savePrice(this,'shop_products','sale_price')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displaySalePrice}</span>
+          <div class="item-price-field">
+            <div class="item-price-label">Price</div>
+            <span class="item-price" contenteditable="true" spellcheck="false" title="Regular price (e.g. €19.99)" onblur="savePrice(this,'shop_products','price')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayPrice}</span>
+          </div>
+          <div class="item-price-field">
+            <div class="item-price-label">Sale Price</div>
+            <span class="item-sale-price" contenteditable="true" spellcheck="false" title="Sale price — leave empty for no discount" onblur="savePrice(this,'shop_products','sale_price')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displaySalePrice}</span>
+          </div>
         </div>
         <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
           <span class="status-pill pill-${status}">${status.toUpperCase()} ▾</span>
