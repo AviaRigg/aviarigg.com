@@ -1,4 +1,5 @@
-export default {
+window.LIB_SCRIPT_DATA = window.LIB_SCRIPT_DATA || {};
+window.LIB_SCRIPT_DATA['transfer-uvs'] = {
   name: 'Transfer UVs',
   category: 'UVs',
   tags: ['uv','uvs','transfer','polyTransfer'],

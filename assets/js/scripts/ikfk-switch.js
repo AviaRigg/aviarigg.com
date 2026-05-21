@@ -1,4 +1,5 @@
-export default {
+window.LIB_SCRIPT_DATA = window.LIB_SCRIPT_DATA || {};
+window.LIB_SCRIPT_DATA['ikfk-switch'] = {
   name: 'IK / FK Switch with Match',
   category: 'IK / FK',
   tags: ['ik','fk','switch','match','arm','IKFK'],

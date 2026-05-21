@@ -1,4 +1,5 @@
-export default {
+window.LIB_SCRIPT_DATA = window.LIB_SCRIPT_DATA || {};
+window.LIB_SCRIPT_DATA['mirror-nonlinear'] = {
   name: 'Mirror NonLinear Deformer Weights',
   category: 'Deformers',
   tags: ['deformer','mirror','weights','nonlinear'],

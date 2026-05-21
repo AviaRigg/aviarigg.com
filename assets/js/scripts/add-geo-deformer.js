@@ -1,4 +1,5 @@
-export default {
+window.LIB_SCRIPT_DATA = window.LIB_SCRIPT_DATA || {};
+window.LIB_SCRIPT_DATA['add-geo-deformer'] = {
   name: 'Add Geometry to Deformer',
   category: 'Deformers',
   tags: ['deformer','geometry','nonlinear','controllers'],

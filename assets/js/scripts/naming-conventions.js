@@ -1,4 +1,5 @@
-export default {
+window.LIB_SCRIPT_DATA = window.LIB_SCRIPT_DATA || {};
+window.LIB_SCRIPT_DATA['naming-conventions'] = {
   name: 'Naming Conventions',
   category: 'Reference',
   tags: ['naming','suffix','convention','node','shader','texture'],

@@ -75,18 +75,32 @@ async function libFetchAndRender() {
   libUpdateStats();
 }
 
-// Dynamically load individual script JS files
+// Load individual script JS files via <script> tags (works on GitHub Pages)
 async function libLoadScriptData() {
-  await Promise.all(_rows.map(async row => {
-    if (_scripts[row.id]) return;
-    try {
-      const mod = await import(`/assets/js/scripts/${row.id}.js`);
-      _scripts[row.id] = { ...mod.default, ...row }; // DB row overrides file
-    } catch(e) {
-      console.warn(`Script file not found: ${row.id}.js`, e);
-      _scripts[row.id] = { id: row.id, name: row.name, category: row.category, tags: (row.tags||'').split(','), desc: '', status: row.status, access: row.access };
+  const toLoad = _rows.filter(row => !_scripts[row.id]);
+  await Promise.all(toLoad.map(row => new Promise(resolve => {
+    const src = `/assets/js/scripts/${row.id}.js`;
+    // Skip if already in DOM
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const el = document.createElement('script');
+    el.src = src;
+    el.onload = resolve;
+    el.onerror = () => {
+      console.warn(`Script file not found: ${row.id}.js`);
+      resolve();
+    };
+    document.head.appendChild(el);
+  })));
+  // Merge window.LIB_SCRIPT_DATA into _scripts, overlaying DB row fields
+  const data = window.LIB_SCRIPT_DATA || {};
+  _rows.forEach(row => {
+    if (data[row.id]) {
+      _scripts[row.id] = { ...data[row.id], ...row };
+    } else if (!_scripts[row.id]) {
+      _scripts[row.id] = { id: row.id, name: row.name, category: row.category,
+        tags: (row.tags||'').split(','), desc: '', status: row.status, access: row.access };
     }
-  }));
+  });
 }
 
 // ── SORT ──

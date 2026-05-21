@@ -1,4 +1,5 @@
-export default {
+window.LIB_SCRIPT_DATA = window.LIB_SCRIPT_DATA || {};
+window.LIB_SCRIPT_DATA['fix-shape-editor'] = {
   name: 'Fix Broken Shape Editor',
   category: 'Shape Editor',
   tags: ['shape editor','blendshape','shapeEditorManager','broken','empty','fix'],

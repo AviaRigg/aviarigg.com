@@ -1,4 +1,5 @@
-export default {
+window.LIB_SCRIPT_DATA = window.LIB_SCRIPT_DATA || {};
+window.LIB_SCRIPT_DATA['fix-arnold-visibility'] = {
   name: 'Fix Arnold Mesh Visibility',
   category: 'Arnold / Viewport',
   tags: ['arnold','visibility','primaryVisibility','render','invisible'],

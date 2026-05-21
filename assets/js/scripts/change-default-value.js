@@ -1,4 +1,5 @@
-export default {
+window.LIB_SCRIPT_DATA = window.LIB_SCRIPT_DATA || {};
+window.LIB_SCRIPT_DATA['change-default-value'] = {
   name: 'Change Default Attribute Value',
   category: 'Attributes',
   tags: ['attribute','default','value','enum'],
