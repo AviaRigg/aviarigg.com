@@ -81,14 +81,24 @@ document.addEventListener('DOMContentLoaded', async function() {
 const MAINTENANCE_PAGES = ['/pages/shop', '/pages/portfolio'];
 
 async function checkMaintenanceMode() {
-  // Admins always bypass maintenance
-  if (typeof _navProfile !== 'undefined' && _navProfile?.role === 'admin') return;
-  // Wait briefly for nav-auth to resolve if needed
+  // Wait for nav-auth Supabase client
   let attempts = 0;
-  while (typeof _navSb === 'undefined' && attempts++ < 20) {
+  while (typeof _navSb === 'undefined' && attempts++ < 40) {
     await new Promise(r => setTimeout(r, 50));
   }
   if (typeof _navSb === 'undefined') return;
+
+  // Wait for profile to resolve — but bail early if no user session
+  // _navUser = null means logged out; no point waiting for profile
+  attempts = 0;
+  while (typeof _navProfile === 'undefined' && attempts++ < 40) {
+    await new Promise(r => setTimeout(r, 50));
+    // If nav-auth has confirmed no session, stop waiting
+    if (typeof _navUser !== 'undefined' && !_navUser) break;
+  }
+
+  // Admins always bypass maintenance
+  if (_navProfile?.role === 'admin') return;
 
   try {
     const { data } = await _navSb
