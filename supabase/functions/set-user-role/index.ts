@@ -1,97 +1,52 @@
-// supabase/functions/set-user-role/index.ts
-// Deploy with: supabase functions deploy set-user-role
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+const SERVICE_KEY  =
+  Deno.env.get('SERVICE_ROLE_KEY') ||
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+const VALID_ROLES  = ['user', 'buyer', 'admin'];
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
 
-const VALID_ROLES = ['user', 'buyer', 'admin']
-
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+serve(async (req: Request) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
-    const { targetUserId, role } = await req.json()
+    const authHeader = req.headers.get('Authorization') || '';
+    const token = authHeader.replace('Bearer ', '');
+    if (!token) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
 
+    const { targetUserId, role } = await req.json();
     if (!targetUserId || !role || !VALID_ROLES.includes(role)) {
-      return new Response(JSON.stringify({ error: 'Invalid parameters' }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      })
+      return new Response(JSON.stringify({ error: 'Invalid parameters' }), { status: 400, headers: corsHeaders });
     }
 
-    // Verify the caller is an admin
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      })
-    }
+    const adminSb = createClient(SUPABASE_URL, SERVICE_KEY);
 
-    const userSb = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
-    )
-    const { data: { user }, error: userErr } = await userSb.auth.getUser()
+    const { data: { user }, error: userErr } = await adminSb.auth.getUser(token);
     if (userErr || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      })
+      console.error('getUser error:', userErr);
+      return new Response(JSON.stringify({ error: 'Invalid token', detail: userErr?.message }), { status: 401, headers: corsHeaders });
     }
 
-    // Service role client — bypasses RLS
-    const adminSb = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    )
+    const { data: callerProfile } = await adminSb.from('profiles').select('role').eq('id', user.id).single();
+    if (callerProfile?.role !== 'admin') return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: corsHeaders });
 
-    // Confirm caller is actually admin
-    const { data: callerProfile } = await adminSb
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (callerProfile?.role !== 'admin') {
-      return new Response(JSON.stringify({ error: 'Forbidden — admins only' }), {
-        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      })
-    }
-
-    // Prevent demoting yourself
     if (targetUserId === user.id && role !== 'admin') {
-      return new Response(JSON.stringify({ error: 'Cannot change your own role' }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      })
+      return new Response(JSON.stringify({ error: 'Cannot demote yourself' }), { status: 400, headers: corsHeaders });
     }
 
-    // Apply the role change
-    const { error: updateErr } = await adminSb
-      .from('profiles')
-      .update({ role })
-      .eq('id', targetUserId)
+    const { error: updateErr } = await adminSb.from('profiles').update({ role }).eq('id', targetUserId);
+    if (updateErr) return new Response(JSON.stringify({ error: 'Update failed' }), { status: 500, headers: corsHeaders });
 
-    if (updateErr) {
-      console.error('Role update error:', updateErr)
-      return new Response(JSON.stringify({ error: 'Update failed' }), {
-        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      })
-    }
-
-    return new Response(JSON.stringify({ success: true, role }), {
-      status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    })
+    return new Response(JSON.stringify({ success: true, role }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
   } catch (err) {
-    console.error('set-user-role error:', err)
-    return new Response(JSON.stringify({ error: 'Server error' }), {
-      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    })
+    console.error('Error:', err);
+    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: corsHeaders });
   }
-})
+});
