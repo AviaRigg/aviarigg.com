@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Purchase Complete — AviaRigg</title>
 <script>
+  document.addEventListener('touchmove', function(e) {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+  let lastTap = 0;
+  document.addEventListener('touchend', function(e) {
+    const tag = e.target.tagName;
+    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(tag)) return;
+    const now = Date.now();
+    if (now - lastTap < 300) e.preventDefault();
+    lastTap = now;
+  }, { passive: false });
+</script>
+<script>
   if (window.top !== window.self) {
     window.top.location.href = window.location.href;
   }

@@ -35,6 +35,9 @@
   }
 </style>
   <script>
+    /* ============================================================
+       NO-ZOOM BLOCK — copy/paste this into every page
+       ============================================================ */
     // Prevent pinch-to-zoom on iOS Safari
     document.addEventListener('touchmove', function(e) {
       if (e.touches.length > 1) e.preventDefault();
@@ -48,6 +51,9 @@
       if (now - lastTap < 300) e.preventDefault();
       lastTap = now;
     }, { passive: false });
+    /* ============================================================
+       END NO-ZOOM BLOCK
+       ============================================================ */
   </script>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>

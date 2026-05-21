@@ -11,6 +11,19 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<script>
+  document.addEventListener('touchmove', function(e) {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+  let lastTap = 0;
+  document.addEventListener('touchend', function(e) {
+    const tag = e.target.tagName;
+    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(tag)) return;
+    const now = Date.now();
+    if (now - lastTap < 300) e.preventDefault();
+    lastTap = now;
+  }, { passive: false });
+</script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   .page { display: block !important; }

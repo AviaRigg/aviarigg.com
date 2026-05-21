@@ -6,6 +6,20 @@
 <title>About — AviaRigg</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
+
+<script>
+  document.addEventListener('touchmove', function(e) {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+  let lastTap = 0;
+  document.addEventListener('touchend', function(e) {
+    const tag = e.target.tagName;
+    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(tag)) return;
+    const now = Date.now();
+    if (now - lastTap < 300) e.preventDefault();
+    lastTap = now;
+  }, { passive: false });
+</script>
 <style>
   .page { display: block !important; }
   .nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
