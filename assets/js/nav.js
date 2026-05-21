@@ -88,17 +88,23 @@ async function checkMaintenanceMode() {
   }
   if (typeof _navSb === 'undefined') return;
 
-  // Wait for profile to resolve — but bail early if no user session
-  // _navUser = null means logged out; no point waiting for profile
+  // Wait for nav-auth session to resolve
   attempts = 0;
-  while (typeof _navProfile === 'undefined' && attempts++ < 40) {
+  while (typeof _navUser === 'undefined' && attempts++ < 40) {
     await new Promise(r => setTimeout(r, 50));
-    // If nav-auth has confirmed no session, stop waiting
-    if (typeof _navUser !== 'undefined' && !_navUser) break;
   }
 
-  // Admins always bypass maintenance
-  if (_navProfile?.role === 'admin') return;
+  // Fetch role from profiles table if logged in
+  if (_navUser) {
+    try {
+      const { data: profile } = await _navSb
+        .from('profiles')
+        .select('role')
+        .eq('id', _navUser.id)
+        .single();
+      if (profile?.role === 'admin') return; // admins bypass maintenance
+    } catch(e) { /* not logged in or no profile — continue */ }
+  }
 
   try {
     const { data } = await _navSb
