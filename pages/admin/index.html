@@ -1210,7 +1210,10 @@
           <span class="item-cat">${displayCat} ▾</span>
           <div class="cat-dropdown">${shopCatOpts}</div>
         </span>
-        <span class="item-name" contenteditable="true" spellcheck="false" onblur="saveName(this,'shop_products')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayName}</span>
+        <span style="display:flex;flex-direction:column;gap:2px;overflow:hidden;">
+          <span class="item-name" contenteditable="true" spellcheck="false" onblur="saveName(this,'shop_products')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayName}</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${id}">${id}</span>
+        </span>
         <div class="item-price-wrap">
           <div class="item-price-field">
             <div class="item-price-label">Price</div>
@@ -1271,7 +1274,10 @@
           <span class="item-cat">${displayCat} ▾</span>
           <div class="cat-dropdown">${portCatOpts}</div>
         </span>
-        <span class="item-name" contenteditable="true" spellcheck="false" onblur="saveName(this,'portfolio_projects')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayName}</span>
+        <span style="display:flex;flex-direction:column;gap:2px;overflow:hidden;">
+          <span class="item-name" contenteditable="true" spellcheck="false" onblur="saveName(this,'portfolio_projects')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayName}</span>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${id}">${id}</span>
+        </span>
         <div class="item-row-footer">
           <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
             <span class="status-pill pill-${status}">${status.toUpperCase()} ▾</span>
