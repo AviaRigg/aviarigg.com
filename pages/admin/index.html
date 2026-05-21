@@ -7,9 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
 <link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<link rel="shortcut icon" href="/assets/icons/SiteIcon.png">
+<link rel="apple-touch-icon" href="/assets/icons/SiteIcon.png">
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
 <script>
@@ -1530,8 +1529,8 @@
 
   // ── MASS EMAIL ──
   async function sendMassEmail() {
-    const subject = document.getElementById('email-subject')?.value?.trim();
-    const body    = document.getElementById('email-body')?.value?.trim();
+    const subject  = document.getElementById('email-subject')?.value?.trim();
+    const body     = document.getElementById('email-body')?.value?.trim();
     const statusEl = document.getElementById('email-status');
 
     if (!subject || !body) { toast('// Subject and body required', true); return; }
@@ -1540,10 +1539,63 @@
     statusEl.textContent = '// Sending...';
     statusEl.style.color = 'var(--accent2)';
 
+    // Convert plain line breaks to <br> if not already HTML
+    const isHtml = body.includes('<') && body.includes('>');
+    const bodyHtml = isHtml ? body : body.replace(/\n/g, '<br>');
+
+    // Wrap in branded template
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${subject}</title>
+</head>
+<body style="margin:0;padding:0;background:#0a0a10;font-family:'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a10;padding:40px 20px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+      <!-- Logo header -->
+      <tr>
+        <td style="background:#0d0d18;border:1px solid rgba(255,255,255,0.08);border-bottom:2px solid #8b4fc8;padding:28px 36px;text-align:center;">
+          <img src="https://aviarigg.com/apple-touch-icon.png" width="56" height="56" alt="AviaRigg" style="display:block;margin:0 auto 12px;border-radius:12px;">
+          <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:5px;text-transform:uppercase;color:#8b4fc8;margin-bottom:4px;">// AviaRigg</div>
+          <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:22px;font-weight:700;color:#eeeef8;letter-spacing:1px;">${subject}</div>
+        </td>
+      </tr>
+
+      <!-- Body -->
+      <tr>
+        <td style="background:#0d0d18;border:1px solid rgba(255,255,255,0.08);border-top:none;padding:36px 36px 28px;">
+          <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.8;color:#b0b0c8;">
+            ${bodyHtml}
+          </div>
+        </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td style="padding:20px 36px;text-align:center;">
+          <div style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;letter-spacing:2px;color:#3a3a5a;text-transform:uppercase;">
+            Paul Chedozeau — AviaRigg &nbsp;·&nbsp;
+            <a href="https://aviarigg.com" style="color:#8b4fc8;text-decoration:none;">aviarigg.com</a>
+            &nbsp;·&nbsp;
+            <a href="https://aviarigg.com" style="color:#3a3a5a;text-decoration:none;">Unsubscribe</a>
+          </div>
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+
     try {
       const sb = await _getAdminSb();
       const { error } = await sb.functions.invoke('send-mass-email', {
-        body: { subject, html: body }
+        body: { subject, html }
       });
       if (error) throw error;
       statusEl.textContent = '// Sent ✓';
