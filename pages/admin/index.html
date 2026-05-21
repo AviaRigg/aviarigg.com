@@ -887,6 +887,16 @@
             <span class="toggle-track"></span>
           </label>
         </div>
+        <div class="toggle-row">
+          <div class="toggle-row-left">
+            <div class="toggle-row-name" style="color:#ff5050;">Maintenance Mode</div>
+            <div class="toggle-row-desc">Disables Shop + Portfolio — shows maintenance splash to visitors</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-maintenance" onchange="saveMaintenanceSetting(this.checked)">
+            <span class="toggle-track" style="border-color:rgba(255,80,80,0.4);"></span>
+          </label>
+        </div>
       </div>
 
       <!-- Quick links -->
@@ -1136,9 +1146,10 @@
     if (!data) return;
     const map = Object.fromEntries(data.map(r => [r.key, r.value]));
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.checked = val === 'true'; };
-    set('toggle-otw',    map['open_to_work']);
-    set('toggle-comm',   map['commissions_open']);
-    set('toggle-banner', map['banner_enabled']);
+    set('toggle-otw',         map['open_to_work']);
+    set('toggle-comm',        map['commissions_open']);
+    set('toggle-banner',      map['banner_enabled']);
+    set('toggle-maintenance', map['maintenance_mode']);
     updateSiteStatFromMap(map);
   }
 
@@ -1154,6 +1165,24 @@
       if (btn) { btn.textContent = 'Work Status: ' + (value ? 'OPEN ✓' : 'CLOSED ✗'); btn.style.color = value ? '#00e87a' : '#ff5050'; }
     }
     // Refresh site stat card
+    const otw  = document.getElementById('toggle-otw')?.checked;
+    const comm = document.getElementById('toggle-comm')?.checked;
+    updateSiteStatFromValues(otw, comm);
+  }
+
+  async function saveMaintenanceSetting(value) {
+    const sb = await _getAdminSb();
+    const updates = [
+      { key: 'maintenance_mode', value: String(value) },
+    ];
+    if (value) {
+      updates.push({ key: 'maintenance_since', value: new Date().toISOString() });
+    }
+    for (const u of updates) {
+      await sb.from('site_settings').upsert(u);
+    }
+    toast('// Maintenance mode: ' + (value ? 'ON ⚠' : 'OFF'), value);
+    // Update stat card
     const otw  = document.getElementById('toggle-otw')?.checked;
     const comm = document.getElementById('toggle-comm')?.checked;
     updateSiteStatFromValues(otw, comm);

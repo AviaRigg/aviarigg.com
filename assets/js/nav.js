@@ -21,11 +21,11 @@ document.addEventListener('DOMContentLoaded', async function() {
   ];
 
   const navLinks = links.map(l =>
-    `<a class="nav-link${isActive(l.href) ? ' active' : ''}" href="${l.href}">${l.label}</a>`
+    `<a class="nav-link${isActive(l.href) ? ' active' : ''}" href="${l.href}" data-nav-key="${l.href}">${l.label}</a>`
   ).join('\n    ');
 
   const drawerLinks = links.map(l =>
-    `<a class="nav-link${isActive(l.href) ? ' active' : ''}" href="${l.href}">${l.label}</a>`
+    `<a class="nav-link${isActive(l.href) ? ' active' : ''}" href="${l.href}" data-nav-key="${l.href}">${l.label}</a>`
   ).join('\n  ');
 
   const NAV_HTML = `<nav class="topnav">
@@ -43,6 +43,20 @@ document.addEventListener('DOMContentLoaded', async function() {
   ${drawerLinks}
   <a class="nav-badge" href="/pages/contact">&#9679; Open to Work</a>
   <div id="nav-auth-container-mobile" style="padding:16px 0 8px;border-top:1px solid rgba(255,255,255,0.06);margin-top:8px;"><a class="nav-auth-link" href="/pages/login">Log In</a></div>
+</div>
+
+<!-- MAINTENANCE SPLASH — hidden by default -->
+<div id="maintenance-splash" style="display:none;position:fixed;inset:0;z-index:99999;background:#07070f;flex-direction:column;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;">
+  <div style="max-width:560px;width:90%;text-align:center;">
+    <div style="font-size:10px;letter-spacing:5px;text-transform:uppercase;color:rgba(255,80,80,0.7);margin-bottom:24px;">// System Offline</div>
+    <div style="font-size:clamp(28px,6vw,52px);font-weight:700;color:#eeeef8;line-height:1.1;margin-bottom:16px;font-family:'Share Tech Mono',monospace;">Under Maintenance</div>
+    <div style="font-size:12px;letter-spacing:3px;color:#666680;text-transform:uppercase;margin-bottom:48px;">This page is temporarily unavailable</div>
+    <div style="border:1px solid rgba(255,80,80,0.2);background:rgba(255,80,80,0.04);padding:24px 32px;margin-bottom:40px;">
+      <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,80,80,0.6);margin-bottom:10px;">// Down for</div>
+      <div id="maintenance-timer" style="font-size:clamp(24px,5vw,40px);letter-spacing:4px;color:#ff5050;font-variant-numeric:tabular-nums;">—</div>
+    </div>
+    <a href="/" style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#666680;text-decoration:none;border:1px solid rgba(255,255,255,0.1);padding:12px 24px;transition:all 0.2s;" onmouseover="this.style.color='#eeeef8';this.style.borderColor='rgba(255,255,255,0.3)'" onmouseout="this.style.color='#666680';this.style.borderColor='rgba(255,255,255,0.1)'">← Back to Home</a>
+  </div>
 </div>`;
 
   // Inject nav
@@ -57,7 +71,95 @@ document.addEventListener('DOMContentLoaded', async function() {
   if (typeof loadAndApplySettings === 'function') {
     await loadAndApplySettings();
   }
+
+  // ── MAINTENANCE CHECK ──
+  await checkMaintenanceMode();
 });
+
+// ── MAINTENANCE LOGIC ──
+
+const MAINTENANCE_PAGES = ['/pages/shop', '/pages/portfolio'];
+
+async function checkMaintenanceMode() {
+  // Admins always bypass maintenance
+  if (typeof _navProfile !== 'undefined' && _navProfile?.role === 'admin') return;
+  // Wait briefly for nav-auth to resolve if needed
+  let attempts = 0;
+  while (typeof _navSb === 'undefined' && attempts++ < 20) {
+    await new Promise(r => setTimeout(r, 50));
+  }
+  if (typeof _navSb === 'undefined') return;
+
+  try {
+    const { data } = await _navSb
+      .from('site_settings')
+      .select('key, value')
+      .in('key', ['maintenance_mode', 'maintenance_since']);
+
+    if (!data) return;
+    const map = Object.fromEntries(data.map(r => [r.key, r.value]));
+    const isOn = map['maintenance_mode'] === 'true';
+
+    if (isOn) {
+      // Grey out nav links for shop + portfolio
+      applyMaintenanceNav(true);
+
+      // Show splash if on a maintenance page
+      const path = window.location.pathname;
+      const isRestricted = MAINTENANCE_PAGES.some(p => path.startsWith(p));
+      if (isRestricted) {
+        showMaintenanceSplash(map['maintenance_since'] || null);
+      }
+    }
+  } catch(e) {
+    console.warn('Maintenance check failed:', e);
+  }
+}
+
+function applyMaintenanceNav(on) {
+  MAINTENANCE_PAGES.forEach(href => {
+    document.querySelectorAll(`[data-nav-key="${href}"]`).forEach(el => {
+      if (on) {
+        el.style.opacity = '0.35';
+        el.style.pointerEvents = 'none';
+        el.style.cursor = 'not-allowed';
+        el.title = 'Under maintenance';
+      } else {
+        el.style.opacity = '';
+        el.style.pointerEvents = '';
+        el.style.cursor = '';
+        el.title = '';
+      }
+    });
+  });
+}
+
+function showMaintenanceSplash(sinceIso) {
+  const splash = document.getElementById('maintenance-splash');
+  if (!splash) return;
+  splash.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  if (!sinceIso) {
+    document.getElementById('maintenance-timer').textContent = '—';
+    return;
+  }
+
+  const since = new Date(sinceIso).getTime();
+
+  function tick() {
+    const elapsed = Math.floor((Date.now() - since) / 1000);
+    const h = Math.floor(elapsed / 3600);
+    const m = Math.floor((elapsed % 3600) / 60);
+    const s = elapsed % 60;
+    const pad = n => String(n).padStart(2, '0');
+    const el = document.getElementById('maintenance-timer');
+    if (el) el.textContent = `${pad(h)}h ${pad(m)}m ${pad(s)}s`;
+  }
+
+  tick();
+  setInterval(tick, 1000);
+}
 
 function toggleMobileNav() {
   const drawer = document.getElementById('nav-drawer');
