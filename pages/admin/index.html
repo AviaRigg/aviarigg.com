@@ -763,6 +763,7 @@
               <th>Username</th>
               <th>Role</th>
               <th>Joined</th>
+              <th>License Key</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -774,7 +775,7 @@
     </div>
     <div class="admin-gap"></div>
 
-    <!-- ══ LICENSE KEYS ═══════════════════════════════════════ -->\n    <div class="admin-section-label">\n      <span>// License Keys</span>\n      <span id="key-count-label" style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;">—</span>\n    </div>\n    <div class="admin-full">\n      <div class="admin-panel-title">Redemption Status</div>\n      <div style="overflow-x:auto;">\n        <table class="user-table" id="license-key-table">\n          <thead>\n            <tr>\n              <th>Key</th>\n              <th>Status</th>\n              <th>Redeemed By</th>\n              <th>Redeemed At</th>\n            </tr>\n          </thead>\n          <tbody id="license-key-body">\n            <tr><td colspan="4" class="table-empty">Loading keys...</td></tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n    <div class="admin-gap"></div>\n\n    <!-- ══ MASS EMAIL ══════════════════════════════════════════ -->
+    <!-- ══ MASS EMAIL ══════════════════════════════════════════ -->
     <div class="admin-section-label">
       <span>// Mass Email</span>
       <span style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;">via Resend edge function</span>
@@ -858,7 +859,6 @@
       loadPortfolio(),
       loadUsers(),
       loadBanner(),
-      loadLicenseKeys(),
     ]);
   });
 
@@ -1172,18 +1172,28 @@
       .from('profiles_with_created_at')
       .select('*');
 
+    // Also fetch all redeemed keys so we can match by user id
+    const { data: keys } = await sb
+      .from('license_keys')
+      .select('key, redeemed_by')
+      .eq('redeemed', true);
+
+    // Build a map: user_id → key
+    const keyByUser = {};
+    (keys || []).forEach(k => { if (k.redeemed_by) keyByUser[k.redeemed_by] = k.key; });
+
     const tbody   = document.getElementById('user-table-body');
     const countEl = document.getElementById('user-count-label');
 
     if (error) {
       console.error('loadUsers error:', error);
-      tbody.innerHTML = `<tr><td colspan="4" class="table-empty" style="color:#ff5050;">// DB error: ${error.message}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" class="table-empty" style="color:#ff5050;">// DB error: ${error.message}</td></tr>`;
       if (countEl) countEl.textContent = 'error';
       return;
     }
 
     if (!data?.length) {
-      tbody.innerHTML = '<tr><td colspan="4" class="table-empty">No profiles found — check Supabase RLS policies on the profiles table.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No profiles found — check Supabase RLS policies on the profiles table.</td></tr>';
       if (countEl) countEl.textContent = '0 total';
       return;
     }
@@ -1200,6 +1210,10 @@
       const role = p.role || 'user';
       const roleClass = role === 'admin' ? 'role-admin' : role === 'buyer' ? 'role-buyer' : 'role-user';
       const isMe = p.id === _adminUser?.id;
+      const licenseKey = keyByUser[p.id] || null;
+      const keyHtml = licenseKey
+        ? `<span style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;color:#00e87a;">${licenseKey}</span>`
+        : `<span style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:8px;">—</span>`;
       // Role selector dropdown (not shown for self)
       const roleSelector = isMe
         ? `<span class="${roleClass}">${role.toUpperCase()}</span>`
@@ -1215,6 +1229,7 @@
         <td>${name}<span class="user-email-sub">${email}</span></td>
         <td>${roleSelector}</td>
         <td class="user-date">${date}</td>
+        <td>${keyHtml}</td>
         <td>${isMe
           ? '<span style="color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:8px;letter-spacing:1px;">YOU</span>'
           : `<button class="user-del-btn" onclick="deleteUser('${p.id}', this)">Delete</button>`
@@ -1261,54 +1276,6 @@
       toast('// Delete failed', true);
       btn.textContent = 'Delete'; btn.disabled = false;
     }
-  }
-
-  // ── LICENSE KEYS ──
-  async function loadLicenseKeys() {
-    const sb = await _getAdminSb();
-    const { data, error } = await sb
-      .from('license_keys_with_user')
-      .select('key, redeemed, redeemed_at, username, email')
-      .order('redeemed', { ascending: false })  // redeemed keys first
-      .order('redeemed_at', { ascending: false, nullsFirst: false });
-
-    const tbody   = document.getElementById('license-key-body');
-    const countEl = document.getElementById('key-count-label');
-
-    if (error) {
-      tbody.innerHTML = `<tr><td colspan="4" class="table-empty" style="color:#ff5050;">// DB error: ${error.message}</td></tr>`;
-      return;
-    }
-    if (!data?.length) {
-      tbody.innerHTML = '<tr><td colspan="4" class="table-empty">No keys found.</td></tr>';
-      return;
-    }
-
-    const total    = data.length;
-    const redeemed = data.filter(k => k.redeemed).length;
-    if (countEl) countEl.textContent = `${redeemed} / ${total} redeemed`;
-
-    tbody.innerHTML = data.map(k => {
-      const statusHtml = k.redeemed
-        ? `<span style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#00e87a;border:1px solid rgba(0,232,122,0.35);background:rgba(0,232,122,0.06);padding:2px 8px;">REDEEMED</span>`
-        : `<span style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);border:1px solid var(--border);padding:2px 8px;">UNUSED</span>`;
-
-      const userHtml = k.redeemed
-        ? `<span style="color:var(--text-bright);">${k.username || '—'}</span>
-           <span class="user-email-sub">${k.email || '—'}</span>`
-        : `<span style="color:var(--text-dim);">—</span>`;
-
-      const dateHtml = k.redeemed_at
-        ? new Date(k.redeemed_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'2-digit', hour:'2-digit', minute:'2-digit' })
-        : '—';
-
-      return `<tr>
-        <td style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;color:${k.redeemed ? 'var(--text-dim)' : 'var(--text)'};">${k.key}</td>
-        <td>${statusHtml}</td>
-        <td>${userHtml}</td>
-        <td class="user-date">${dateHtml}</td>
-      </tr>`;
-    }).join('');
   }
 
   // ── BANNER ──
