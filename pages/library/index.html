@@ -27,10 +27,11 @@
 #lib-gate{position:fixed;inset:0;z-index:9998;background:var(--bg,#07070f);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
 
 /* ── LAYOUT ── */
-.lib-page{display:flex;height:calc(100vh - var(--nav-h,60px));overflow:hidden;}
+.lib-page-outer{width:100%;height:calc(100vh - var(--nav-h,60px));overflow:hidden;display:flex;justify-content:center;background:var(--bg,#07070f);}
+.lib-page{display:flex;width:100%;max-width:1800px;height:100%;overflow:hidden;}
 
 /* ── SIDEBAR ── */
-.lib-sidebar{width:240px;flex-shrink:0;background:rgba(255,255,255,0.015);border-right:1px solid var(--border,rgba(255,255,255,0.07));display:flex;flex-direction:column;overflow:hidden;}
+.lib-sidebar{width:clamp(220px,16%,300px);flex-shrink:0;background:rgba(255,255,255,0.015);border-right:1px solid var(--border,rgba(255,255,255,0.07));display:flex;flex-direction:column;overflow:hidden;}
 .lib-sidebar-header{padding:20px 16px 14px;border-bottom:1px solid var(--border,rgba(255,255,255,0.07));flex-shrink:0;}
 .lib-sidebar-eyebrow{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--accent,#8b4fc8);margin-bottom:4px;}
 .lib-sidebar-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--text-bright,#eeeef8);letter-spacing:2px;text-transform:uppercase;}
@@ -194,14 +195,19 @@
 <script src="/assets/js/banner.js"></script>
 <script src="/assets/js/lib-engine.js"></script>
 
-<!-- LOGIN GATE -->
+<!-- LOGIN GATE — reuses _navSb from nav-auth.js, no duplicate client -->
 <script>
 document.addEventListener('DOMContentLoaded', async function() {
-  const _gateSb = supabase.createClient(
-    'https://bbyiezjvonacajigqoik.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJieWllemp2b25hY2FqaWdxb2lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMTI0MTcsImV4cCI6MjA5NDY4ODQxN30.TbSdKC1qXcGTpyEmILfPlZi_z1RrTR1-SPCFjE-1mLs'
-  );
-  const { data: { session } } = await _gateSb.auth.getSession();
+  // Wait for nav-auth.js to initialise _navSb
+  let attempts = 0;
+  while (typeof _navSb === 'undefined' && attempts++ < 40) {
+    await new Promise(r => setTimeout(r, 50));
+  }
+  if (typeof _navSb === 'undefined') {
+    window.location.replace('/pages/login?redirect=' + encodeURIComponent(window.location.pathname));
+    return;
+  }
+  const { data: { session } } = await _navSb.auth.getSession();
   if (!session) {
     window.location.replace('/pages/login?redirect=' + encodeURIComponent(window.location.pathname));
     return;
@@ -229,7 +235,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 </div>
 
 <div class="page active" id="page-library" style="visibility:hidden;">
-<div class="lib-page">
+<div class="lib-page-outer"><div class="lib-page">
 
   <!-- SIDEBAR -->
   <aside class="lib-sidebar">
@@ -315,6 +321,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     <div id="lib-view-script" style="display:none;"></div>
 
   </main>
+</div>
 </div>
 </div>
 

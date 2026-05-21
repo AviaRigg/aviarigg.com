@@ -4,6 +4,7 @@
 //           sort/filter, access gating, admin controls
 // ══════════════════════════════════════════
 
+// Uses _navSb from nav-auth.js — no duplicate client
 const LIB_SB_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
 const LIB_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJieWllemp2b25hY2FqaWdxb2lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMTI0MTcsImV4cCI6MjA5NDY4ODQxN30.TbSdKC1qXcGTpyEmILfPlZi_z1RrTR1-SPCFjE-1mLs';
 
@@ -49,7 +50,7 @@ async function libInit() {
   _isAdmin = window._navIsAdmin || false;
   _isBuyer = window._navIsBuyer || false;
 
-  _sb = typeof _navSb !== 'undefined' ? _navSb : supabase.createClient(LIB_SB_URL, LIB_SB_KEY);
+  _sb = _navSb; // always use the shared nav-auth client — never create a new one
 
   await libFetchAndRender();
 
