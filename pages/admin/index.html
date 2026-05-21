@@ -1240,10 +1240,14 @@
 
   async function changeUserRole(userId, btn, newRole) {
     const sb = await _getAdminSb();
-    const { error } = await sb.from('profiles')
-      .update({ role: newRole, updated_at: new Date().toISOString() })
-      .eq('id', userId);
-    if (error) { toast('// Role change failed', true); return; }
+    const { data, error } = await sb.functions.invoke('set-user-role', {
+      body: { targetUserId: userId, role: newRole }
+    });
+    if (error || data?.error) {
+      toast('// Role change failed', true);
+      console.error('set-user-role error:', error || data?.error);
+      return;
+    }
     // Update pill UI
     const wrap = btn.closest('.pill-wrap');
     const pill = wrap.querySelector('span');
