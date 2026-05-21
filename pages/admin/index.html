@@ -302,6 +302,17 @@
   }
   .item-name:hover { border-bottom-color: rgba(139,79,200,0.3); }
   .item-name:focus { border-bottom-color: var(--accent); background: rgba(139,79,200,0.05); }
+  .item-id-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(9px,0.65vw,11px); letter-spacing: 1px;
+    color: var(--text-dim);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    border-bottom: 1px solid transparent;
+    outline: none; cursor: text;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .item-id-sub:hover { color: var(--text); border-bottom-color: rgba(139,79,200,0.3); }
+  .item-id-sub:focus { color: var(--accent2); border-bottom-color: var(--accent); background: rgba(139,79,200,0.05); }
   .item-cat {
     font-family: 'Share Tech Mono', monospace;
     font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
@@ -321,12 +332,14 @@
     .item-list-header { grid-template-columns: 24px 36px 180px 1fr 320px 140px 30px; }
     .item-list-header > span { font-size: 12px; letter-spacing: 4px; padding: 10px 14px; }
     .item-row > * { padding: 16px 14px; }
+    .item-id-sub { font-size: 13px; letter-spacing: 2px; }
   }
   @media (min-width: 3840px) {
     .item-row { grid-template-columns: 28px 44px 220px 1fr 400px 170px 36px; }
     .item-list-header { grid-template-columns: 28px 44px 220px 1fr 400px 170px 36px; }
     .item-list-header > span { font-size: 15px; letter-spacing: 5px; padding: 13px 18px; }
     .item-row > * { padding: 20px 18px; }
+    .item-id-sub { font-size: 16px; letter-spacing: 2px; }
   }
 
   /* ── USER TABLE ── */
@@ -1210,9 +1223,9 @@
           <span class="item-cat">${displayCat} ▾</span>
           <div class="cat-dropdown">${shopCatOpts}</div>
         </span>
-        <span style="display:flex;flex-direction:column;gap:2px;overflow:hidden;">
+        <span style="display:flex;flex-direction:column;gap:3px;overflow:hidden;min-width:0;">
           <span class="item-name" contenteditable="true" spellcheck="false" onblur="saveName(this,'shop_products')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayName}</span>
-          <span style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${id}">${id}</span>
+          <span class="item-id-sub" contenteditable="true" spellcheck="false" title="Supabase row ID — click to edit" onblur="saveRowId(this,'shop_products')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${id}</span>
         </span>
         <div class="item-price-wrap">
           <div class="item-price-field">
@@ -1274,9 +1287,9 @@
           <span class="item-cat">${displayCat} ▾</span>
           <div class="cat-dropdown">${portCatOpts}</div>
         </span>
-        <span style="display:flex;flex-direction:column;gap:2px;overflow:hidden;">
+        <span style="display:flex;flex-direction:column;gap:3px;overflow:hidden;min-width:0;">
           <span class="item-name" contenteditable="true" spellcheck="false" onblur="saveName(this,'portfolio_projects')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${displayName}</span>
-          <span style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${id}">${id}</span>
+          <span class="item-id-sub" contenteditable="true" spellcheck="false" title="Supabase row ID — click to edit" onblur="saveRowId(this,'portfolio_projects')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${id}</span>
         </span>
         <div class="item-row-footer">
           <span class="pill-wrap" onclick="event.stopPropagation();toggleWrap(this)">
@@ -1352,6 +1365,31 @@
     // Close dropdown
     btn.closest('.cat-wrap').classList.remove('open');
     btn.closest('.cat-dropdown').querySelectorAll('.cat-opt').forEach(o => o.classList.toggle('active', o === btn));
+  }
+
+  // ── SAVE ROW ID ──
+  async function saveRowId(el, table) {
+    const row = el.closest('.item-row');
+    const oldId = row.dataset.id;
+    const newId = el.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+    if (!newId || newId === oldId) { el.textContent = oldId; return; }
+    const sb = await _getAdminSb();
+    const { error } = await sb.from(table)
+      .update({ id: newId, updated_at: new Date().toISOString() })
+      .eq('id', oldId);
+    if (error) {
+      console.error('ID save error:', error);
+      el.textContent = oldId;
+      el.style.color = '#ff5050';
+      setTimeout(() => el.style.color = '', 1500);
+      toast('// ID save failed', true);
+    } else {
+      row.dataset.id = newId;
+      el.textContent = newId;
+      el.style.color = 'var(--green)';
+      setTimeout(() => el.style.color = '', 800);
+      toast('// ID → ' + newId);
+    }
   }
 
   // ── SAVE NAME ──
