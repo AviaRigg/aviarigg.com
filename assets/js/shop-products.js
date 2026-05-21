@@ -315,7 +315,7 @@ async function loadProductStatuses() {
   if (featuredId) {
     const card = document.querySelector(`[data-product-id="${featuredId}"]`);
     if (card) applyStatusToCard(featuredId, 'featured', card, false);
-    applyHeroPrice(featuredPrice, featuredSalePrice);
+    // swapHeroCard inside applyStatusToCard already renders the full price
   } else {
     showHeroEmpty();
   }
