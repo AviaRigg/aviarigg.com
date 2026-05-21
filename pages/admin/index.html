@@ -1256,6 +1256,26 @@
     const row = btn.closest('.item-row');
     const id = row.dataset.id;
     const sb = await _getAdminSb();
+
+    // If setting featured, demote any existing featured row first
+    if (newStatus === 'featured') {
+      const allRows = document.querySelectorAll(`.item-row[data-list="${row.dataset.list}"]`);
+      for (const otherRow of allRows) {
+        if (otherRow === row) continue;
+        const otherPill = otherRow.querySelector('.status-pill');
+        if (otherPill && otherPill.textContent.trim().startsWith('FEATURED')) {
+          const otherId = otherRow.dataset.id;
+          const demoteTo = table === 'portfolio_projects' ? 'published' : 'live';
+          await sb.from(table).update({ status: demoteTo, updated_at: new Date().toISOString() }).eq('id', otherId);
+          otherPill.className = 'status-pill pill-' + demoteTo;
+          otherPill.textContent = demoteTo.toUpperCase() + ' ▾';
+          otherRow.querySelector('.pill-dropdown')?.querySelectorAll('.pill-opt').forEach(o => {
+            o.classList.toggle('active', o.textContent.trim() === demoteTo.toUpperCase());
+          });
+        }
+      }
+    }
+
     const { error } = await sb.from(table).update({ status: newStatus, updated_at: new Date().toISOString() }).eq('id', id);
     if (error) { console.error('Status save error:', error); return; }
     // Update pill UI
@@ -1451,8 +1471,10 @@
 
   async function changeUserRole(userId, btn, newRole) {
     const sb = await _getAdminSb();
+    const { data: { session } } = await sb.auth.getSession();
     const { data, error } = await sb.functions.invoke('set-user-role', {
-      body: { targetUserId: userId, role: newRole }
+      body: { targetUserId: userId, role: newRole },
+      headers: session ? { Authorization: `Bearer ${session.access_token}` } : {}
     });
     if (error || data?.error) {
       toast('// Role change failed', true);
@@ -1475,9 +1497,11 @@
     if (!confirm('Delete this user? This cannot be undone.')) return;
     btn.textContent = '...'; btn.disabled = true;
     const sb = await _getAdminSb();
+    const { data: { session } } = await sb.auth.getSession();
     try {
       const { error } = await sb.functions.invoke('delete-user', {
-        body: { userId }
+        body: { userId },
+        headers: session ? { Authorization: `Bearer ${session.access_token}` } : {}
       });
       if (error) throw error;
       btn.closest('tr').remove();
@@ -1594,8 +1618,11 @@
 
     try {
       const sb = await _getAdminSb();
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { toast('// Not logged in', true); return; }
       const { error } = await sb.functions.invoke('send-mass-email', {
-        body: { subject, html }
+        body: { subject, html },
+        headers: { Authorization: `Bearer ${session.access_token}` }
       });
       if (error) throw error;
       statusEl.textContent = '// Sent ✓';
