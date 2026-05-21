@@ -764,7 +764,7 @@
       z-index: 9000;
       flex-direction: column;
       align-items: flex-end;
-      gap: 10px;
+      gap: 8px;
     }
     #edit-mode-btn {
       font-family: 'Share Tech Mono', monospace;
@@ -776,6 +776,110 @@
       transition: all 0.2s;
     }
     #edit-mode-btn:hover { background: rgba(139,79,200,0.25); }
+
+    #add-product-btn {
+      display: none;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+      color: #00e87a;
+      background: rgba(0,232,122,0.1);
+      border: 1px solid rgba(0,232,122,0.45);
+      padding: 10px 20px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    #add-product-btn:hover { background: rgba(0,232,122,0.2); }
+    body.edit-mode #add-product-btn { display: block; }
+
+    /* ── DRAG REORDER ── */
+    .product-card.drag-over { outline: 2px dashed rgba(0,232,122,0.6) !important; background: rgba(0,232,122,0.04) !important; }
+    .product-card.dragging  { opacity: 0.35 !important; cursor: grabbing !important; }
+    body.edit-mode .product-card { cursor: grab; }
+
+    /* ── ADD PRODUCT MODAL ── */
+    #add-product-modal {
+      display: none; position: fixed; inset: 0; z-index: 9998;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    #add-product-modal.open { display: flex; }
+    .apm-box {
+      width: min(600px, 95vw);
+      background: #0d0d12;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-top: 2px solid #8b4fc8;
+      box-shadow: 0 0 60px rgba(139,79,200,0.25);
+      display: flex; flex-direction: column;
+      max-height: 92vh; overflow: hidden;
+    }
+    .apm-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #666680;
+      flex-shrink: 0;
+    }
+    .apm-header span { color: #b06ef5; }
+    .apm-close {
+      background: none; border: none; color: #666680; font-size: 20px;
+      cursor: pointer; line-height: 1; padding: 0 4px; transition: color 0.2s;
+    }
+    .apm-close:hover { color: #eeeef8; }
+    .apm-body {
+      padding: 24px 24px 0; overflow-y: auto; flex: 1;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .apm-field { display: flex; flex-direction: column; gap: 6px; }
+    .apm-field.full { grid-column: 1 / -1; }
+    .apm-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+      color: #666680;
+    }
+    .apm-label span { color: rgba(176,110,245,0.6); font-size: 8px; margin-left: 4px; }
+    .apm-input, .apm-select {
+      font-family: 'Share Tech Mono', monospace; font-size: 11px;
+      color: #eeeef8; background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 9px 12px; outline: none;
+      transition: border-color 0.2s;
+      width: 100%; box-sizing: border-box;
+    }
+    .apm-input:focus, .apm-select:focus { border-color: rgba(139,79,200,0.6); }
+    .apm-select option { background: #13121a; }
+    .apm-slug-preview {
+      font-family: 'Share Tech Mono', monospace; font-size: 9px;
+      letter-spacing: 2px; color: rgba(0,232,122,0.6);
+      min-height: 14px;
+    }
+    .apm-footer {
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 10px; padding: 18px 24px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      flex-shrink: 0;
+    }
+    .apm-cancel {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: #666680; background: none;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 9px 18px; cursor: pointer; transition: all 0.2s;
+    }
+    .apm-cancel:hover { color: #eeeef8; border-color: rgba(255,255,255,0.25); }
+    .apm-submit {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: #00e87a; background: rgba(0,232,122,0.1);
+      border: 1px solid rgba(0,232,122,0.45);
+      padding: 9px 22px; cursor: pointer; transition: all 0.2s;
+    }
+    .apm-submit:hover { background: rgba(0,232,122,0.2); }
+    .apm-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+    .apm-error {
+      font-family: 'Share Tech Mono', monospace; font-size: 9px;
+      letter-spacing: 2px; color: #ff5050;
+      padding: 0 24px 14px; display: none;
+    }
 
     .admin-status-badge {
       font-family: 'Share Tech Mono', monospace;
@@ -1124,6 +1228,80 @@
     <div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,0.07);background:#0d0d12;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
       <span style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:#555570;text-transform:uppercase;">If Payhip does not load, open directly ↓</span>
       <a id="checkout-fallback-btn" href="#" target="_blank" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#00e87a;border:1px solid rgba(0,232,122,0.4);padding:7px 16px;text-decoration:none;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='rgba(0,232,122,0.1)'" onmouseout="this.style.background='transparent'">Open in Browser ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PRODUCT MODAL -->
+<div id="add-product-modal">
+  <div class="apm-box">
+    <div class="apm-header">
+      <span>// Add Product</span>
+      <button class="apm-close" onclick="closeAddProductModal()">&#10005;</button>
+    </div>
+    <div class="apm-body">
+      <!-- Name -->
+      <div class="apm-field full">
+        <div class="apm-label">Product Name <span>*</span></div>
+        <input class="apm-input" id="apm-name" type="text" placeholder="e.g. SF-27 Formula 1 Rig" oninput="apmSyncSlug()">
+        <div class="apm-slug-preview" id="apm-slug-preview"></div>
+      </div>
+      <!-- Category -->
+      <div class="apm-field">
+        <div class="apm-label">Category <span>*</span></div>
+        <select class="apm-select" id="apm-cat">
+          <option value="Maya Rig">Maya Rig</option>
+          <option value="Blender Rig">Blender Rig</option>
+          <option value="Script">Script</option>
+          <option value="Tutorial">Tutorial</option>
+          <option value="3D Model">3D Model</option>
+        </select>
+      </div>
+      <!-- Status -->
+      <div class="apm-field">
+        <div class="apm-label">Initial Status</div>
+        <select class="apm-select" id="apm-status">
+          <option value="draft">Draft</option>
+          <option value="live">Live</option>
+          <option value="hidden">Hidden</option>
+          <option value="early">Early Access</option>
+        </select>
+      </div>
+      <!-- Price -->
+      <div class="apm-field">
+        <div class="apm-label">Price <span>*</span></div>
+        <input class="apm-input" id="apm-price" type="text" placeholder="€19.99+">
+      </div>
+      <!-- Sale Price -->
+      <div class="apm-field">
+        <div class="apm-label">Sale Price <span>optional</span></div>
+        <input class="apm-input" id="apm-sale-price" type="text" placeholder="€14.99">
+      </div>
+      <!-- Buy URL -->
+      <div class="apm-field full">
+        <div class="apm-label">Buy URL (Payhip) <span>*</span></div>
+        <input class="apm-input" id="apm-buy-url" type="text" placeholder="https://payhip.com/b/xxxxx">
+      </div>
+      <!-- Image path -->
+      <div class="apm-field full">
+        <div class="apm-label">Image Path <span>optional</span></div>
+        <input class="apm-input" id="apm-img" type="text" placeholder="/projects/my-product/images/thumbnail.png">
+      </div>
+      <!-- Product page href -->
+      <div class="apm-field full">
+        <div class="apm-label">Product Page URL <span>optional</span></div>
+        <input class="apm-input" id="apm-href" type="text" placeholder="/pages/shop/product-xxx">
+      </div>
+      <!-- Description -->
+      <div class="apm-field full">
+        <div class="apm-label">Short Description <span>optional</span></div>
+        <input class="apm-input" id="apm-desc" type="text" placeholder="One-liner shown on the card">
+      </div>
+    </div>
+    <div class="apm-error" id="apm-error"></div>
+    <div class="apm-footer">
+      <button class="apm-cancel" onclick="closeAddProductModal()">Cancel</button>
+      <button class="apm-submit" id="apm-submit-btn" onclick="submitAddProduct()">+ Insert Product</button>
     </div>
   </div>
 </div>
@@ -1670,6 +1848,7 @@
 
 <!-- ADMIN EDIT TOGGLE -->
 <div id="admin-edit-toggle">
+  <button id="add-product-btn" onclick="openAddProductModal()">+ Add Product</button>
   <button id="edit-mode-btn" onclick="toggleEditMode()">✎ Edit Mode</button>
 </div>
 
@@ -2233,7 +2412,303 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.target === this) closeCheckout();
   });
 });
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeCheckout(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeCheckout(); closeAddProductModal(); } });
+
+/* ══════════════════════════════════════════
+   ADD PRODUCT MODAL
+══════════════════════════════════════════ */
+
+function openAddProductModal() {
+  if (!isAdmin || !editMode) return;
+  // Reset form
+  ['apm-name','apm-price','apm-sale-price','apm-buy-url','apm-img','apm-href','apm-desc'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('apm-cat').value    = 'Maya Rig';
+  document.getElementById('apm-status').value = 'draft';
+  document.getElementById('apm-slug-preview').textContent = '';
+  document.getElementById('apm-error').style.display = 'none';
+  document.getElementById('apm-error').textContent = '';
+  document.getElementById('apm-submit-btn').disabled = false;
+  document.getElementById('add-product-modal').classList.add('open');
+}
+
+function closeAddProductModal() {
+  document.getElementById('add-product-modal').classList.remove('open');
+}
+
+function apmSyncSlug() {
+  const name = document.getElementById('apm-name').value.trim();
+  const slug = name.toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+  const preview = document.getElementById('apm-slug-preview');
+  preview.textContent = slug ? '// id: ' + slug : '';
+}
+
+function apmGetSlug() {
+  const name = document.getElementById('apm-name').value.trim();
+  return name.toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+function apmShowError(msg) {
+  const el = document.getElementById('apm-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function submitAddProduct() {
+  const name    = document.getElementById('apm-name').value.trim();
+  const cat     = document.getElementById('apm-cat').value;
+  const status  = document.getElementById('apm-status').value;
+  const price   = document.getElementById('apm-price').value.trim();
+  const salePrice = document.getElementById('apm-sale-price').value.trim();
+  const buyUrl  = document.getElementById('apm-buy-url').value.trim();
+  const img     = document.getElementById('apm-img').value.trim();
+  const href    = document.getElementById('apm-href').value.trim();
+  const desc    = document.getElementById('apm-desc').value.trim();
+  const id      = apmGetSlug();
+
+  // Validation
+  if (!name)   { apmShowError('// Product name is required'); return; }
+  if (!id)     { apmShowError('// Could not generate a valid product ID'); return; }
+  if (!price)  { apmShowError('// Price is required'); return; }
+  if (!buyUrl) { apmShowError('// Buy URL is required'); return; }
+  if (document.querySelector(`[data-product-id="${id}"]`)) {
+    apmShowError('// A product with this ID already exists: ' + id); return;
+  }
+
+  const btn = document.getElementById('apm-submit-btn');
+  btn.disabled = true;
+  btn.textContent = '// Saving…';
+  document.getElementById('apm-error').style.display = 'none';
+
+  // Category → filter slug map
+  const catSlugMap = {
+    'Maya Rig': 'rig', 'Blender Rig': 'rig',
+    'Script': 'tool', 'Tutorial': 'tutorial', '3D Model': 'model'
+  };
+  const catSlug = catSlugMap[cat] || 'tool';
+
+  // Get max position for insert-at-end
+  const existingCards = document.querySelectorAll('#product-grid [data-product-id]');
+  const position = existingCards.length + 1;
+
+  // Supabase insert
+  try {
+    const sb = await _getShopSb();
+    const payload = {
+      id, name, cat, status,
+      price: price || null,
+      sale_price: salePrice || null,
+      buy_url: buyUrl || null,
+      img: img || null,
+      href: href || null,
+      position,
+      updated_at: new Date().toISOString()
+    };
+    const { error } = await sb.from('shop_products').insert(payload);
+    if (error) { apmShowError('// Supabase error: ' + error.message); btn.disabled = false; btn.textContent = '+ Insert Product'; return; }
+  } catch (e) {
+    apmShowError('// Save failed: ' + e.message);
+    btn.disabled = false; btn.textContent = '+ Insert Product';
+    return;
+  }
+
+  // Build and inject card
+  const card = buildProductCard({ id, name, cat, catSlug, status, price, salePrice, buyUrl, img, href, desc });
+  const grid = document.getElementById('product-grid');
+  grid.appendChild(card);
+
+  // Apply initial status visuals
+  applyStatusToCard(id, status, card, false);
+
+  // Make it draggable
+  initDragOnCard(card);
+
+  // Update filter counts
+  updateFilterCounts();
+
+  closeAddProductModal();
+  btn.disabled = false;
+  btn.textContent = '+ Insert Product';
+}
+
+/* ══════════════════════════════════════════
+   BUILD PRODUCT CARD — mirrors existing HTML structure exactly
+══════════════════════════════════════════ */
+function buildProductCard({ id, name, cat, catSlug, status, price, salePrice, buyUrl, img, href, desc }) {
+  const tag = '// ' + cat.toUpperCase();
+  const hasImg = img && img.trim() && img !== '#';
+
+  // Status dropdown options
+  const statuses = ['live','draft','hidden','featured','early'];
+  const optionsHtml = statuses.map(s => `
+    <button class="admin-status-option opt-${s}${s === status ? ' active-opt' : ''}"
+      onclick="event.stopPropagation();setProductStatus('${id}','${s}',this.closest('[data-product-id]')); this.closest('.admin-status-wrap').classList.remove('open')">${s.toUpperCase()}</button>`
+  ).join('');
+
+  // Thumb HTML
+  let thumbInner = '';
+  if (hasImg) {
+    thumbInner = `<img class="pc-img" src="${img}" alt="${name}"><div class="pc-tag">${tag}</div>`;
+  } else {
+    thumbInner = `<div class="pc-placeholder">// Coming Soon</div>`;
+  }
+
+  // Price HTML
+  let priceHtml = '';
+  if (salePrice && salePrice.trim()) {
+    const pct = calcDiscount(price, salePrice);
+    const badgeHtml = pct > 0 ? `<span class="pc-sale-badge">-${pct}%</span>` : '';
+    priceHtml = `<div class="pc-price-wrap">
+      <div class="pc-price-original">${price}</div>
+      <div class="pc-price-sale">${salePrice}</div>
+      ${badgeHtml}
+    </div>`;
+  } else {
+    priceHtml = `<span class="pc-price">${price || '—'}</span>`;
+  }
+
+  // Buy button / badge
+  const buyHtml = buyUrl && buyUrl !== '#'
+    ? `<a href="${buyUrl}" class="shop-buy-btn" onclick="event.preventDefault();event.stopPropagation();openCheckout('${buyUrl}')">Buy &#8594;</a>`
+    : `<span class="pc-badge">Coming Soon</span>`;
+
+  const onclickAttr = href ? `onclick="window.location.href='${href}'"` : '';
+
+  const div = document.createElement('div');
+  div.className = 'product-card';
+  div.setAttribute('data-product-id', id);
+  div.setAttribute('data-status', status);
+  div.setAttribute('data-cat', status === 'draft' ? 'soon' : catSlug);
+  div.setAttribute('data-original-cat', catSlug);
+  if (href)   div.setAttribute('data-href', href);
+  if (img)    div.setAttribute('data-img', img);
+  div.setAttribute('data-tag', tag);
+  div.setAttribute('data-category', cat);
+  div.setAttribute('data-title', name);
+  if (desc)   div.setAttribute('data-desc', desc);
+  div.setAttribute('data-price', price || '');
+  if (salePrice) div.setAttribute('data-sale-price', salePrice);
+  if (buyUrl) div.setAttribute('data-buy-url', buyUrl);
+  div.setAttribute('data-buy-label', 'Buy Now');
+  if (href)   div.setAttribute('onclick', `window.location.href='${href}'`);
+
+  div.innerHTML = `
+    <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')">
+      <span class="admin-status-badge status-${status}">${status.toUpperCase()} <span style="opacity:0.7;font-size:8px;">▾</span></span>
+      <div class="admin-status-dropdown">${optionsHtml}</div>
+    </div>
+    <div class="pc-thumb">${thumbInner}</div>
+    <div class="pc-body">
+      <div class="pc-cat">${cat}</div>
+      <div class="pc-title">${name}</div>
+      <div class="pc-desc">${desc || ''}</div>
+      <div class="pc-footer">
+        ${priceHtml}
+        ${buyHtml}
+      </div>
+    </div>`;
+
+  return div;
+}
+
+/* ══════════════════════════════════════════
+   DRAG-TO-REORDER (admin edit mode only)
+══════════════════════════════════════════ */
+function initDrag() {
+  document.querySelectorAll('#product-grid .product-card').forEach(initDragOnCard);
+}
+
+function initDragOnCard(card) {
+  // Prevent double-binding
+  if (card.dataset.dragBound === '1') return;
+  card.dataset.dragBound = '1';
+
+  card.setAttribute('draggable', 'true');
+
+  card.addEventListener('dragstart', function(e) {
+    if (!editMode) { e.preventDefault(); return; }
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', this.dataset.productId);
+    setTimeout(() => this.classList.add('dragging'), 0);
+  });
+
+  card.addEventListener('dragend', function() {
+    this.classList.remove('dragging');
+    document.querySelectorAll('#product-grid .product-card').forEach(c => c.classList.remove('drag-over'));
+    saveDragOrder();
+  });
+
+  card.addEventListener('dragover', function(e) {
+    if (!editMode) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    // Remove drag-over from all others
+    document.querySelectorAll('#product-grid .product-card').forEach(c => c.classList.remove('drag-over'));
+    this.classList.add('drag-over');
+  });
+
+  card.addEventListener('dragleave', function() {
+    this.classList.remove('drag-over');
+  });
+
+  card.addEventListener('drop', function(e) {
+    if (!editMode) return;
+    e.preventDefault();
+    const draggedId = e.dataTransfer.getData('text/plain');
+    const draggedEl = document.querySelector(`[data-product-id="${draggedId}"]`);
+    const grid = document.getElementById('product-grid');
+    if (draggedEl && draggedEl !== this) {
+      // Insert before or after based on vertical midpoint
+      const rect = this.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      if (e.clientY < midY) {
+        grid.insertBefore(draggedEl, this);
+      } else {
+        grid.insertBefore(draggedEl, this.nextSibling);
+      }
+    }
+    this.classList.remove('drag-over');
+  });
+}
+
+async function saveDragOrder() {
+  try {
+    const sb = await _getShopSb();
+    const cards = document.querySelectorAll('#product-grid [data-product-id]');
+    const updates = Array.from(cards).map((card, i) => ({
+      id: card.dataset.productId,
+      position: i + 1,
+      updated_at: new Date().toISOString()
+    }));
+    // Upsert positions in batch
+    await sb.from('shop_products').upsert(updates);
+  } catch (e) {
+    console.warn('saveDragOrder error:', e);
+  }
+}
+
+// Hook drag init into toggleEditMode and page load
+const _origToggleEditMode = toggleEditMode;
+function toggleEditMode() {
+  _origToggleEditMode();
+  if (editMode) initDrag();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Close modal on backdrop click
+  document.getElementById('add-product-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeAddProductModal();
+  });
+});
 </script>
 </body>
 </html>
