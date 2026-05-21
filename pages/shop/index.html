@@ -1256,7 +1256,11 @@
             <div class="pc-footer">
               <span class="pc-price">—</span>
               <a class="shop-buy-btn" href="#" style="opacity:0.35;cursor:not-allowed;pointer-events:none;">Coming Soon</a>
-            </div> data-status="live" data-cat="tool" data-original-cat="tool">
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card" data-product-id="mel-python-scripts" data-status="live" data-cat="tool" data-original-cat="tool">
           <div class="admin-status-wrap" onclick="event.stopPropagation();this.classList.toggle('open')">
           <span class="admin-status-badge status-live">LIVE <span style="opacity:0.7;font-size:8px;">▾</span></span>
           <div class="admin-status-dropdown">
@@ -1944,10 +1948,14 @@ async function loadProductStatuses() {
         if (titleEl) titleEl.textContent = name;
         card.dataset.title = name;
       }
-      // Update display category and filter slug from Supabase
+      // Update display category, tag and filter slug from Supabase
       if (cat) {
         const catEl = card.querySelector('.pc-cat');
         if (catEl) catEl.textContent = cat;
+        // Update the pc-tag top-left label
+        const tagEl = card.querySelector('.pc-tag');
+        if (tagEl) tagEl.textContent = '// ' + cat.toUpperCase();
+        card.dataset.tag = '// ' + cat.toUpperCase();
         const slug = catSlugMap[cat] || 'tool';
         if (status !== 'draft') {
           card.dataset.cat = slug;
