@@ -9,105 +9,105 @@
 <style>
   .page { display: block !important; }
   .nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
-  /* ── Shop card thumbnail ── */
+  /* ── Shop card — full-bleed image card ── */
   .work-card--has-thumb {
-    padding-left: 0;
-    padding-right: 0;
-    padding-bottom: 0;
-  }
-  .work-card--has-thumb .work-top {
-    padding: 0 clamp(20px,2.5vw,40px);
-  }
-  .work-card--has-thumb .work-bottom {
-    padding: clamp(16px,2vw,32px) clamp(20px,2.5vw,40px) clamp(20px,2.5vw,40px);
-  }
-  .work-card-graphic--shop-thumb {
+    padding: 0;
     position: relative;
-    width: 100%;
-    flex: 1;
     overflow: hidden;
-    background: #0a0a0f;
   }
-  .wcg-thumb-img {
+  /* Image fills the entire card */
+  .work-card-graphic--shop-thumb {
     position: absolute;
     inset: 0;
+    z-index: 0;
+  }
+  .wcg-thumb-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.5s ease;
-    filter: brightness(0.88) contrast(1.05);
-    /* 1080p default: wide landscape — side profile of the car */
-    object-position: 50% 70%;
+    transition: transform 0.6s ease;
+    filter: brightness(0.75) contrast(1.08) saturate(0.9);
+    /* 1080p: landscape — show the side sweep of the car */
+    object-position: 50% 72%;
   }
-  /* 1440p/1080p wide: start shifting toward center */
   @media (min-width: 1920px) {
-    .wcg-thumb-img {
-      object-position: 45% 60%;
-    }
+    .wcg-thumb-img { object-position: 48% 65%; }
   }
-  /* 4K: portrait feel — pull tight on nose/front quarter */
   @media (min-width: 2560px) {
-    .wcg-thumb-img {
-      object-position: 35% 55%;
-    }
+    .wcg-thumb-img { object-position: 38% 58%; }
   }
   .work-card--has-thumb:hover .wcg-thumb-img {
-    transform: scale(1.05);
+    transform: scale(1.06);
   }
+  /* Gradient layers — heavy bottom for title legibility, light top for num/cat */
   .wcg-thumb-overlay {
     position: absolute;
     inset: 0;
+    z-index: 1;
     background:
-      linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 35%),
-      linear-gradient(to top,    rgba(0,0,0,0.65) 0%, transparent 55%);
+      linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 30%),
+      linear-gradient(to top,    rgba(0,0,0,0.82) 0%, transparent 60%);
   }
+  /* Faint purple cast to tie into site palette */
   .wcg-thumb-tint {
     position: absolute;
     inset: 0;
-    background: rgba(139,79,200,0.07);
-    mix-blend-mode: screen;
+    z-index: 2;
+    background: linear-gradient(135deg, rgba(139,79,200,0.12) 0%, transparent 60%);
     pointer-events: none;
   }
-  .wcg-thumb-badges {
+  /* Top row — sits over the image */
+  .work-card--has-thumb .work-top {
+    position: relative;
+    z-index: 3;
+    padding: clamp(16px,1.8vw,28px) clamp(16px,1.8vw,28px) 0;
+  }
+  /* Hide the graphic div itself since image is position:absolute */
+  .work-card-graphic--shop-thumb > .wcg-thumb-img,
+  .work-card-graphic--shop-thumb > .wcg-thumb-overlay,
+  .work-card-graphic--shop-thumb > .wcg-thumb-tint { }
+  /* Bottom title block — sits over image at the bottom */
+  .work-card--has-thumb .work-bottom {
     position: absolute;
-    top: clamp(8px, 0.7vw, 14px);
-    left: clamp(8px, 0.7vw, 14px);
-    display: flex;
-    gap: 5px;
-    align-items: center;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    padding: clamp(16px,1.8vw,28px);
   }
-  .wcg-thumb-badge {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(7px, 0.48vw, 10px);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border: 1px solid;
-    backdrop-filter: blur(4px);
-  }
-  .wcg-thumb-badge--store {
-    color: #c084fc;
-    border-color: rgba(192,132,252,0.5);
-    background: rgba(139,79,200,0.28);
-  }
-  .wcg-thumb-badge--type {
-    color: rgba(255,255,255,0.5);
-    border-color: rgba(255,255,255,0.1);
-    background: rgba(0,0,0,0.4);
-  }
+  /* Price pill — top right corner */
   .wcg-thumb-price {
     position: absolute;
-    bottom: clamp(8px, 0.7vw, 14px);
-    right: clamp(8px, 0.7vw, 14px);
+    top: clamp(16px,1.8vw,28px);
+    right: clamp(16px,1.8vw,28px);
+    z-index: 3;
     font-family: 'Share Tech Mono', monospace;
     font-size: clamp(9px, 0.6vw, 12px);
     letter-spacing: 3px;
     color: #c084fc;
-    background: rgba(139,79,200,0.22);
-    border: 1px solid rgba(192,132,252,0.3);
+    background: rgba(139,79,200,0.25);
+    border: 1px solid rgba(192,132,252,0.4);
     padding: 4px 12px;
+    backdrop-filter: blur(6px);
+  }
+  /* Store badge — inline with the num */
+  .wcg-thumb-store-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(7px, 0.48vw, 9px);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #c084fc;
+    border: 1px solid rgba(192,132,252,0.45);
+    background: rgba(139,79,200,0.22);
+    padding: 2px 7px;
     backdrop-filter: blur(4px);
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  /* Accent bar still shows on hover */
+  .work-card--has-thumb::before {
+    z-index: 4;
   }
 
   #lib-mobile-toast {
@@ -217,20 +217,20 @@
 
       <!-- Card 2: Shop -->
       <a class="work-card work-card--has-thumb" href="/pages/shop">
-        <div class="work-top">
-          <div class="work-num">02</div>
-          <div class="work-cat">Store</div>
-        </div>
-        <div class="work-card-graphic work-card-graphic--shop-thumb">
+        <!-- Full-bleed image layer -->
+        <div class="work-card-graphic--shop-thumb">
           <img class="wcg-thumb-img" src="/projects/SF26/images/SF26_Rendered.png" alt="SF-26 Rig" onerror="this.style.display='none'">
           <div class="wcg-thumb-overlay"></div>
           <div class="wcg-thumb-tint"></div>
-          <div class="wcg-thumb-badges">
-            <span class="wcg-thumb-badge wcg-thumb-badge--store">&#9632; Store</span>
-            <span class="wcg-thumb-badge wcg-thumb-badge--type">Maya Rig</span>
-          </div>
-          <div class="wcg-thumb-price">from €19</div>
         </div>
+        <!-- Price — top right -->
+        <div class="wcg-thumb-price">from €19</div>
+        <!-- Header — overlaid top left -->
+        <div class="work-top">
+          <div class="work-num">02 <span class="wcg-thumb-store-tag">&#9632; Store</span></div>
+          <div class="work-cat">Shop</div>
+        </div>
+        <!-- Title — overlaid bottom -->
         <div class="work-bottom">
           <div class="work-bar-wrap"><div class="work-bar" style="width:60%"></div></div>
           <div class="work-title">Shop</div>
