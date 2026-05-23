@@ -581,17 +581,21 @@
       <div class="reel-section">
         <div class="avia-player" id="avia-player-reel">
 
-          <div class="avia-player-video" id="avia-video-area-reel" onclick="aviaHandleOverlay('reel')">
+          <div class="avia-player-video" id="avia-video-area-reel">
             <iframe
               id="avia-iframe-reel"
-              src="https://www.youtube.com/embed/vkeLPcO5DqU?enablejsapi=1&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&vq=hd1080&origin=https://aviarigg.com"
+              src=""
               frameborder="0"
               allow="autoplay; fullscreen"
-              allowfullscreen>
+              allowfullscreen
+              style="display:none;">
             </iframe>
-            <div class="avia-overlay" id="avia-overlay-reel">
-              <div class="avia-big-play">
-                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <div class="avia-thumb" id="avia-thumb-reel" onclick="aviaClickPlay('reel','vkeLPcO5DqU')">
+              <img id="avia-thumb-img-reel" src="https://img.youtube.com/vi/vkeLPcO5DqU/maxresdefault.jpg" alt="AviaRigg Demoreel" onerror="this.src='https://img.youtube.com/vi/vkeLPcO5DqU/hqdefault.jpg'">
+              <div class="avia-overlay" id="avia-overlay-reel">
+                <div class="avia-big-play">
+                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
               </div>
             </div>
           </div>
@@ -652,6 +656,15 @@
           transition: opacity 0.3s;
         }
         .avia-overlay.hidden { opacity: 0; pointer-events: none; }
+        .avia-thumb {
+          position: absolute; inset: 0;
+          cursor: pointer;
+        }
+        .avia-thumb img {
+          width: 100%; height: 100%;
+          object-fit: cover; display: block;
+        }
+        .avia-thumb.hidden { display: none; }
         .avia-big-play {
           width: 72px; height: 72px;
           border: 2px solid rgba(255,255,255,0.85);
@@ -752,12 +765,21 @@
           }
         }
 
+        function aviaClickPlay(id, ytId) {
+          const thumb = document.getElementById('avia-thumb-' + id);
+          const iframe = document.getElementById('avia-iframe-' + id);
+          thumb.classList.add('hidden');
+          iframe.style.display = 'block';
+          iframe.src = 'https://www.youtube.com/embed/' + ytId + '?enablejsapi=1&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&vq=hd1080&autoplay=1&origin=https://aviarigg.com';
+          aviaInitPlayer(id, 'avia-iframe-' + id);
+        }
         function aviaHandleOverlay(id) {
           const s = window._aviaPlayers[id]; if (!s) return;
           s.playing ? s.player.pauseVideo() : (s.player.playVideo(), aviaForceHD(s.player));
         }
         function aviaTogglePlay(id) {
           const s = window._aviaPlayers[id]; if (!s) return;
+          if (!s.player) return;
           s.playing ? s.player.pauseVideo() : (s.player.playVideo(), aviaForceHD(s.player));
         }
         function aviaToggleMute(id) {
@@ -802,14 +824,7 @@
           const tag = document.createElement('script');
           tag.src = 'https://www.youtube.com/iframe_api';
           document.head.appendChild(tag);
-          const prev = window.onYouTubeIframeAPIReady;
-          window.onYouTubeIframeAPIReady = function() {
-            if (prev) prev();
-            document.querySelectorAll('[id^="avia-iframe-"]').forEach(el => {
-              const id = el.id.replace('avia-iframe-', '');
-              aviaInitPlayer(id, el.id);
-            });
-          };
+          window.onYouTubeIframeAPIReady = function() {};
         }
       </script>
     </div>
