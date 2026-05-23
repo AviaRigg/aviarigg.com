@@ -754,7 +754,8 @@
             ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'
             : '<path d="M8 5v14l11-7z"/>';
           if (playing) {
-            document.getElementById('avia-overlay-' + id).classList.add('hidden');
+            const ov = document.getElementById('avia-overlay-' + id);
+            if (ov) ov.remove();
             if (!s.timer) s.timer = setInterval(() => aviaUpdateProgress(id), 500);
           } else {
             clearInterval(s.timer); s.timer = null;
