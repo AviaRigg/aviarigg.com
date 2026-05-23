@@ -120,7 +120,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
         style="display:none;">
       </iframe>
     </div>
-    <div class="rig-cap"><span>// SF-26 · Hero Render</span><span>Loop · No Sound</span></div>
+    <div class="rig-cap"><span>// SF-26</span><button onclick="aviaLoopFullscreen()" style="background:none;border:none;cursor:pointer;color:var(--txb);opacity:0.6;padding:0;display:flex;align-items:center;gap:5px;font-family:inherit;font-size:inherit;letter-spacing:inherit;text-transform:inherit;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>Fullscreen</button></div>
   </div>
 
   <style>
@@ -159,7 +159,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
         iframe.src = 'https://www.youtube.com/embed/' + YT_ID
           + '?autoplay=1&mute=1&loop=1&playlist=' + YT_ID
           + '&controls=0&rel=0&modestbranding=1&playsinline=1'
-          + '&iv_load_policy=3&disablekb=1&origin=https://aviarigg.com';
+          + '&iv_load_policy=3&disablekb=1&vq=hd2160&origin=https://aviarigg.com';
         iframe.style.display = 'block';
         // Fade out thumbnail after a short delay so iframe has time to start
         setTimeout(() => thumb.classList.add('hidden'), 800);
@@ -168,7 +168,14 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       function observeLoop() {
         const wrap = document.getElementById('avia-loop-hero');
         if (!wrap) return;
-        if ('IntersectionObserver' in window) {
+        window.aviaLoopFullscreen = function() {
+        const wrap = document.getElementById('avia-loop-hero');
+        if (!wrap) return;
+        if (wrap.requestFullscreen) wrap.requestFullscreen();
+        else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
+      };
+
+      if ('IntersectionObserver' in window) {
           const io = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) {
               startLoop();
@@ -534,11 +541,17 @@ if (toc) {
     tocStartIdx=dots.findIndex(d=>d.classList.contains('active'));
     e.preventDefault();
   });
+  let tocLastNav = 0;
   window.addEventListener('mousemove', e => {
     if (!tocDrag) return;
-    const step = Math.round((tocStartY - e.clientY) / 24);
+    const step = Math.round((tocStartY - e.clientY) / 60);
     const next = Math.max(0, Math.min(IDS.length-1, tocStartIdx - step));
-    g(IDS[next]);
+    const cur  = dots.findIndex(d => d.classList.contains('active'));
+    const now  = Date.now();
+    if (next !== cur && now - tocLastNav > 400) {
+      tocLastNav = now;
+      g(IDS[next]);
+    }
   });
   window.addEventListener('mouseup', () => { tocDrag=false; });
 }
