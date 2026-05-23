@@ -104,12 +104,90 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     </div>
   </div>
   <div class="rig-img-frame">
-    <div class="rig-ph hero">
-      <svg class="bg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g0" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0L0 0 0 40" class="rig-ph-grid-bg"/></pattern></defs><rect width="800" height="500" fill="url(#g0)"/><circle cx="400" cy="250" r="200" fill="none" stroke="#8b4fc8" stroke-width=".5" opacity=".3"/><circle cx="400" cy="250" r="120" fill="none" stroke="#8b4fc8" stroke-width=".5" opacity=".2"/></svg>
-      <div class="rig-ph-label"><b>SF26_Hero.jpg</b>Hero render / beauty shot</div>
+    <div class="avia-loop-wrap" id="avia-loop-hero">
+      <img
+        class="avia-loop-thumb"
+        id="avia-loop-thumb-hero"
+        src="https://img.youtube.com/vi/XalzOhIbHMw/maxresdefault.jpg"
+        alt="SF-26 Hero"
+        onerror="this.src='https://img.youtube.com/vi/XalzOhIbHMw/hqdefault.jpg'">
+      <iframe
+        class="avia-loop-iframe"
+        id="avia-loop-iframe-hero"
+        src=""
+        frameborder="0"
+        allow="autoplay"
+        style="display:none;">
+      </iframe>
     </div>
-    <div class="rig-cap"><span>// SF-26 · Hero Render</span><span>/projects/f1_SF26/images/</span></div>
+    <div class="rig-cap"><span>// SF-26 · Hero Render</span><span>Loop · No Sound</span></div>
   </div>
+
+  <style>
+    .avia-loop-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #06060f;
+    }
+    .avia-loop-thumb {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: opacity 0.4s ease;
+    }
+    .avia-loop-thumb.hidden { opacity: 0; }
+    .avia-loop-iframe {
+      position: absolute;
+      top: -10%; left: -10%;
+      width: 120%; height: 120%;
+      border: none;
+      pointer-events: none;
+    }
+  </style>
+
+  <script>
+    (function() {
+      const YT_ID = 'XalzOhIbHMw';
+      const wrapId = 'avia-loop-wrap-hero';
+      const thumbId = 'avia-loop-thumb-hero';
+      const iframeId = 'avia-loop-iframe-hero';
+
+      function startLoop() {
+        const iframe = document.getElementById(iframeId);
+        const thumb  = document.getElementById(thumbId);
+        iframe.src = 'https://www.youtube.com/embed/' + YT_ID
+          + '?autoplay=1&mute=1&loop=1&playlist=' + YT_ID
+          + '&controls=0&rel=0&modestbranding=1&playsinline=1'
+          + '&iv_load_policy=3&disablekb=1&origin=https://aviarigg.com';
+        iframe.style.display = 'block';
+        // Fade out thumbnail after a short delay so iframe has time to start
+        setTimeout(() => thumb.classList.add('hidden'), 800);
+      }
+
+      function observeLoop() {
+        const wrap = document.getElementById('avia-loop-hero');
+        if (!wrap) return;
+        if ('IntersectionObserver' in window) {
+          const io = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+              startLoop();
+              io.disconnect();
+            }
+          }, { threshold: 0.3 });
+          io.observe(wrap);
+        } else {
+          startLoop();
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', observeLoop);
+      } else {
+        observeLoop();
+      }
+    })();
+  </script>
 </div>
 
 <!-- SPECS BAR -->
