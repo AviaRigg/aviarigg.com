@@ -22,6 +22,19 @@
 <style>
   .page { display: block !important; }
   .nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
+  .avia-thumb-play {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(6,6,15,0.45);
+    transition: background 0.2s;
+    pointer-events: none;
+  }
+  .avia-thumb-wrap:hover .avia-thumb-play { background: rgba(6,6,15,0.3); }
+  .avia-thumb-play svg {
+    width: 56px; height: 56px; fill: white;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+    margin-left: 5px;
+  }
 </style>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
@@ -179,7 +192,12 @@
         </div>
         <div class="product-gallery">
           <div id="gallery-main-img" class="product-gallery-main-img">
-            <iframe src="https://www.youtube.com/embed/AbGyZreyAak?rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;height:100%;display:block;"></iframe>
+            <div class="avia-thumb-wrap" id="avia-gthumb-AbGyZreyAak" onclick="setGalleryVideo(this,'yt:AbGyZreyAak')" style="position:absolute;inset:0;cursor:pointer;">
+              <img src="https://img.youtube.com/vi/AbGyZreyAak/maxresdefault.jpg" alt="F1 SF-25 Showcase" onerror="this.src='https://img.youtube.com/vi/AbGyZreyAak/hqdefault.jpg'" style="width:100%;height:100%;object-fit:cover;display:block;">
+              <div class="avia-thumb-play">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
           </div>
           <div class="product-gallery-label" id="gallery-label">F1 SF-25 · Maya Rig · Video</div>
         </div>
@@ -273,9 +291,20 @@ function setGallerySketchfab(thumb, modelId) {
 }
 function setGalleryVideo(thumb, id) {
   const ytId = id.replace('yt:', '');
-  setProductGallery(thumb, 'gallery-main-img', 'gallery-label',
-    `<iframe src="https://www.youtube.com/embed/${ytId}?rel=0&autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`,
-    'F1 SF-25 · Maya Rig · Video');
+  const existing = document.getElementById('avia-gthumb-' + ytId);
+  if (existing) {
+    // First click — swap thumb for iframe
+    const main = document.getElementById('gallery-main-img');
+    main.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytId}?enablejsapi=1&controls=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&autoplay=1&vq=hd1080&origin=https://aviarigg.com" frameborder="0" allow="autoplay; fullscreen" allowfullscreen style="width:100%;height:100%;border:none;pointer-events:none;display:block;"></iframe>`;
+    document.getElementById('gallery-label').textContent = 'F1 SF-25 · Maya Rig · Video';
+    document.querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+  } else {
+    // Switching to a different video — show thumb first
+    setProductGallery(thumb, 'gallery-main-img', 'gallery-label',
+      `<div class="avia-thumb-wrap" id="avia-gthumb-${ytId}" onclick="setGalleryVideo(this,'yt:${ytId}')" style="position:absolute;inset:0;cursor:pointer;"><img src="https://img.youtube.com/vi/${ytId}/maxresdefault.jpg" alt="Video" onerror="this.src='https://img.youtube.com/vi/${ytId}/hqdefault.jpg'" style="width:100%;height:100%;object-fit:cover;display:block;"><div class="avia-thumb-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>`,
+      'F1 SF-25 · Maya Rig · Video');
+  }
 }
 function setGalleryImg(thumb, src) {
   setProductGallery(thumb, 'gallery-main-img', 'gallery-label', `<img src="${src}">`, 'F1 SF-25 · Maya Rig · Image');
