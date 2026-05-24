@@ -688,104 +688,16 @@
 .cat-uvs       { background:rgba(0,180,255,0.08);  color:#00b4ff; border-color:rgba(0,180,255,0.2); }
 .cat-reference { background:rgba(255,255,255,0.04);color:#888899; border-color:rgba(255,255,255,0.12); }
 /* ══════════════════════════════════════════
-   4K SCALING — overrides clamp() caps
-   Kicks in at 2560px+ (1440p and above)
-   All values proportional to viewport width
+   4K SCALING — zoom approach
+   Scales the whole library page down at 4K
+   so it matches 1080p proportions visually
 ══════════════════════════════════════════ */
 @media (min-width: 2560px) {
-
-  /* ── Sidebar ── */
-  .lib-sidebar,
-  .lib-sidebar-inner { width: clamp(300px, 14vw, 480px) !important; min-width: clamp(300px, 14vw, 480px) !important; }
-  .lib-main          { margin-left: clamp(300px, 14vw, 480px) !important; }
-  .lib-sidebar-toggle { left: clamp(300px, 14vw, 480px) !important; width: 44px !important; height: 44px !important; font-size: 16px !important; }
-  .lib-sidebar.collapsed .lib-sidebar-toggle { left: 0 !important; }
-
-  .lib-sidebar-eyebrow  { font-size: clamp(11px, 0.55vw, 18px) !important; }
-  .lib-sidebar-title    { font-size: clamp(22px, 1.2vw, 38px) !important; }
-  .lib-sidebar-sub      { font-size: clamp(11px, 0.55vw, 18px) !important; }
-  .lib-cat-label        { font-size: clamp(12px, 0.6vw, 20px) !important; }
-  .lib-nav-item         { font-size: clamp(14px, 0.75vw, 24px) !important; }
-  .lib-nav-new          { font-size: clamp(10px, 0.5vw, 16px) !important; }
-  .lib-home-btn         { font-size: clamp(14px, 0.75vw, 24px) !important; }
-  .lib-version          { font-size: clamp(11px, 0.5vw, 16px) !important; }
-  .lib-search           { font-size: clamp(14px, 0.75vw, 22px) !important; padding: clamp(10px,0.7vw,18px) clamp(12px,0.9vw,22px) !important; }
-
-  /* ── Breadcrumb ── */
-  .lib-breadcrumb { font-size: clamp(11px, 0.55vw, 18px) !important; }
-
-  /* ── Home hero ── */
-  .lib-hero-title  { font-size: clamp(64px, 5.5vw, 160px) !important; }
-  .lib-hero-sub    { font-size: clamp(11px, 0.65vw, 20px) !important; }
-
-  /* ── Stats ── */
-  .lib-stat-icon   { font-size: clamp(14px, 0.7vw, 22px) !important; }
-  .lib-stat-value  { font-size: clamp(32px, 2.2vw, 64px) !important; }
-  .lib-stat-label  { font-size: clamp(11px, 0.55vw, 18px) !important; }
-
-  /* ── Sort / search ── */
-  .lib-sort-label  { font-size: clamp(11px, 0.55vw, 18px) !important; }
-  .lib-sort-btn    { font-size: clamp(11px, 0.55vw, 18px) !important; padding: clamp(7px,0.5vw,14px) clamp(12px,0.9vw,22px) !important; }
-  .lib-home-search { font-size: clamp(13px, 0.75vw, 22px) !important; }
-  .lib-search-icon { font-size: clamp(16px, 1vw, 28px) !important; }
-
-  /* ── Index ── */
-  .lib-index-label    { font-size: clamp(11px, 0.55vw, 18px) !important; }
-  .lib-index-meta     { font-size: clamp(11px, 0.55vw, 18px) !important; }
-  .lib-index-cat-badge { font-size: clamp(11px, 0.55vw, 16px) !important; min-width: clamp(110px, 8vw, 180px) !important; padding: clamp(5px,0.4vw,10px) clamp(10px,0.8vw,20px) !important; }
-  .lib-index-name     { font-size: clamp(20px, 1.2vw, 36px) !important; }
-  .lib-index-desc     { font-size: clamp(12px, 0.65vw, 20px) !important; }
-  .lib-index-arrow    { font-size: clamp(18px, 1vw, 28px) !important; }
-  .lib-index-row      { padding: clamp(16px, 1.1vw, 28px) clamp(20px, 1.6vw, 40px) !important; gap: clamp(14px, 1.2vw, 28px) !important; }
-  .lib-new-badge      { font-size: clamp(10px, 0.5vw, 16px) !important; }
-  .lib-lock-badge     { font-size: clamp(10px, 0.5vw, 16px) !important; }
-  .lib-no-results     { font-size: clamp(13px, 0.7vw, 22px) !important; }
-  .lib-load-more      { font-size: clamp(12px, 0.65vw, 20px) !important; padding: clamp(12px,0.9vw,22px) clamp(28px,2.2vw,56px) !important; }
-  .lib-index-footer   { font-size: clamp(11px, 0.6vw, 18px) !important; }
-
-  /* ── Script view ── */
-  #lib-view-script      { padding: 0 clamp(40px,3.5vw,100px) clamp(80px,6vw,140px) !important; }
-  .lib-script-inner     { max-width: clamp(900px, 68%, 1600px) !important; }
-  .lib-script-eyebrow   { font-size: clamp(13px, 0.65vw, 22px) !important; }
-  .lib-script-title     { font-size: clamp(42px, 3.2vw, 96px) !important; }
-  .lib-script-desc      { font-size: clamp(16px, 0.9vw, 26px) !important; max-width: clamp(700px, 64vw, 1400px) !important; }
-  .lib-script-desc code { font-size: clamp(15px, 0.85vw, 24px) !important; }
-  .lib-tag              { font-size: clamp(11px, 0.55vw, 18px) !important; padding: clamp(5px,0.4vw,10px) clamp(10px,0.8vw,20px) !important; }
-  .lib-section-label    { font-size: clamp(12px, 0.6vw, 20px) !important; }
-  .lib-sublabel         { font-size: clamp(13px, 0.65vw, 22px) !important; }
-
-  /* ── When to use ── */
-  .lib-when-title { font-size: clamp(11px, 0.55vw, 18px) !important; }
-
-  /* ── Code blocks ── */
-  .lib-code-lang    { font-size: clamp(11px, 0.55vw, 18px) !important; }
-  .lib-copy-btn     { font-size: clamp(11px, 0.55vw, 18px) !important; padding: clamp(5px,0.4vw,10px) clamp(12px,0.9vw,22px) !important; }
-  .lib-code-wrap pre { font-size: clamp(14px, 0.8vw, 24px) !important; line-height: 1.7 !important; padding: clamp(20px,1.6vw,40px) clamp(24px,1.8vw,48px) !important; }
-
-  /* ── Params table ── */
-  .lib-params-table      { font-size: clamp(13px, 0.75vw, 22px) !important; }
-  .lib-params-table th   { font-size: clamp(11px, 0.55vw, 18px) !important; padding: clamp(10px,0.8vw,20px) clamp(14px,1.1vw,28px) !important; }
-  .lib-params-table td   { padding: clamp(12px,1vw,24px) clamp(14px,1.1vw,28px) !important; }
-
-  /* ── Notes ── */
-  .lib-note-item      { font-size: clamp(13px, 0.75vw, 22px) !important; }
-  .lib-note-item code { font-size: clamp(13px, 0.72vw, 21px) !important; }
-
-  /* ── Conventions ── */
-  .lib-conv-title  { font-size: clamp(11px, 0.55vw, 18px) !important; }
-  .lib-conv-row    { font-size: clamp(15px, 0.9vw, 26px) !important; }
-  .lib-conv-suffix { font-size: clamp(13px, 0.78vw, 22px) !important; }
-
-  /* ── Back button ── */
-  .lib-back-btn { font-size: clamp(12px, 0.65vw, 20px) !important; }
-
-  /* ── Admin ── */
-  .lib-admin-bar-label   { font-size: clamp(11px, 0.55vw, 18px) !important; }
-  .lib-admin-group-label { font-size: clamp(11px, 0.55vw, 18px) !important; }
-  .lib-admin-pill        { font-size: clamp(11px, 0.55vw, 18px) !important; }
-  .lib-admin-status      { font-size: clamp(10px, 0.5vw, 16px) !important; }
-  .lib-access-badge      { font-size: clamp(10px, 0.5vw, 16px) !important; }
-
-  /* ── Blender category badge ── */
+  .lib-page {
+    zoom: 0.6;
+    width: calc(100% / 0.6);
+    height: calc(100vh / 0.6);
+  }
+  /* Blender category badge */
   .cat-blender { background: rgba(234,124,40,0.15); color: #ea7c28; border-color: rgba(234,124,40,0.3); }
 }
