@@ -108,15 +108,15 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <img
         class="avia-loop-thumb"
         id="avia-loop-thumb-hero"
-        src="https://img.youtube.com/vi/XalzOhIbHMw/maxresdefault.jpg"
-        alt="SF-26 Hero"
-        onerror="this.src='https://img.youtube.com/vi/XalzOhIbHMw/hqdefault.jpg'">
+        src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/SF26_Rendered.png"
+        alt="SF-26 Hero">
       <iframe
         class="avia-loop-iframe"
         id="avia-loop-iframe-hero"
         src=""
         frameborder="0"
-        allow="autoplay"
+        allow="autoplay; fullscreen"
+        allowfullscreen
         style="display:none;">
       </iframe>
     </div>
@@ -148,7 +148,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
   <script>
     (function() {
-      const YT_ID = 'XalzOhIbHMw';
       const wrapId = 'avia-loop-wrap-hero';
       const thumbId = 'avia-loop-thumb-hero';
       const iframeId = 'avia-loop-iframe-hero';
@@ -156,10 +155,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       function startLoop() {
         const iframe = document.getElementById(iframeId);
         const thumb  = document.getElementById(thumbId);
-        iframe.src = 'https://www.youtube.com/embed/' + YT_ID
-          + '?autoplay=1&mute=1&loop=1&playlist=' + YT_ID
-          + '&controls=0&rel=0&modestbranding=1&playsinline=1'
-          + '&iv_load_policy=3&disablekb=1&vq=hd2160&origin=https://aviarigg.com';
+        iframe.src = 'https://player.vimeo.com/video/1195052601?autoplay=1&loop=1&muted=1&background=1&quality=4K';
         iframe.style.display = 'block';
         // Fade out thumbnail after a short delay so iframe has time to start
         setTimeout(() => thumb.classList.add('hidden'), 800);
@@ -173,6 +169,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
         if (!wrap) return;
         if (wrap.requestFullscreen) wrap.requestFullscreen();
         else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
+        // Also try the iframe itself
+        const iframe = document.getElementById('avia-loop-iframe-hero');
+        if (iframe && iframe.requestFullscreen) iframe.requestFullscreen();
       };
 
       if ('IntersectionObserver' in window) {
