@@ -105,11 +105,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   </div>
   <div class="rig-img-frame">
     <div class="avia-loop-wrap" id="avia-loop-hero">
-      <img
-        class="avia-loop-thumb"
-        id="avia-loop-thumb-hero"
-        src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/SF26_Rendered.png"
-        alt="SF-26 Hero">
       <iframe
         class="avia-loop-iframe"
         id="avia-loop-iframe-hero"
@@ -131,12 +126,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       overflow: hidden;
       background: #06060f;
     }
-    .avia-loop-thumb {
-      width: 100%; height: 100%;
-      object-fit: cover; display: block;
-      transition: opacity 0.4s ease;
-    }
-    .avia-loop-thumb.hidden { opacity: 0; }
     .avia-loop-iframe {
       position: absolute;
       top: 0; left: 0;
@@ -154,11 +143,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
       function startLoop() {
         const iframe = document.getElementById(iframeId);
-        const thumb  = document.getElementById(thumbId);
         iframe.src = 'https://player.vimeo.com/video/1195052601?autoplay=1&loop=1&muted=1&background=1&quality=4K';
         iframe.style.display = 'block';
-        // Fade out thumbnail after a short delay so iframe has time to start
-        setTimeout(() => thumb.classList.add('hidden'), 800);
       }
 
       function observeLoop() {
