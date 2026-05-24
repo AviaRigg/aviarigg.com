@@ -693,7 +693,7 @@
 ══════════════════════════════════════════ */
 @media (min-width: 2560px) {
   html {
-    zoom: 0.72;
+    zoom: 1;
   }
   .cat-blender { background: rgba(234,124,40,0.15); color: #ea7c28; border-color: rgba(234,124,40,0.3); }
 }
