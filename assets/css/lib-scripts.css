@@ -688,16 +688,12 @@
 .cat-uvs       { background:rgba(0,180,255,0.08);  color:#00b4ff; border-color:rgba(0,180,255,0.2); }
 .cat-reference { background:rgba(255,255,255,0.04);color:#888899; border-color:rgba(255,255,255,0.12); }
 /* ══════════════════════════════════════════
-   4K SCALING — zoom approach
-   Scales the whole library page down at 4K
-   so it matches 1080p proportions visually
+   4K SCALING — zoom on html element
+   Makes 4K render at 1080p proportions
 ══════════════════════════════════════════ */
 @media (min-width: 2560px) {
-  .lib-page {
-    zoom: 0.6;
-    width: calc(100% / 0.6);
-    height: calc(100vh / 0.6);
+  html {
+    zoom: 0.55;
   }
-  /* Blender category badge */
   .cat-blender { background: rgba(234,124,40,0.15); color: #ea7c28; border-color: rgba(234,124,40,0.3); }
 }
