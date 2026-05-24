@@ -81,52 +81,60 @@ document.addEventListener('DOMContentLoaded', async function() {
 const MAINTENANCE_PAGES = ['/pages/shop', '/pages/portfolio'];
 
 async function checkMaintenanceMode() {
-  // Wait for nav-auth Supabase client
+  // Wait for _navSb to be available
   let attempts = 0;
   while (typeof _navSb === 'undefined' && attempts++ < 40) {
     await new Promise(r => setTimeout(r, 50));
   }
   if (typeof _navSb === 'undefined') return;
 
-  // Wait for nav-auth session to resolve
-  attempts = 0;
-  while (typeof _navUser === 'undefined' && attempts++ < 40) {
-    await new Promise(r => setTimeout(r, 50));
-  }
+  const path = window.location.pathname;
+  const isRestricted = MAINTENANCE_PAGES.some(p => path.startsWith(p));
+  if (!isRestricted) return;
 
-  // Fetch role from profiles table if logged in
-  if (_navUser) {
-    try {
-      const { data: profile } = await _navSb
-        .from('profiles')
-        .select('role')
-        .eq('id', _navUser.id)
-        .single();
-      if (profile?.role === 'admin') return; // admins bypass maintenance
-    } catch(e) { /* not logged in or no profile — continue */ }
-  }
-
+  // Check maintenance flag first — fast, no auth needed
+  let isOn = false;
+  let since = null;
   try {
     const { data } = await _navSb
       .from('site_settings')
       .select('key, value')
       .in('key', ['maintenance_mode', 'maintenance_since']);
-
-    if (!data) return;
-    const map = Object.fromEntries(data.map(r => [r.key, r.value]));
-    const isOn = map['maintenance_mode'] === 'true';
-
-    if (isOn) {
-      // Show splash if on a maintenance page
-      const path = window.location.pathname;
-      const isRestricted = MAINTENANCE_PAGES.some(p => path.startsWith(p));
-      if (isRestricted) {
-        showMaintenanceSplash(map['maintenance_since'] || null);
-      }
+    if (data) {
+      const map = Object.fromEntries(data.map(r => [r.key, r.value]));
+      isOn  = map['maintenance_mode'] === 'true';
+      since = map['maintenance_since'] || null;
     }
   } catch(e) {
     console.warn('Maintenance check failed:', e);
+    return;
   }
+
+  if (!isOn) return;
+
+  // Maintenance is on — show splash immediately so customers never see the page
+  showMaintenanceSplash(since);
+
+  // Now wait for auth to fully resolve via navAuthReady, then lift if admin
+  function handleAuthReady(e) {
+    const isAdmin = e?.detail?.isAdmin || window._navIsAdmin || false;
+    if (isAdmin) hideMaintenanceSplash();
+  }
+
+  // navAuthReady may have already fired before we registered (fast auth)
+  if (typeof window._navIsAdmin !== 'undefined') {
+    handleAuthReady({ detail: { isAdmin: window._navIsAdmin } });
+  } else {
+    // Wait for it — no timeout, we trust navAuthReady always fires
+    document.addEventListener('navAuthReady', handleAuthReady, { once: true });
+  }
+}
+
+function hideMaintenanceSplash() {
+  const splash = document.getElementById('maintenance-splash');
+  if (!splash) return;
+  splash.style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 function showMaintenanceSplash(sinceIso) {
