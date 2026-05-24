@@ -364,7 +364,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 <!-- TEX LIGHTBOX -->
 <div id="tex-lightbox" onclick="closeTexLightbox()" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(4,4,12,0.88);align-items:center;justify-content:center;backdrop-filter:blur(6px);">
-  <div onclick="event.stopPropagation()" style="position:relative;width:min(70vw,70vh,900px);max-width:900px;max-height:90vh;background:#07070f;border:1px solid rgba(139,79,200,0.25);box-shadow:0 0 80px rgba(139,79,200,0.12);display:flex;flex-direction:column;">
+  <div onclick="event.stopPropagation()" style="position:relative;width:min(75vw,75vh);max-height:90vh;background:#07070f;border:1px solid rgba(139,79,200,0.25);box-shadow:0 0 80px rgba(139,79,200,0.12);display:flex;flex-direction:column;">
     <!-- Header bar -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid rgba(139,79,200,0.2);flex-shrink:0;">
       <div>
@@ -375,7 +375,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     </div>
     <!-- Image area -->
     <div style="flex:1;overflow:hidden;background:#050510;display:flex;align-items:center;justify-content:center;min-height:0;">
-      <img id="tex-lb-img" src="" alt="" style="max-width:100%;max-height:calc(90vh - 60px);width:auto;height:auto;object-fit:contain;display:block;">
+      <img id="tex-lb-img" src="" alt="" style="max-width:100%;max-height:calc(75vh - 60px);width:auto;height:auto;object-fit:contain;display:block;">
       <div id="tex-lb-placeholder" style="display:none;width:100%;padding:80px 0;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:rgba(139,79,200,0.3);">// IMAGE NOT YET AVAILABLE</div>
     </div>
   </div>
