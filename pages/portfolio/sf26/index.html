@@ -108,11 +108,10 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <iframe
         class="avia-loop-iframe"
         id="avia-loop-iframe-hero"
-        src=""
+        src="https://player.vimeo.com/video/1195052601?autoplay=1&loop=1&muted=1&background=1&quality=4K"
         frameborder="0"
         allow="autoplay; fullscreen"
-        allowfullscreen
-        style="display:none;">
+        allowfullscreen>
       </iframe>
     </div>
     <div class="rig-cap"><span>// SF-26</span><button onclick="aviaLoopFullscreen()" style="background:none;border:none;cursor:pointer;color:var(--txb);opacity:0.6;padding:0;display:flex;align-items:center;gap:5px;font-family:inherit;font-size:inherit;letter-spacing:inherit;text-transform:inherit;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>Fullscreen</button></div>
@@ -142,9 +141,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       const iframeId = 'avia-loop-iframe-hero';
 
       function startLoop() {
-        const iframe = document.getElementById(iframeId);
-        iframe.src = 'https://player.vimeo.com/video/1195052601?autoplay=1&loop=1&muted=1&background=1&quality=4K';
-        iframe.style.display = 'block';
+        // src already set on iframe — nothing to do
       }
 
       function observeLoop() {
