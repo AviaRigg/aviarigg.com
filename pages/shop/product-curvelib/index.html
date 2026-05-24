@@ -160,7 +160,7 @@
         </div>
         <div class="product-gallery">
           <div id="curvelib-gallery-main" class="product-gallery-main-img">
-            <iframe src="https://player.vimeo.com/video/1195057926?autoplay=0&title=0&byline=0&portrait=0&controls=1&dnt=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+            <iframe src="https://player.vimeo.com/video/1195057926?autoplay=1&loop=1&background=1&dnt=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
           </div>
           <div class="product-gallery-label" id="curvelib-gallery-label">Controller Shape Menu · Showcase</div>
         </div>
@@ -252,7 +252,7 @@ function setCurvlibGalleryImg(thumb, src, label) {
 function setCurvlibGalleryVideo(thumb, id) {
   const vmId = id.replace('vm:', '');
   setProductGallery(thumb, 'curvelib-gallery-main', 'curvelib-gallery-label',
-    `<iframe src="https://player.vimeo.com/video/${vmId}?autoplay=1&title=0&byline=0&portrait=0&controls=1&dnt=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`,
+    `<iframe src="https://player.vimeo.com/video/${vmId}?autoplay=1&loop=1&background=1&dnt=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`,
     'Controller Shape Menu · Video');
 }
 function syncGallerySidebars() {
