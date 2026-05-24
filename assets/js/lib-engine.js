@@ -16,6 +16,7 @@ const CAT_CLASS = {
   'Shape Editor':      'cat-shape',
   'UVs':               'cat-uvs',
   'Reference':         'cat-reference',
+  'Blender':           'cat-blender',
 };
 
 const CAT_SHORT = {
@@ -26,6 +27,7 @@ const CAT_SHORT = {
   'Shape Editor':      'SHAPE ED',
   'UVs':               'UVS',
   'Reference':         'REFERENCE',
+  'Blender':           'BLENDER',
 };
 
 // State
