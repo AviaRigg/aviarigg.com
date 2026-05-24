@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SF-26 Rig Breakdown — AviaRigg</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<script>
+  document.addEventListener('touchmove', function(e) {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+  let lastTap = 0;
+  document.addEventListener('touchend', function(e) {
+    const tag = e.target.tagName;
+    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(tag)) return;
+    const now = Date.now();
+    if (now - lastTap < 300) e.preventDefault();
+    lastTap = now;
+  }, { passive: false });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#06060f;--sur:#0b0a18;--bor:#1a1830;--ac:#8b4fc8;--ac2:#b06ef5;--tx:#c0b8d8;--txd:#6a6088;--txb:#ede8ff;--gr:#00e87a;--rd:#ff4d6a;--ye:#f5c518;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(139,79,200,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(139,79,200,.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+
+/* ── TEXT READABILITY OVERRIDES ── */
+/* captions, section labels, small text — much brighter */
+.rig-cap { color: var(--txb) !important; font-size: clamp(10px, 0.9vw, 14px) !important; }
+.rig-ph-label { color: var(--tx) !important; font-size: clamp(10px, 0.9vw, 13px) !important; }
+.rig-ph-label b { color: var(--ac2) !important; font-size: clamp(11px, 1vw, 15px) !important; }
+.rig-sl { color: var(--tx) !important; font-size: clamp(11px, 1vw, 15px) !important; }
+.rig-sk { color: var(--tx) !important; font-size: clamp(10px, 0.9vw, 13px) !important; }
+.rig-sv { font-size: clamp(15px, 1.4vw, 22px) !important; }
+.rig-ct { color: var(--tx) !important; font-size: clamp(11px, 1vw, 15px) !important; }
+.rig-nn { color: var(--ac2) !important; font-size: clamp(10px, 0.9vw, 14px) !important; }
+.rig-nt { font-size: clamp(16px, 1.5vw, 22px) !important; }
+.rig-nd { color: var(--tx) !important; font-size: clamp(13px, 1.1vw, 17px) !important; }
+.rig-fct { color: var(--ac2) !important; font-size: clamp(10px, 0.9vw, 13px) !important; }
+.rig-fr  { color: var(--tx) !important; font-size: clamp(11px, 1vw, 15px) !important; }
+.rig-ik  { color: var(--tx) !important; font-size: clamp(10px, 0.9vw, 13px) !important; }
+.rig-iv  { font-size: clamp(16px, 1.4vw, 22px) !important; }
+.rig-ey  { color: var(--ac2) !important; font-size: clamp(11px, 1vw, 15px) !important; }
+.rig-swn { font-size: clamp(13px, 1.1vw, 18px) !important; letter-spacing: 2px !important; }
+.rig-swd { color: var(--tx) !important; font-size: clamp(12px, 1vw, 16px) !important; }
+.rig-swb { width: clamp(28px, 2vw, 40px) !important; height: clamp(28px, 2vw, 40px) !important; flex-shrink: 0 !important; }
+.rig-tab { font-size: clamp(10px, 0.9vw, 14px) !important; color: var(--tx) !important; }
+.rig-badge { font-size: clamp(10px, 0.9vw, 14px) !important; }
+
+/* ── TOC DOTS — bigger, scrollable ── */
+.rig-toc { gap: clamp(4px, 0.6vw, 10px) !important; cursor: ns-resize; }
+.toc-hit { display:flex; align-items:center; justify-content:center; width:44px; height:44px; cursor:pointer; position:relative; margin:-8px 0; }
+.toc-hit .td::after { right: 28px; }
+.td { width: clamp(7px, 0.7vw, 12px) !important; height: clamp(7px, 0.7vw, 12px) !important; }
+.td::after { font-size: clamp(9px, 0.8vw, 12px) !important; opacity: 0; transition: opacity .2s; }
+.td:hover::after { opacity: 1 !important; }
+.td.active::after { opacity: 1 !important; color: var(--ac2) !important; }
+
+/* ── SLIDER FIX ── */
+.rig-cbi { position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: auto !important; min-width: unset !important; }
+</style>
+</head>
+<body>
+
+<div class="rig-toc" id="toc">
+  <div class="toc-hit" onclick="g('s-hero')"><div class="td active" data-l="Overview"></div></div>
+  <div class="toc-hit" onclick="g('s-video')"><div class="td" data-l="Videos"></div></div>
+  <div class="toc-hit" onclick="g('s-wire')"><div class="td" data-l="Wireframe"></div></div>
+  <div class="toc-hit" onclick="g('s-topo')"><div class="td" data-l="Topology"></div></div>
+  <div class="toc-hit" onclick="g('s-deform')"><div class="td" data-l="Deformation"></div></div>
+  <div class="toc-hit" onclick="g('s-facial')"><div class="td" data-l="Facial"></div></div>
+  <div class="toc-hit" onclick="g('s-bs')"><div class="td" data-l="Blend Shapes"></div></div>
+  <div class="toc-hit" onclick="g('s-uv')"><div class="td" data-l="UV Maps"></div></div>
+  <div class="toc-hit" onclick="g('s-tex')"><div class="td" data-l="Textures"></div></div>
+  <div class="toc-hit" onclick="g('s-ctrl')"><div class="td" data-l="Controls"></div></div>
+</div>
+
+<div id="nav-root"></div>
+<script src="/assets/js/status.js"></script>
+<script src="/assets/js/nav.js"></script>
+<script src="/assets/js/nav-auth.js"></script>
+
+<div class="rig-page-header">
+  <div class="rig-page-eyebrow">Portfolio</div>
+  <div class="rig-page-title">SF-26 Rig Breakdown</div>
+</div>
+
+<div class="rig-wrap">
+
+<!-- ─── HERO ─── -->
+<div id="s-hero" class="rig-hero">
+  <div>
+    <div class="rig-ey">Hard Surface · 2026</div>
+    <h1 class="rig-ht"><span class="d">Formula 1 Car</span>SF-<span class="a">26</span></h1>
+    <p class="rig-desc">Full production rig for the Ferrari SF-26 Formula 1 car — built to feature-animation quality with a game-ready export pipeline. Covers procedural wheel spin, DRS actuation, full suspension travel, dual livery system, and a custom MgPicker layout. Every control is clean, locked, and animator-ready out of the box.</p>
+    <div class="rig-tags">
+      <span class="rig-tag hi">Maya 2022+</span><span class="rig-tag hi">Python 3</span><span class="rig-tag hi">MgPicker</span>
+      <span class="rig-tag">Hard Surface</span><span class="rig-tag">Procedural</span><span class="rig-tag">DRS System</span><span class="rig-tag">Dual Livery</span>
+    </div>
+  </div>
+  <div class="rig-img-frame">
+    <div class="avia-loop-wrap" id="avia-loop-hero">
+      <iframe
+        class="avia-loop-iframe"
+        id="avia-loop-iframe-hero"
+        src="https://player.vimeo.com/video/1195052601?autoplay=1&loop=1&muted=1&background=1&quality=4K"
+        frameborder="0"
+        allow="autoplay; fullscreen"
+        allowfullscreen>
+      </iframe>
+    </div>
+    <div class="rig-cap"><span>// SF-26</span><button onclick="aviaLoopFullscreen()" style="background:none;border:none;cursor:pointer;color:var(--txb);opacity:0.6;padding:0;display:flex;align-items:center;gap:5px;font-family:inherit;font-size:inherit;letter-spacing:inherit;text-transform:inherit;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>Fullscreen</button></div>
+  </div>
+
+  <style>
+    .avia-loop-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: #06060f;
+    }
+    .avia-loop-iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+      pointer-events: none;
+    }
+  </style>
+
+  <script>
+    (function() {
+      const wrapId = 'avia-loop-wrap-hero';
+      const thumbId = 'avia-loop-thumb-hero';
+      const iframeId = 'avia-loop-iframe-hero';
+
+      function startLoop() {
+        // src already set on iframe — nothing to do
+      }
+
+      function observeLoop() {
+        const wrap = document.getElementById('avia-loop-hero');
+        if (!wrap) return;
+        window.aviaLoopFullscreen = function() {
+        const wrap = document.getElementById('avia-loop-hero');
+        if (!wrap) return;
+        if (wrap.requestFullscreen) wrap.requestFullscreen();
+        else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
+        // Also try the iframe itself
+        const iframe = document.getElementById('avia-loop-iframe-hero');
+        if (iframe && iframe.requestFullscreen) iframe.requestFullscreen();
+      };
+
+      if ('IntersectionObserver' in window) {
+          const io = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+              startLoop();
+              io.disconnect();
+            }
+          }, { threshold: 0.3 });
+          io.observe(wrap);
+        } else {
+          startLoop();
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', observeLoop);
+      } else {
+        observeLoop();
+      }
+    })();
+  </script>
+</div>
+
+<!-- SPECS BAR -->
+<div class="rig-specs">
+  <div class="rig-si"><div class="rig-sk">Software</div><div class="rig-sv">Maya 2022+</div></div>
+  <div class="rig-si"><div class="rig-sk">Rig Type</div><div class="rig-sv">Hard Surface / Vehicle</div></div>
+  <div class="rig-si"><div class="rig-sk">Pipeline</div><div class="rig-sv">Feature Anim + Game</div></div>
+  <div class="rig-si"><div class="rig-sk">Renderer</div><div class="rig-sv">Cycles</div></div>
+  <div class="rig-si"><div class="rig-sk">Completed</div><div class="rig-sv">2026</div></div>
+  <div class="rig-si"><div class="rig-sk">Status</div><div class="rig-sv" style="color:var(--gr)">Complete</div></div>
+</div>
+
+<!-- STATS -->
+<div class="rig-stats">
+  <div class="rig-stat"><div class="rig-sn">[ 0 ]</div><div class="rig-sl2">[ Stat Label ]</div></div>
+  <div class="rig-stat"><div class="rig-sn">[ 0 ]</div><div class="rig-sl2">[ Stat Label ]</div></div>
+  <div class="rig-stat"><div class="rig-sn">[ 0 ]</div><div class="rig-sl2">[ Stat Label ]</div></div>
+  <div class="rig-stat"><div class="rig-sn">[ 0 ]</div><div class="rig-sl2">[ Stat Label ]</div></div>
+  <div class="rig-stat"><div class="rig-sn">[ 0 ]</div><div class="rig-sl2">[ Stat Label ]</div></div>
+</div>
+
+<!-- ─── VIDEOS ─── -->
+<div id="s-video" class="rig-sec">
+  <div class="rig-sl">// Video Showcase</div>
+  <div class="rig-card" style="margin-bottom:2px;">
+    <div class="rig-ph r169">
+      <svg class="bg" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g1" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0L0 0 0 32" class="rig-ph-grid-bg"/></pattern></defs><rect width="800" height="450" fill="url(#g1)"/></svg>
+      <div class="rig-ph-label"><b>sf26-full-demo.mp4</b>Full rig demo reel · 2:30</div>
+    </div>
+    <div class="rig-cap"><span>// Full Demo Reel — animation test + deformation showcase</span><span>2:30</span></div>
+  </div>
+  <div class="rig-gv">
+    <div class="rig-card"><div class="rig-ph r169"><svg class="bg" viewBox="0 0 400 225" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g1b" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0L0 0 0 32" class="rig-ph-grid-bg"/></pattern></defs><rect width="400" height="225" fill="url(#g1b)"/></svg><div class="rig-ph-label"><b>sf26-suspension.mp4</b>IK–FK switch · 0:45</div></div><div class="rig-cap"><span>// Suspension Travel Demo</span><span>0:45</span></div></div>
+    <div class="rig-card"><div class="rig-ph r169"><svg class="bg" viewBox="0 0 400 225" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g1c" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0L0 0 0 32" class="rig-ph-grid-bg"/></pattern></defs><rect width="400" height="225" fill="url(#g1c)"/></svg><div class="rig-ph-label"><b>sf26-controls.mp4</b>Facial walkthrough · 1:10</div></div><div class="rig-cap"><span>// Facial Walkthrough</span><span>1:10</span></div></div>
+    <div class="rig-card"><div class="rig-ph r169"><svg class="bg" viewBox="0 0 400 225" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g1d" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0L0 0 0 32" class="rig-ph-grid-bg"/></pattern></defs><rect width="400" height="225" fill="url(#g1d)"/></svg><div class="rig-ph-label"><b>sf26-deform.mp4</b>Deform stress test · 0:55</div></div><div class="rig-cap"><span>// Deformation Test</span><span>0:55</span></div></div>
+    <div class="rig-card"><div class="rig-ph r169"><svg class="bg" viewBox="0 0 400 225" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g1e" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0L0 0 0 32" class="rig-ph-grid-bg"/></pattern></defs><rect width="400" height="225" fill="url(#g1e)"/></svg><div class="rig-ph-label"><b>sf26-python.mp4</b>Python tools · 0:30</div></div><div class="rig-cap"><span>// Python Tools</span><span>0:30</span></div></div>
+  </div>
+</div>
+
+<!-- ─── WIREFRAME ─── -->
+<div id="s-wire" class="rig-sec">
+  <div class="rig-sl">// Wireframe &amp; Skeleton</div>
+  <div class="rig-g2" style="margin-bottom:2px;">
+    <div class="rig-card rig-s2"><div class="rig-ph r219"><svg class="bg" viewBox="0 0 900 385" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g2" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0L0 0 0 30" class="rig-ph-grid-bg"/></pattern></defs><rect width="900" height="385" fill="url(#g2)"/><line x1="300" y1="10" x2="300" y2="375" stroke="#1a1830" stroke-width="1"/><line x1="600" y1="10" x2="600" y2="375" stroke="#1a1830" stroke-width="1"/><text x="150" y="22" fill="#6a6088" font-family="monospace" font-size="9" text-anchor="middle" letter-spacing="2">FRONT VIEW</text><text x="450" y="22" fill="#6a6088" font-family="monospace" font-size="9" text-anchor="middle" letter-spacing="2">SIDE VIEW</text><text x="750" y="22" fill="#6a6088" font-family="monospace" font-size="9" text-anchor="middle" letter-spacing="2">BACK VIEW</text></svg><div class="rig-ph-label"><b>sf26-skeleton-3view.jpg</b>Skeleton — front / side / back</div></div><div class="rig-cap"><span>// 214-joint skeleton · 3 views</span><span>/projects/f1_SF26/images/</span></div></div>
+    <div class="rig-card"><div class="rig-ph r43"><svg class="bg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g2b" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" class="rig-ph-grid-bg"/></pattern></defs><rect width="400" height="300" fill="url(#g2b)"/></svg><div class="rig-ph-label"><b>sf26-wireframe-body.jpg</b>Wireframe mesh — body</div></div><div class="rig-cap"><span>// Body wireframe</span><span>~38k tris</span></div></div>
+    <div class="rig-card"><div class="rig-ph r43"><svg class="bg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g2c" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" class="rig-ph-grid-bg"/></pattern></defs><rect width="400" height="300" fill="url(#g2c)"/></svg><div class="rig-ph-label"><b>sf26-outliner.jpg</b>Joint hierarchy · Maya outliner</div></div><div class="rig-cap"><span>// Outliner · hierarchy</span><span>214 joints</span></div></div>
+  </div>
+</div>
+
+<!-- ─── TOPOLOGY ─── -->
+<div id="s-topo" class="rig-sec">
+  <div class="rig-sl">// Topology</div>
+  <div class="rig-card">
+    <div class="rig-tb">
+      <button class="rig-tab active" onclick="st('tp','body',this)">Body</button>
+      <button class="rig-tab"        onclick="st('tp','head',this)">Head</button>
+      <button class="rig-tab"        onclick="st('tp','hand',this)">Hand</button>
+      <button class="rig-tab"        onclick="st('tp','shldr',this)">Shoulder</button>
+    </div>
+    <div id="tp-body" class="rig-tp active"><div class="rig-ph r219"><svg class="bg" viewBox="0 0 900 280" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g3" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" class="rig-ph-grid-bg"/></pattern></defs><rect width="900" height="280" fill="url(#g3)"/></svg><div class="rig-ph-label"><b>sf26-topo-body.jpg</b>Body topology — edge loop view</div></div><div class="rig-cap"><span>// Body — quad-dominant · loops follow muscle anatomy</span><span>~38k tris</span></div></div>
+    <div id="tp-head" class="rig-tp"><div class="rig-ph r219"><svg class="bg" viewBox="0 0 900 280" preserveAspectRatio="xMidYMid slice"><use href="#g3"/></svg><div class="rig-ph-label"><b>sf26-topo-head.jpg</b>Head topology — FACS-optimised</div></div><div class="rig-cap"><span>// Head — radial loops at eyes + mouth</span><span>~12k tris</span></div></div>
+    <div id="tp-hand" class="rig-tp"><div class="rig-ph r219"><svg class="bg" viewBox="0 0 900 280" preserveAspectRatio="xMidYMid slice"><use href="#g3"/></svg><div class="rig-ph-label"><b>sf26-topo-hand.jpg</b>Hand topology — knuckle loops</div></div><div class="rig-cap"><span>// Hand — 3-joint fingers · clean bending</span><span>~3.2k tris</span></div></div>
+    <div id="tp-shldr" class="rig-tp"><div class="rig-ph r219"><svg class="bg" viewBox="0 0 900 280" preserveAspectRatio="xMidYMid slice"><use href="#g3"/></svg><div class="rig-ph-label"><b>sf26-topo-shoulder.jpg</b>Shoulder — radial fan loops</div></div><div class="rig-cap"><span>// Shoulder — corrective-ready topology</span><span>Critical area</span></div></div>
+  </div>
+</div>
+
+<!-- ─── DEFORMATION ─── -->
+<div id="s-deform" class="rig-sec">
+  <div class="rig-sl">// Deformation Quality</div>
+  <div class="rig-card">
+    <div class="rig-ch"><span class="rig-ct">// Drag to Compare</span><div style="display:flex;gap:10px;"><span class="rig-badge rig-br">Without Correctives</span><span class="rig-badge rig-bg">With Correctives</span></div></div>
+    <div class="rig-cmp r169" id="rig-cmp">
+      <!-- AFTER — full width underneath, shows when slider is left -->
+      <div style="position:absolute;inset:0;background:#090a14;">
+        <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g4" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0L0 0 0 24" class="rig-ph-grid-bg"/></pattern></defs><rect width="800" height="450" fill="#090a14"/><rect width="800" height="450" fill="url(#g4)"/></svg>
+        <div style="position:absolute;bottom:14px;right:16px;z-index:1;"></div>
+      </div>
+      <!-- BEFORE — clipped on top, fills from left, shows when slider is right -->
+      <div class="rig-cb" id="rig-cb">
+        <div class="rig-cbi" id="rig-cbi" style="background:#110920;position:absolute;top:0;left:0;right:0;bottom:0;width:auto;min-width:unset;">
+          <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice"><rect width="800" height="450" fill="#110920"/><rect width="800" height="450" fill="url(#g4)" opacity=".4"/></svg>
+          <div style="position:absolute;bottom:14px;left:16px;z-index:1;"></div>
+        </div>
+      </div>
+      <div class="rig-cl" id="rig-cl"></div>
+      <div class="rig-ch2" id="rig-ch2"><svg width="20" height="14" viewBox="0 0 20 14" fill="none"><path d="M6 1L1 7L6 13" stroke="rgba(255,255,255,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 1L19 7L14 13" stroke="rgba(255,255,255,.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="rig-cap"><span id="cmp-caption">// Shoulder — 90° raise</span><span style="display:flex;gap:16px;align-items:center;"><span id="before-label" style="font-size:10px;opacity:.5;"></span><span id="after-label" style="font-size:10px;opacity:.5;"></span><span>Drag ◁▷</span></span></div>
+  </div>
+  <div class="rig-g4" style="margin-top:2px;">
+    <div class="rig-note rig-corr-card active-card" data-n="A" data-joint="shoulder" data-label="// Shoulder — 90° raise" onclick="switchCorr(this)" style="cursor:pointer;border-color:rgba(139,79,200,.5);">
+      <div class="rig-nn">// Shoulder</div><div class="rig-nt" style="font-size:14px;">90° Raise</div><div class="rig-nd">[ Description of shoulder corrective ]</div>
+    </div>
+    <div class="rig-note rig-corr-card" data-n="B" data-joint="elbow" data-label="// Elbow — full flex" onclick="switchCorr(this)" style="cursor:pointer;">
+      <div class="rig-nn">// Elbow</div><div class="rig-nt" style="font-size:14px;">Full Flex</div><div class="rig-nd">[ Description of elbow corrective ]</div>
+    </div>
+    <div class="rig-note rig-corr-card" data-n="C" data-joint="knee" data-label="// Knee — deep bend" onclick="switchCorr(this)" style="cursor:pointer;">
+      <div class="rig-nn">// Knee</div><div class="rig-nt" style="font-size:14px;">Deep Bend</div><div class="rig-nd">[ Description of knee corrective ]</div>
+    </div>
+    <div class="rig-note rig-corr-card" data-n="D" data-joint="wrist" data-label="// Wrist — extreme flex" onclick="switchCorr(this)" style="cursor:pointer;">
+      <div class="rig-nn">// Wrist</div><div class="rig-nt" style="font-size:14px;">Extreme Flex</div><div class="rig-nd">[ Description of wrist corrective ]</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FACIAL ─── -->
+<div id="s-facial" class="rig-sec">
+  <div class="rig-sl">// Facial Rig</div>
+  <div class="rig-g2" style="margin-bottom:2px;">
+    <div class="rig-card"><div class="rig-ph r43"><svg class="bg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g5" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" class="rig-ph-grid-bg"/></pattern></defs><rect width="400" height="300" fill="url(#g5)"/></svg><div class="rig-ph-label"><b>sf26-controls-overview.jpg</b>Facial controls — Maya viewport</div></div><div class="rig-cap"><span>// 38 NURBS control curves</span><span>/projects/f1_SF26/images/</span></div></div>
+    <div class="rig-card">
+      <div class="rig-ch"><span class="rig-ct">// FACS Action Units</span><span class="rig-badge rig-bd">87 total shapes</span></div>
+      <div class="rig-fg">
+        <div><div class="rig-fct">// Upper Face</div><div class="rig-fr">AU01 · Inner Brow Raise</div><div class="rig-fr">AU02 · Outer Brow Raise</div><div class="rig-fr">AU04 · Brow Lowerer</div><div class="rig-fr">AU05 · Upper Lid Raise</div><div class="rig-fr">AU06 · Cheek Raise</div><div class="rig-fr">AU07 · Lid Tightener</div><div class="rig-fr">AU43 · Eyes Closed</div><div class="rig-fr">AU46 · Wink</div><div class="rig-fr" style="opacity:.5">+ 8 more...</div></div>
+        <div><div class="rig-fct">// Lower Face</div><div class="rig-fr">AU10 · Upper Lip Raise</div><div class="rig-fr">AU12 · Lip Corner Pull</div><div class="rig-fr">AU15 · Lip Corner Depr.</div><div class="rig-fr">AU17 · Chin Raise</div><div class="rig-fr">AU20 · Lip Stretch</div><div class="rig-fr">AU23 · Lip Tightener</div><div class="rig-fr">AU25 · Lips Part</div><div class="rig-fr">AU26 · Jaw Drop</div><div class="rig-fr" style="opacity:.5">+ 12 more...</div></div>
+      </div>
+      <div class="rig-cap" style="border-top:1px solid var(--bor);"><span>28 FACS AUs · SDK-driven · Jaw joint</span></div>
+    </div>
+  </div>
+  <div class="rig-g4">
+    <div class="rig-card"><div class="rig-ph r11"><svg class="bg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g5b" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" class="rig-ph-grid-bg"/></pattern></defs><rect width="200" height="200" fill="url(#g5b)"/></svg><div class="rig-ph-label"><b>sf26-expr-neutral.jpg</b></div></div><div class="rig-cap"><span>Neutral</span><span>Base</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11"><svg class="bg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><use href="#g5b"/></svg><div class="rig-ph-label"><b>sf26-expr-happy.jpg</b></div></div><div class="rig-cap"><span>Happy</span><span>AU06+12</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11"><svg class="bg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><use href="#g5b"/></svg><div class="rig-ph-label"><b>sf26-expr-angry.jpg</b></div></div><div class="rig-cap"><span>Angry</span><span>AU04+05+23</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11"><svg class="bg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><use href="#g5b"/></svg><div class="rig-ph-label"><b>sf26-expr-sad.jpg</b></div></div><div class="rig-cap"><span>Sad</span><span>AU01+15+17</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11"><svg class="bg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><use href="#g5b"/></svg><div class="rig-ph-label"><b>sf26-expr-surprised.jpg</b></div></div><div class="rig-cap"><span>Surprised</span><span>AU01+02+05+26</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11"><svg class="bg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><use href="#g5b"/></svg><div class="rig-ph-label"><b>sf26-expr-disgust.jpg</b></div></div><div class="rig-cap"><span>Disgust</span><span>AU09+16+17</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11"><svg class="bg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><use href="#g5b"/></svg><div class="rig-ph-label"><b>sf26-expr-fear.jpg</b></div></div><div class="rig-cap"><span>Fear</span><span>AU01+02+04+20</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11"><svg class="bg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><use href="#g5b"/></svg><div class="rig-ph-label"><b>sf26-expr-speak.jpg</b></div></div><div class="rig-cap"><span>Speaking</span><span>AU25+26+jaw</span></div></div>
+  </div>
+</div>
+
+<!-- ─── BLEND SHAPES ─── -->
+<div id="s-bs" class="rig-sec">
+  <div class="rig-sl">// Blend Shape Library</div>
+  <div class="rig-card">
+    <div class="rig-ch"><span class="rig-ct">// 87 Blend Shapes</span><span class="rig-badge rig-bd">FACS-based · SDK-driven</span></div>
+    <div class="rig-tb">
+      <button class="rig-tab active" onclick="bs('brow',this)">Brow (12)</button>
+      <button class="rig-tab"        onclick="bs('eye',this)">Eye / Lid (14)</button>
+      <button class="rig-tab"        onclick="bs('nose',this)">Nose (6)</button>
+      <button class="rig-tab"        onclick="bs('mouth',this)">Mouth (24)</button>
+      <button class="rig-tab"        onclick="bs('jaw',this)">Jaw (8)</button>
+      <button class="rig-tab"        onclick="bs('cheek',this)">Cheek (10)</button>
+      <button class="rig-tab"        onclick="bs('corr',this)">Correctives (13)</button>
+    </div>
+    <div id="bs-content" style="padding:20px;"></div>
+    <div class="rig-cap" style="border-top:1px solid var(--bor);justify-content:space-between;"><span id="bs-label">// Brow — 12 shapes</span><span>// Replace with blendShape editor screenshot per category</span></div>
+  </div>
+</div>
+
+<!-- ─── UV ─── -->
+<div id="s-uv" class="rig-sec">
+  <div class="rig-sl">// UV Layout</div>
+  <div class="rig-g3" style="margin-bottom:2px;">
+    <div class="rig-card"><div class="rig-ph r11"><svg class="bg" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g6" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0L0 0 0 30" class="rig-ph-grid-bg"/></pattern></defs><rect width="300" height="300" fill="#050510"/><rect width="300" height="300" fill="url(#g6)"/><line x1="150" y1="0" x2="150" y2="300" stroke="#1a1830" stroke-width="1"/><line x1="0" y1="150" x2="300" y2="150" stroke="#1a1830" stroke-width="1"/></svg><div class="rig-ph-label"><b>sf26-uv-body.jpg</b>Body UV — UDIM 1001</div></div><div class="rig-cap"><span>// Body — UDIM 1001</span><span>Torso + Limbs</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11"><svg class="bg" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid slice"><use href="#g6"/><line x1="150" y1="0" x2="150" y2="300" stroke="#1a1830" stroke-width="1"/><line x1="0" y1="150" x2="300" y2="150" stroke="#1a1830" stroke-width="1"/></svg><div class="rig-ph-label"><b>sf26-uv-head.jpg</b>Head UV — UDIM 1002</div></div><div class="rig-cap"><span>// Head — UDIM 1002</span><span>Face + Neck</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11"><svg class="bg" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid slice"><use href="#g6"/><line x1="150" y1="0" x2="150" y2="300" stroke="#1a1830" stroke-width="1"/><line x1="0" y1="150" x2="300" y2="150" stroke="#1a1830" stroke-width="1"/></svg><div class="rig-ph-label"><b>sf26-uv-hand.jpg</b>Hand UV — UDIM 1003</div></div><div class="rig-cap"><span>// Hand — UDIM 1003</span><span>Per-finger islands</span></div></div>
+  </div>
+  <div class="rig-ir">
+    <div><div class="rig-ik">UV Method</div><div class="rig-iv">UDIM · 4 tiles</div></div>
+    <div><div class="rig-ik">Texel Density</div><div class="rig-iv">Uniform · 10.24 px/cm</div></div>
+    <div><div class="rig-ik">Overlap</div><div class="rig-iv">L/R mirrored where symmetric</div></div>
+    <div><div class="rig-ik">Seam Placement</div><div class="rig-iv">Under arms / inner leg</div></div>
+  </div>
+</div>
+
+<!-- ─── TEXTURES ─── -->
+<div id="s-tex" class="rig-sec">
+  <div class="rig-sl">// Texture Maps</div>
+  <div class="rig-g3" style="margin-bottom:2px;">
+    <div class="rig-card"><div class="rig-ph r11" style="background:linear-gradient(135deg,#1a1230,#2e1d56,#1a1230);"><div class="rig-ph-label"><b>sf26-tex-albedo.jpg</b>Albedo / Base Color</div></div><div class="rig-cap"><span>// Albedo</span><span>4K</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11" style="background:linear-gradient(135deg,#4a6080,#7090b0,#506090);"><div class="rig-ph-label"><b>sf26-tex-normal.jpg</b>Normal Map</div></div><div class="rig-cap"><span>// Normal</span><span>4K · Mikk tangent</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11" style="background:linear-gradient(135deg,#1a1a1a,#3a3a3a,#1a1a1a);"><div class="rig-ph-label"><b>sf26-tex-roughness.jpg</b>Roughness</div></div><div class="rig-cap"><span>// Roughness</span><span>4K · Armor vs organic</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11" style="background:#080808;"><div class="rig-ph-label"><b>sf26-tex-metallic.jpg</b>Metallic</div></div><div class="rig-cap"><span>// Metallic</span><span>4K · Exoskeleton mask</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11" style="background:#060606;"><div class="rig-ph-label" style="color:rgba(176,110,245,.7);"><b>sf26-tex-emissive.jpg</b>Emissive</div></div><div class="rig-cap"><span>// Emissive</span><span>Energy core + visor</span></div></div>
+    <div class="rig-card"><div class="rig-ph r11" style="background:linear-gradient(135deg,#c0c0c0,#d8d8d8,#b8b8b8);"><div class="rig-ph-label" style="color:#555;"><b>sf26-tex-ao.jpg</b>Ambient Occlusion</div></div><div class="rig-cap"><span>// AO</span><span>Baked</span></div></div>
+  </div>
+  <div class="rig-ir">
+    <div><div class="rig-ik">Resolution</div><div class="rig-iv">4096×4096 (4K)</div></div>
+    <div><div class="rig-ik">Workflow</div><div class="rig-iv">PBR Metallic-Roughness</div></div>
+    <div><div class="rig-ik">Software</div><div class="rig-iv">Substance Painter</div></div>
+    <div><div class="rig-ik">UDIM Tiles</div><div class="rig-iv">4 tiles</div></div>
+  </div>
+</div>
+
+<!-- ─── CONTROLS ─── -->
+<div id="s-ctrl" class="rig-sec">
+  <div class="rig-sl">// Controls &amp; Picker</div>
+  <div class="rig-g2">
+    <div class="rig-card">
+      <div class="rig-ch"><span class="rig-ct">// MgPicker</span><span class="rig-badge rig-bd">Custom Layout</span></div>
+      <div class="rig-ph r43"><svg class="bg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><defs><pattern id="g7" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" class="rig-ph-grid-bg"/></pattern></defs><rect width="400" height="300" fill="url(#g7)"/></svg><div class="rig-ph-label"><b>sf26-picker.jpg</b>AnimSchool Picker — custom layout</div></div>
+      <div class="rig-cap"><span>// SF-26 custom picker</span><span>/projects/f1_SF26/images/</span></div>
+    </div>
+    <div class="rig-card">
+      <div class="rig-ch"><span class="rig-ct">// Color Coding</span></div>
+      <div class="rig-sw-list">
+        <div class="rig-sw"><div class="rig-swb" style="width:32px;height:32px;flex-shrink:0;" style="background:rgba(139,79,200,.5);border:1px solid rgba(139,79,200,.8);"></div><div><div class="rig-swn">Purple — Centre</div><div class="rig-swd">Spine, head, jaw, root</div></div></div>
+        <div class="rig-sw"><div class="rig-swb" style="width:32px;height:32px;flex-shrink:0;" style="background:rgba(30,80,200,.5);border:1px solid rgba(80,140,255,.8);"></div><div><div class="rig-swn">Blue — Left side</div><div class="rig-swd">L arm, L leg, L foot, L hand</div></div></div>
+        <div class="rig-sw"><div class="rig-swb" style="width:32px;height:32px;flex-shrink:0;" style="background:rgba(200,100,20,.5);border:1px solid rgba(255,140,40,.8);"></div><div><div class="rig-swn">Orange — Right side</div><div class="rig-swd">R arm, R leg, R foot, R hand</div></div></div>
+        <div class="rig-sw"><div class="rig-swb" style="width:32px;height:32px;flex-shrink:0;" style="background:rgba(0,232,122,.15);border:1px solid rgba(0,232,122,.6);"></div><div><div class="rig-swn">Green — IK targets</div><div class="rig-swd">IK handles, pole vectors</div></div></div>
+        <div class="rig-sw"><div class="rig-swb" style="width:32px;height:32px;flex-shrink:0;" style="background:rgba(255,77,106,.15);border:1px solid rgba(255,77,106,.6);"></div><div><div class="rig-swn">Red — Global / Root</div><div class="rig-swd">World offset, global scale</div></div></div>
+      </div>
+      <div class="rig-cap" style="border-top:1px solid var(--bor);">// Built with AviaRigg Controller Shape Menu</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER CTA -->
+<div class="rig-ftc">
+  <div><div class="rig-ftt">Like what you <span>see?</span></div><div class="rig-fts">// Open to work — remote, hybrid, relocation</div></div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <a href="/pages/portfolio" class="rig-btn-primary">View All Work &#9654;</a>
+    <a href="/pages/contact"   class="rig-btn-ghost">Get in Touch</a>
+  </div>
+</div>
+
+</div><!-- .rig-wrap -->
+
+<script>
+// ── TAB SWITCHER ──
+function st(group, id, btn) {
+  document.querySelectorAll('[id^="'+group+'-"]').forEach(p => p.classList.toggle('active', p.id === group+'-'+id));
+  btn.closest('.rig-tb').querySelectorAll('.rig-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── BLEND SHAPES ──
+const BS = {
+  brow:  ['browInnerUp_L','browInnerUp_R','browDown_L','browDown_R','browOuter_L','browOuter_R','browFurrow','browRaise_L','browRaise_R','browSquint_L','browSquint_R','browPinch'],
+  eye:   ['eyeBlink_L','eyeBlink_R','eyeWide_L','eyeWide_R','eyeSquint_L','eyeSquint_R','eyeLookUp_L','eyeLookUp_R','eyeLookDown_L','eyeLookDown_R','eyeLookIn_L','eyeLookOut_R','eyeWink_L','eyeWink_R'],
+  nose:  ['noseSneer_L','noseSneer_R','noseDilate_L','noseDilate_R','noseCompress','noseCrinkle'],
+  mouth: ['mouthSmile_L','mouthSmile_R','mouthFrown_L','mouthFrown_R','mouthOpen','mouthPucker','mouthFunnel','mouthLeft','mouthRight','mouthStretch_L','mouthStretch_R','mouthUpperUp_L','mouthUpperUp_R','mouthLowerDown_L','mouthLowerDown_R','mouthPress_L','mouthPress_R','mouthClose','mouthDimple_L','mouthDimple_R','mouthRollUpper','mouthRollLower','mouthShrugUpper','mouthShrugLower'],
+  jaw:   ['jawOpen','jawLeft','jawRight','jawForward','jawBack','tongueOut','tongueUp','tongueWide'],
+  cheek: ['cheekPuff_L','cheekPuff_R','cheekSquint_L','cheekSquint_R','cheekSuck_L','cheekSuck_R','cheekRaise_L','cheekRaise_R','cheekThin_L','cheekThin_R'],
+  corr:  ['corrShldrRaise_L','corrShldrRaise_R','corrElbowFlex_L','corrElbowFlex_R','corrKneeBend_L','corrKneeBend_R','corrWristFlex_L','corrWristFlex_R','corrHipFlex_L','corrHipFlex_R','corrNeckFlex','corrWaistTwist','corrClavicle_L']
+};
+const BN = {brow:'Brow',eye:'Eye / Lid',nose:'Nose',mouth:'Mouth',jaw:'Jaw',cheek:'Cheek',corr:'Correctives'};
+function bs(cat, btn) {
+  const shapes = BS[cat];
+  document.getElementById('bs-label').textContent = '// '+BN[cat]+' — '+shapes.length+' shapes';
+  document.getElementById('bs-content').innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1px;background:var(--bor);">'+
+    shapes.map(s=>'<div style="background:var(--sur);padding:12px 14px;font-family:\'Share Tech Mono\',monospace;font-size:clamp(10px,0.9vw,13px);letter-spacing:1px;text-transform:uppercase;color:var(--tx);cursor:pointer;transition:background .15s;" onmouseenter="this.style.background=\'rgba(139,79,200,.1)\'" onmouseleave="this.style.background=\'var(--sur)\'">'+s+'</div>').join('')+'</div>';
+  btn.closest('.rig-tb').querySelectorAll('.rig-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const firstTab = document.querySelector('#s-bs .rig-tab');
+  if (firstTab) bs('brow', firstTab);
+});
+
+// ── CORRECTIVE SELECTOR ──
+const CORR = {
+  shoulder: { label:'// Shoulder — 90° raise',  before:'sf26-deform-before.jpg', after:'sf26-deform-after.jpg' },
+  elbow:    { label:'// Elbow — full flex',      before:'sf26-elbow-before.jpg',  after:'sf26-elbow-after.jpg'  },
+  knee:     { label:'// Knee — deep bend',       before:'sf26-knee-before.jpg',   after:'sf26-knee-after.jpg'   },
+  wrist:    { label:'// Wrist — extreme flex',   before:'sf26-wrist-before.jpg',  after:'sf26-wrist-after.jpg'  }
+};
+function switchCorr(card) {
+  document.querySelectorAll('.rig-corr-card').forEach(c => { c.classList.remove('active-card'); c.style.borderColor = ''; });
+  card.classList.add('active-card');
+  card.style.borderColor = 'rgba(139,79,200,.5)';
+  const d = CORR[card.dataset.joint];
+  if (!d) return;
+  const cap = document.getElementById('cmp-caption');
+  const al  = document.getElementById('after-label');
+  const bl  = document.getElementById('before-label');
+  if (cap) cap.textContent = d.label;
+  if (al)  al.textContent  = d.after;
+  if (bl)  bl.textContent  = d.before;
+  if (window._sliderReset) window._sliderReset();
+}
+
+// ── COMPARE SLIDER ──
+(function(){
+  const w  = document.getElementById('rig-cmp');
+  const b  = document.getElementById('rig-cb');
+  const l  = document.getElementById('rig-cl');
+  const hh = document.getElementById('rig-ch2');
+  if (!w||!b||!l||!hh) { console.warn('Slider elements missing'); return; }
+  let drag = false;
+  function setPos(x) {
+    const r = w.getBoundingClientRect();
+    const p = Math.max(0, Math.min(1, (x - r.left) / r.width));
+    const s = (p * 100) + '%';
+    b.style.width = s; l.style.left = s; hh.style.left = s;
+  }
+  w.addEventListener('mousedown', e => { drag=true; setPos(e.clientX); e.preventDefault(); });
+  window.addEventListener('mousemove', e => { if (drag) setPos(e.clientX); });
+  window.addEventListener('mouseup', () => { drag=false; });
+  w.addEventListener('touchstart', e => { drag=true; setPos(e.touches[0].clientX); e.preventDefault(); }, {passive:false});
+  window.addEventListener('touchmove', e => { if (drag) setPos(e.touches[0].clientX); }, {passive:true});
+  window.addEventListener('touchend', () => { drag=false; });
+  function reset() { b.style.width='50%'; l.style.left='50%'; hh.style.left='50%'; }
+  window._sliderReset = reset;
+  requestAnimationFrame(() => requestAnimationFrame(reset));
+})();
+
+// ── TOC ──
+function g(id) {
+  if (id === 's-hero') { window.scrollTo({top: 0, behavior: 'smooth'}); return; }
+  const el = document.getElementById(id);
+  if (!el) return;
+  const navH = 64;
+  const top = el.getBoundingClientRect().top + window.scrollY - navH - 32;
+  window.scrollTo({top, behavior: 'smooth'});
+}
+const IDS  = ['s-hero','s-video','s-wire','s-topo','s-deform','s-facial','s-bs','s-uv','s-tex','s-ctrl'];
+const dots = Array.from(document.querySelectorAll('.td'));
+
+function setActiveDot(idx) {
+  dots.forEach(d => d.classList.remove('active'));
+  if (dots[idx]) dots[idx].classList.add('active');
+}
+
+// Track active section by scroll position (reliable across all layouts)
+function updateTOC() {
+  const mid = window.scrollY + window.innerHeight * 0.4;
+  let active = 0;
+  IDS.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top + window.scrollY <= mid) active = i;
+  });
+  setActiveDot(active);
+}
+window.addEventListener('scroll', updateTOC, {passive:true});
+updateTOC();
+
+// Wheel over TOC = scroll sections
+const toc = document.getElementById('toc');
+if (toc) {
+  toc.addEventListener('wheel', e => {
+    e.preventDefault();
+    const cur  = dots.findIndex(d => d.classList.contains('active'));
+    const next = e.deltaY > 0 ? Math.min(cur+1, IDS.length-1) : Math.max(cur-1, 0);
+    g(IDS[next]);
+  }, {passive:false});
+
+  // Drag vertically over TOC = navigate
+  let tocDrag=false, tocStartY=0, tocStartIdx=0;
+  toc.addEventListener('mousedown', e => {
+    tocDrag=true; tocStartY=e.clientY;
+    tocStartIdx=dots.findIndex(d=>d.classList.contains('active'));
+    e.preventDefault();
+  });
+  let tocLastNav = 0;
+  window.addEventListener('mousemove', e => {
+    if (!tocDrag) return;
+    const step = Math.round((tocStartY - e.clientY) / 60);
+    const next = Math.max(0, Math.min(IDS.length-1, tocStartIdx - step));
+    const cur  = dots.findIndex(d => d.classList.contains('active'));
+    const now  = Date.now();
+    if (next !== cur && now - tocLastNav > 400) {
+      tocLastNav = now;
+      g(IDS[next]);
+    }
+  });
+  window.addEventListener('mouseup', () => { tocDrag=false; });
+}
+</script>
+</body>
+</html>
