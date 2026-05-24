@@ -364,19 +364,19 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 <!-- TEX LIGHTBOX -->
 <div id="tex-lightbox" onclick="closeTexLightbox()" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(4,4,12,0.88);align-items:center;justify-content:center;backdrop-filter:blur(6px);">
-  <div onclick="event.stopPropagation()" style="position:relative;width:min(85vw,85vh);max-width:1100px;background:#07070f;border:1px solid rgba(139,79,200,0.25);box-shadow:0 0 80px rgba(139,79,200,0.12);">
+  <div onclick="event.stopPropagation()" style="position:relative;width:min(70vw,70vh,900px);max-width:900px;max-height:90vh;background:#07070f;border:1px solid rgba(139,79,200,0.25);box-shadow:0 0 80px rgba(139,79,200,0.12);display:flex;flex-direction:column;">
     <!-- Header bar -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(139,79,200,0.2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid rgba(139,79,200,0.2);flex-shrink:0;">
       <div>
-        <div id="tex-lb-title" style="font-family:'Share Tech Mono',monospace;font-size:clamp(11px,1vw,14px);letter-spacing:3px;text-transform:uppercase;color:#eeeef8;"></div>
-        <div id="tex-lb-sub" style="font-family:'Share Tech Mono',monospace;font-size:clamp(9px,0.7vw,11px);letter-spacing:2px;text-transform:uppercase;color:rgba(139,79,200,0.7);margin-top:3px;"></div>
+        <div id="tex-lb-title" style="font-family:'Share Tech Mono',monospace;font-size:clamp(10px,0.9vw,13px);letter-spacing:3px;text-transform:uppercase;color:#eeeef8;"></div>
+        <div id="tex-lb-sub" style="font-family:'Share Tech Mono',monospace;font-size:clamp(8px,0.65vw,10px);letter-spacing:2px;text-transform:uppercase;color:rgba(139,79,200,0.7);margin-top:3px;"></div>
       </div>
-      <button onclick="closeTexLightbox()" style="background:none;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.4);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;padding:6px 14px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.color='#eeeef8';this.style.borderColor='rgba(255,255,255,0.3)'" onmouseout="this.style.color='rgba(255,255,255,0.4)';this.style.borderColor='rgba(255,255,255,0.12)'">✕ CLOSE</button>
+      <button onclick="closeTexLightbox()" style="background:none;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.4);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;padding:5px 12px;cursor:pointer;transition:all 0.15s;flex-shrink:0;" onmouseover="this.style.color='#eeeef8';this.style.borderColor='rgba(255,255,255,0.3)'" onmouseout="this.style.color='rgba(255,255,255,0.4)';this.style.borderColor='rgba(255,255,255,0.12)'">✕ CLOSE</button>
     </div>
     <!-- Image area -->
-    <div id="tex-lb-img-wrap" style="width:100%;aspect-ratio:1/1;overflow:hidden;background:#050510;display:flex;align-items:center;justify-content:center;">
-      <img id="tex-lb-img" src="" alt="" style="width:100%;height:100%;object-fit:contain;display:block;">
-      <div id="tex-lb-placeholder" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:rgba(139,79,200,0.3);">// IMAGE NOT YET AVAILABLE</div>
+    <div style="flex:1;overflow:hidden;background:#050510;display:flex;align-items:center;justify-content:center;min-height:0;">
+      <img id="tex-lb-img" src="" alt="" style="max-width:100%;max-height:calc(90vh - 60px);width:auto;height:auto;object-fit:contain;display:block;">
+      <div id="tex-lb-placeholder" style="display:none;width:100%;padding:80px 0;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:rgba(139,79,200,0.3);">// IMAGE NOT YET AVAILABLE</div>
     </div>
   </div>
 </div>
@@ -388,7 +388,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 <script>
 function openTexLightbox(src, title, sub) {
-  const lb = document.getElementById('tex-lightbox');
+  const lb  = document.getElementById('tex-lightbox');
   const img = document.getElementById('tex-lb-img');
   const ph  = document.getElementById('tex-lb-placeholder');
   document.getElementById('tex-lb-title').textContent = title;
@@ -406,6 +406,7 @@ function openTexLightbox(src, title, sub) {
 }
 function closeTexLightbox() {
   document.getElementById('tex-lightbox').style.display = 'none';
+  document.getElementById('tex-lb-img').src = '';
   document.body.style.overflow = '';
 }
 document.addEventListener('keydown', function(e) {
