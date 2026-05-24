@@ -347,20 +347,71 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 <div id="s-tex" class="rig-sec">
   <div class="rig-sl">// Texture Maps</div>
   <div class="rig-g3" style="margin-bottom:2px;">
-    <div class="rig-card"><img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/SF26DiffuseUVLayout.png" alt="SF-26 Diffuse / Albedo" style="width:100%;height:auto;display:block;"><div class="rig-cap"><span>// Albedo</span><span>4K</span></div></div>
-    <div class="rig-card"><div class="rig-ph r11" style="background:linear-gradient(135deg,#4a6080,#7090b0,#506090);"><div class="rig-ph-label"><b>sf26-tex-normal.jpg</b>Normal Map</div></div><div class="rig-cap"><span>// Normal</span><span>4K · Mikk tangent</span></div></div>
-    <div class="rig-card"><div class="rig-ph r11" style="background:linear-gradient(135deg,#1a1a1a,#3a3a3a,#1a1a1a);"><div class="rig-ph-label"><b>sf26-tex-roughness.jpg</b>Roughness</div></div><div class="rig-cap"><span>// Roughness</span><span>4K · Armor vs organic</span></div></div>
-    <div class="rig-card"><div class="rig-ph r11" style="background:#080808;"><div class="rig-ph-label"><b>sf26-tex-metallic.jpg</b>Metallic</div></div><div class="rig-cap"><span>// Metallic</span><span>4K · Exoskeleton mask</span></div></div>
-    <div class="rig-card"><div class="rig-ph r11" style="background:#060606;"><div class="rig-ph-label" style="color:rgba(176,110,245,.7);"><b>sf26-tex-emissive.jpg</b>Emissive</div></div><div class="rig-cap"><span>// Emissive</span><span>Energy core + visor</span></div></div>
-    <div class="rig-card"><div class="rig-ph r11" style="background:linear-gradient(135deg,#c0c0c0,#d8d8d8,#b8b8b8);"><div class="rig-ph-label" style="color:#555;"><b>sf26-tex-ao.jpg</b>Ambient Occlusion</div></div><div class="rig-cap"><span>// AO</span><span>Baked</span></div></div>
+    <div class="rig-card tex-lightbox-trigger" onclick="openTexLightbox('https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/SF26DiffuseUVLayout.png','// Albedo · Diffuse UDIM Layout','4K · Base Color')"><img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/SF26DiffuseUVLayout.png" alt="Albedo" style="width:100%;height:auto;display:block;"><div class="rig-cap"><span>// Albedo</span><span>4K</span></div></div>
+    <div class="rig-card tex-lightbox-trigger" onclick="openTexLightbox('','// Normal · Mikk Tangent','4K · Mikk tangent')"><div class="rig-ph r11" style="background:linear-gradient(135deg,#4a6080,#7090b0,#506090);"><div class="rig-ph-label"><b>sf26-tex-normal.jpg</b>Normal Map</div></div><div class="rig-cap"><span>// Normal</span><span>4K · Mikk tangent</span></div></div>
+    <div class="rig-card tex-lightbox-trigger" onclick="openTexLightbox('','// Roughness','4K · Armor vs organic')"><div class="rig-ph r11" style="background:linear-gradient(135deg,#1a1a1a,#3a3a3a,#1a1a1a);"><div class="rig-ph-label"><b>sf26-tex-roughness.jpg</b>Roughness</div></div><div class="rig-cap"><span>// Roughness</span><span>4K · Armor vs organic</span></div></div>
+    <div class="rig-card tex-lightbox-trigger" onclick="openTexLightbox('','// Metallic','4K · Exoskeleton mask')"><div class="rig-ph r11" style="background:#080808;"><div class="rig-ph-label"><b>sf26-tex-metallic.jpg</b>Metallic</div></div><div class="rig-cap"><span>// Metallic</span><span>4K · Exoskeleton mask</span></div></div>
+    <div class="rig-card tex-lightbox-trigger" onclick="openTexLightbox('','// Emissive','Energy core + visor')"><div class="rig-ph r11" style="background:#060606;"><div class="rig-ph-label" style="color:rgba(176,110,245,.7);"><b>sf26-tex-emissive.jpg</b>Emissive</div></div><div class="rig-cap"><span>// Emissive</span><span>Energy core + visor</span></div></div>
+    <div class="rig-card tex-lightbox-trigger" onclick="openTexLightbox('','// AO · Ambient Occlusion','Baked')"><div class="rig-ph r11" style="background:linear-gradient(135deg,#c0c0c0,#d8d8d8,#b8b8b8);"><div class="rig-ph-label" style="color:#555;"><b>sf26-tex-ao.jpg</b>Ambient Occlusion</div></div><div class="rig-cap"><span>// AO</span><span>Baked</span></div></div>
   </div>
   <div class="rig-ir">
     <div><div class="rig-ik">Resolution</div><div class="rig-iv">4096×4096 (4K)</div></div>
     <div><div class="rig-ik">Workflow</div><div class="rig-iv">PBR Metallic-Roughness</div></div>
     <div><div class="rig-ik">Software</div><div class="rig-iv">Substance Painter</div></div>
-    <div><div class="rig-ik">UDIM Tiles</div><div class="rig-iv">4 tiles</div></div>
+    <div><div class="rig-ik">UDIM Tiles</div><div class="rig-iv">12 tiles · 1001–1012</div></div>
   </div>
 </div>
+
+<!-- TEX LIGHTBOX -->
+<div id="tex-lightbox" onclick="closeTexLightbox()" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(4,4,12,0.88);align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div onclick="event.stopPropagation()" style="position:relative;width:min(85vw,85vh);max-width:1100px;background:#07070f;border:1px solid rgba(139,79,200,0.25);box-shadow:0 0 80px rgba(139,79,200,0.12);">
+    <!-- Header bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(139,79,200,0.2);">
+      <div>
+        <div id="tex-lb-title" style="font-family:'Share Tech Mono',monospace;font-size:clamp(11px,1vw,14px);letter-spacing:3px;text-transform:uppercase;color:#eeeef8;"></div>
+        <div id="tex-lb-sub" style="font-family:'Share Tech Mono',monospace;font-size:clamp(9px,0.7vw,11px);letter-spacing:2px;text-transform:uppercase;color:rgba(139,79,200,0.7);margin-top:3px;"></div>
+      </div>
+      <button onclick="closeTexLightbox()" style="background:none;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.4);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;padding:6px 14px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.color='#eeeef8';this.style.borderColor='rgba(255,255,255,0.3)'" onmouseout="this.style.color='rgba(255,255,255,0.4)';this.style.borderColor='rgba(255,255,255,0.12)'">✕ CLOSE</button>
+    </div>
+    <!-- Image area -->
+    <div id="tex-lb-img-wrap" style="width:100%;aspect-ratio:1/1;overflow:hidden;background:#050510;display:flex;align-items:center;justify-content:center;">
+      <img id="tex-lb-img" src="" alt="" style="width:100%;height:100%;object-fit:contain;display:block;">
+      <div id="tex-lb-placeholder" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:rgba(139,79,200,0.3);">// IMAGE NOT YET AVAILABLE</div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .tex-lightbox-trigger { cursor:pointer; transition:border-color 0.2s, box-shadow 0.2s; }
+  .tex-lightbox-trigger:hover { border-color:rgba(139,79,200,0.4) !important; box-shadow:0 0 20px rgba(139,79,200,0.08); }
+</style>
+
+<script>
+function openTexLightbox(src, title, sub) {
+  const lb = document.getElementById('tex-lightbox');
+  const img = document.getElementById('tex-lb-img');
+  const ph  = document.getElementById('tex-lb-placeholder');
+  document.getElementById('tex-lb-title').textContent = title;
+  document.getElementById('tex-lb-sub').textContent   = sub;
+  if (src) {
+    img.src = src;
+    img.style.display = 'block';
+    ph.style.display  = 'none';
+  } else {
+    img.style.display = 'none';
+    ph.style.display  = 'flex';
+  }
+  lb.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeTexLightbox() {
+  document.getElementById('tex-lightbox').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeTexLightbox();
+});
+</script>
 
 <!-- ─── CONTROLS ─── -->
 <div id="s-ctrl" class="rig-sec">
