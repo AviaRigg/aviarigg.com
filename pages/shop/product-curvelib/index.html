@@ -162,7 +162,7 @@
           <div id="curvelib-gallery-main" class="product-gallery-main-img">
             <iframe src="https://player.vimeo.com/video/1195057926?autoplay=1&loop=1&background=1&quality=4K&dnt=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
           </div>
-          <div class="product-gallery-label" id="curvelib-gallery-label">Controller Shape Menu · Showcase</div>
+          <div class="product-gallery-label" id="curvelib-gallery-label" style="display:flex;align-items:center;justify-content:space-between;">Controller Shape Menu · Showcase<button onclick="curvlibFullscreen()" style="background:none;border:none;cursor:pointer;color:var(--text-bright,#eeeef8);opacity:0.5;padding:0;display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:inherit;letter-spacing:inherit;text-transform:inherit;transition:opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>Fullscreen</button></div>
         </div>
       </div>
     </div>
@@ -253,7 +253,15 @@ function setCurvlibGalleryVideo(thumb, id) {
   const vmId = id.replace('vm:', '');
   setProductGallery(thumb, 'curvelib-gallery-main', 'curvelib-gallery-label',
     `<iframe src="https://player.vimeo.com/video/${vmId}?autoplay=1&loop=1&background=1&quality=4K&dnt=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`,
-    'Controller Shape Menu · Video');
+    'Controller Shape Menu · Video <button onclick="curvlibFullscreen()" style="background:none;border:none;cursor:pointer;color:var(--text-bright,#eeeef8);opacity:0.5;padding:0;display:inline-flex;align-items:center;gap:5px;font-family:\'Share Tech Mono\',monospace;font-size:inherit;letter-spacing:inherit;text-transform:inherit;transition:opacity 0.2s;float:right;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>Fullscreen</button>');
+}
+function curvlibFullscreen() {
+  const wrap = document.getElementById('curvelib-gallery-main');
+  if (!wrap) return;
+  if (wrap.requestFullscreen) wrap.requestFullscreen();
+  else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
+  const iframe = wrap.querySelector('iframe');
+  if (iframe && iframe.requestFullscreen) iframe.requestFullscreen();
 }
 function syncGallerySidebars() {
   document.querySelectorAll('.product-gallery-wrap').forEach(wrap => {
