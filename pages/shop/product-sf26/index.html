@@ -19,93 +19,530 @@
     lastTap = now;
   }, { passive: false });
 </script>
-<style>
-  .page { display: block !important; }
-  .nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
-  .avia-thumb-play {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(6,6,15,0.45);
-    transition: background 0.2s;
-    pointer-events: none;
-  }
-  .avia-thumb-wrap:hover .avia-thumb-play { background: rgba(6,6,15,0.3); }
-  .avia-thumb-play svg {
-    width: 56px; height: 56px; fill: white;
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
-    margin-left: 5px;
-  }
-</style>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-RYTKYEPJG2');
-  </script>
-  <link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
-  <link rel="shortcut icon" href="/favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
-  <script src="/assets/js/status.js"></script>
-  <script src="/assets/js/nav.js"></script>
-  <!-- Supabase + product availability check -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/assets/js/product-check.js"></script>
-  <!-- Nav auth styles -->
-<!-- Nav auth script -->
-  <script>
-    const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
-    const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    let currentUser = null, currentProfile = null, isAdmin = false;
 
-    async function initAuth() {
-      const { data: { session } } = await _sb.auth.getSession();
+<!-- Google tag -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-RYTKYEPJG2');
+</script>
+<link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<script src="/assets/js/status.js"></script>
+<script src="/assets/js/nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/product-check.js"></script>
+<script src="/assets/js/nav-auth.js"></script>
+<script src="/assets/js/banner.js"></script>
+
+<script>
+  const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
+  const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  let currentUser = null, currentProfile = null, isAdmin = false;
+  async function initAuth() {
+    const { data: { session } } = await _sb.auth.getSession();
+    if (session) await handleSession(session.user);
+    _sb.auth.onAuthStateChange(async (_e, session) => {
       if (session) await handleSession(session.user);
-      _sb.auth.onAuthStateChange(async (_e, session) => {
-        if (session) await handleSession(session.user);
-        else { currentUser = null; currentProfile = null; isAdmin = false; updateNavAuth(); }
-      });
+      else { currentUser = null; currentProfile = null; isAdmin = false; updateNavAuth(); }
+    });
+  }
+  async function handleSession(user) {
+    currentUser = user;
+    const { data: profile } = await _sb.from('profiles').select('role, username').eq('id', user.id).single();
+    currentProfile = profile; isAdmin = profile?.role === 'admin';
+    updateNavAuth();
+  }
+  function updateNavAuth() {
+    const c = document.getElementById('nav-auth-container');
+    if (!c) return;
+    if (currentUser) {
+      const name = currentProfile?.username || currentUser.email.split('@')[0];
+      c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="toggleUserMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${currentUser.email}</div><a class="nav-dropdown-item" href="#">My Profile</a><button class="nav-dropdown-item" onclick="handleLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="handleDeleteAccount()">Delete Account</button></div></div>`;
+    } else {
+      c.innerHTML = '<a class="nav-auth-link" href="/pages/login">Log In</a>';
     }
-    async function handleSession(user) {
-      currentUser = user;
-      const { data: profile } = await _sb.from('profiles').select('role, username').eq('id', user.id).single();
-      currentProfile = profile; isAdmin = profile?.role === 'admin';
-      updateNavAuth();
-    }
-    function updateNavAuth() {
-      const c = document.getElementById('nav-auth-container');
-      if (!c) return;
-      if (currentUser) {
-        const name = currentProfile?.username || currentUser.email.split('@')[0];
-        c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="toggleUserMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${currentUser.email}</div><a class="nav-dropdown-item" href="#">My Profile</a><button class="nav-dropdown-item" onclick="handleLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="handleDeleteAccount()">Delete Account</button></div></div>`;
-      } else {
-        c.innerHTML = '<a class="nav-auth-link" href="/pages/login">Log In</a>';
-      }
-    }
-    function toggleUserMenu(e) {
-      e.stopPropagation();
-      const dd = document.getElementById('nav-user-dropdown');
-      if (dd) dd.classList.toggle('open');
-    }
-    document.addEventListener('click', () => { const dd = document.getElementById('nav-user-dropdown'); if (dd) dd.classList.remove('open'); });
-    async function handleLogout() { await _sb.auth.signOut(); window.location.href = '/'; }
-    async function handleDeleteAccount() {
-      if (!confirm('Delete your account? This cannot be undone.')) return;
-      await _sb.from('profiles').delete().eq('id', currentUser.id);
-      await _sb.auth.signOut(); window.location.href = '/';
-    }
-    document.addEventListener('DOMContentLoaded', initAuth);
-  </script>
-  </script>
-  <script>
-    </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/assets/js/nav-auth.js"></script>
-  <script src="/assets/js/banner.js"></script>
+  }
+  function toggleUserMenu(e) {
+    e.stopPropagation();
+    const dd = document.getElementById('nav-user-dropdown');
+    if (dd) dd.classList.toggle('open');
+  }
+  document.addEventListener('click', () => { const dd = document.getElementById('nav-user-dropdown'); if (dd) dd.classList.remove('open'); });
+  async function handleLogout() { await _sb.auth.signOut(); window.location.href = '/'; }
+  async function handleDeleteAccount() {
+    if (!confirm('Delete your account? This cannot be undone.')) return;
+    await _sb.from('profiles').delete().eq('id', currentUser.id);
+    await _sb.auth.signOut(); window.location.href = '/';
+  }
+  document.addEventListener('DOMContentLoaded', initAuth);
+</script>
+
+<style>
+.page { display: block !important; }
+.nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
+
+/* ── RESET & BASE ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #06060f;
+  --bg2:       #0d0d18;
+  --border:    rgba(255,255,255,0.07);
+  --accent:    #c8102e;
+  --accent2:   #00e87a;
+  --text:      #e8e8f0;
+  --text-dim:  #7a7a99;
+  --text-faint:#3a3a55;
+  --mono:      'Share Tech Mono', monospace;
+  --head:      'Rajdhani', sans-serif;
+}
+
+body { background: var(--bg); color: var(--text); font-family: var(--head); overflow-x: hidden; }
+
+/* ── STICKY BUY BAR ───────────────────────────────────────── */
+#sticky-buy {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 900;
+  background: rgba(6,6,15,0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+#sticky-buy.visible { transform: translateY(0); }
+#sticky-buy .sb-left {
+  display: flex; align-items: center; gap: 16px;
+}
+#sticky-buy .sb-title {
+  font-family: var(--head);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+#sticky-buy .sb-sub {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+#sticky-buy .sb-price {
+  font-family: var(--head);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent2);
+}
+.sticky-btn {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  padding: 12px 28px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+.sticky-btn:hover { background: #a50d25; transform: translateY(-1px); }
+
+/* ── CHECKOUT MODAL ───────────────────────────────────────── */
+#checkout-modal {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center;
+}
+
+/* ── BACK LINK ────────────────────────────────────────────── */
+.sf26-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 24px 40px;
+  transition: color 0.2s;
+}
+.sf26-back:hover { color: var(--text); }
+
+/* ── HERO SECTION ─────────────────────────────────────────── */
+.sf26-hero {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 600px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+.sf26-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+.sf26-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(6,6,15,0.97) 0%,
+    rgba(6,6,15,0.5) 40%,
+    rgba(6,6,15,0.1) 100%
+  );
+}
+.sf26-hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 0 60px 70px;
+  max-width: 900px;
+}
+.sf26-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+.sf26-hero-title {
+  font-family: var(--head);
+  font-size: clamp(52px, 8vw, 110px);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -1px;
+  color: #fff;
+  margin-bottom: 24px;
+}
+.sf26-hero-title span { color: var(--accent); }
+.sf26-hero-desc {
+  font-family: var(--head);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--text-dim);
+  max-width: 520px;
+  line-height: 1.6;
+  margin-bottom: 36px;
+}
+.sf26-tags {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.sf26-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+}
+.sf26-scroll-hint {
+  position: absolute;
+  bottom: 28px; right: 40px;
+  z-index: 2;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  writing-mode: vertical-rl;
+  display: flex; align-items: center; gap: 10px;
+}
+.sf26-scroll-hint::before {
+  content: '';
+  display: block;
+  width: 1px; height: 48px;
+  background: linear-gradient(to bottom, transparent, var(--text-faint));
+}
+
+/* ── FULL BLEED IMAGE ─────────────────────────────────────── */
+.sf26-fullbleed {
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  position: relative;
+}
+.sf26-fullbleed img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+/* ── OVERLAY SECTION (text over image) ────────────────────── */
+.sf26-overlay-section {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+.sf26-overlay-section img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.sf26-overlay-section .sf26-overlay-grad {
+  position: absolute; inset: 0;
+  background: linear-gradient(to right, rgba(6,6,15,0.88) 0%, rgba(6,6,15,0.3) 60%, transparent 100%);
+}
+.sf26-overlay-section.right .sf26-overlay-grad {
+  background: linear-gradient(to left, rgba(6,6,15,0.88) 0%, rgba(6,6,15,0.3) 60%, transparent 100%);
+}
+.sf26-overlay-text {
+  position: relative; z-index: 2;
+  padding: 60px;
+  max-width: 480px;
+}
+.sf26-overlay-section.right .sf26-overlay-text {
+  margin-left: auto;
+}
+.sf26-overlay-label {
+  font-family: var(--mono);
+  font-size: 9px; letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+.sf26-overlay-title {
+  font-family: var(--head);
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+.sf26-overlay-body {
+  font-family: var(--head);
+  font-size: 15px; font-weight: 400;
+  color: rgba(232,232,240,0.7);
+  line-height: 1.65;
+}
+
+/* ── EDITORIAL PAIR (two images side by side) ─────────────── */
+.sf26-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: #000;
+}
+.sf26-pair-item {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+}
+.sf26-pair-item img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.sf26-pair-item .sf26-pair-label {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 16px 20px;
+  background: linear-gradient(to top, rgba(6,6,15,0.85), transparent);
+  font-family: var(--mono);
+  font-size: 9px; letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ── STANDALONE TEXT BLOCK ────────────────────────────────── */
+.sf26-text-block {
+  padding: 100px 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.sf26-text-block .sf26-eyebrow { margin-bottom: 20px; }
+.sf26-text-block-title {
+  font-family: var(--head);
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 40px;
+}
+.sf26-includes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.sf26-include {
+  background: var(--bg2);
+  padding: 36px 32px;
+}
+.sf26-include-num {
+  font-family: var(--mono);
+  font-size: 9px; letter-spacing: 3px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.sf26-include-title {
+  font-family: var(--head);
+  font-size: 20px; font-weight: 600;
+  color: #fff;
+  margin-bottom: 10px;
+}
+.sf26-include-desc {
+  font-family: var(--head);
+  font-size: 14px; font-weight: 400;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* ── TRIPLE IMAGE ROW ─────────────────────────────────────── */
+.sf26-triple {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2px;
+  background: #000;
+}
+.sf26-triple-item {
+  overflow: hidden;
+  aspect-ratio: 3/2;
+}
+.sf26-triple-item img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+
+/* ── CTA SECTION ──────────────────────────────────────────── */
+.sf26-cta {
+  padding: 120px 60px 160px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.sf26-cta::before {
+  content: 'SF-26';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--head);
+  font-size: clamp(120px, 20vw, 280px);
+  font-weight: 700;
+  color: rgba(200,16,46,0.04);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
+.sf26-cta-title {
+  font-family: var(--head);
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+}
+.sf26-cta-sub {
+  font-family: var(--mono);
+  font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 40px;
+}
+.sf26-cta-price {
+  font-family: var(--head);
+  font-size: clamp(42px, 6vw, 80px);
+  font-weight: 700;
+  color: var(--accent2);
+  line-height: 1;
+  margin-bottom: 32px;
+}
+.sf26-buy-btn {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  padding: 18px 52px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+  margin-right: 16px;
+}
+.sf26-buy-btn:hover { background: #a50d25; transform: translateY(-2px); }
+.sf26-gumroad-link {
+  font-family: var(--mono);
+  font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 2px;
+  transition: color 0.2s;
+}
+.sf26-gumroad-link:hover { color: var(--text); }
+.sf26-license {
+  font-family: var(--mono);
+  font-size: 9px; letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-top: 32px;
+}
+
+/* ── DIVIDER ──────────────────────────────────────────────── */
+.sf26-divider {
+  height: 1px; background: var(--border);
+  margin: 0;
+}
+
+/* ── SCROLL REVEAL ────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ── RESPONSIVE ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sf26-hero-content { padding: 0 24px 60px; }
+  .sf26-overlay-text { padding: 32px 24px; }
+  .sf26-text-block { padding: 64px 24px; }
+  .sf26-pair { grid-template-columns: 1fr; }
+  .sf26-triple { grid-template-columns: 1fr; }
+  .sf26-cta { padding: 80px 24px 120px; }
+  .sf26-overlay-section { aspect-ratio: auto; min-height: 520px; }
+  #sticky-buy { padding: 12px 20px; }
+  .sf26-back { padding: 20px 24px; }
+}
+</style>
 </head>
 <body data-product-id="f1-sf26">
 
@@ -121,131 +558,159 @@
     <iframe id="checkout-iframe" src="" style="flex:1;border:none;width:100%;"></iframe>
     <div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,0.07);background:#0d0d12;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
       <span style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:#555570;text-transform:uppercase;">If Payhip does not load, open directly ↓</span>
-      <a id="checkout-fallback-btn" href="#" target="_blank" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#00e87a;border:1px solid rgba(0,232,122,0.4);padding:7px 16px;text-decoration:none;white-space:nowrap;" onmouseover="this.style.background='rgba(0,232,122,0.1)'" onmouseout="this.style.background='transparent'">Open in Browser ↗</a>
+      <a id="checkout-fallback-btn" href="#" target="_blank" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#00e87a;border:1px solid rgba(0,232,122,0.4);padding:7px 16px;text-decoration:none;white-space:nowrap;">Open in Browser ↗</a>
     </div>
   </div>
+</div>
+
+<!-- STICKY BUY BAR -->
+<div id="sticky-buy">
+  <div class="sb-left">
+    <div>
+      <div class="sb-title">Ferrari SF-26 Model</div>
+      <div class="sb-sub">Hamilton &amp; Leclerc Liveries &nbsp;·&nbsp; 1K–4K &nbsp;·&nbsp; FBX</div>
+    </div>
+    <div class="sb-price product-price">€TBD</div>
+  </div>
+  <a href="https://payhip.com/b/SF26PLACEHOLDER" class="sticky-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
 </div>
 
 <div class="page active" id="page-product-f1-sf26">
-  <div class="product-wrap">
-    <a class="product-back" href="/pages/shop" style="text-decoration:none;">&#8592; Back to Shop</a>
-    <div class="product-hero">
-      <div class="product-hero-left">
-        <div class="eyebrow">Hard Surface Model</div>
-        <div class="section-h">Formula 1<br><span class="accent">SF-26 Model</span></div>
-        <p class="product-tagline">The 2026 Ferrari SF-26, modelled and textured for Maya. Hamilton or Leclerc livery — choose your side carefully.</p>
-        <div class="product-tags">
-          <span class="ptag">Maya 2022+</span><span class="ptag">Hard Surface</span><span class="ptag">1K – 4K Textures</span><span class="ptag">Two Liveries</span>
-        </div>
-        <div class="product-buy-row">
-          <span class="product-price">&#8364;TBD</span>
-          <a href="https://payhip.com/b/SF26PLACEHOLDER" class="product-buy-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
-        </div>
-        <div class="product-license">// Personal, educational &amp; portfolio use only</div>
-      </div>
-      <div class="product-hero-right">
-        <div class="product-img-wrap">
-          <div class="shop-card-scan"></div>
-          <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Rendered.png" alt="F1 SF-26 Rendered" class="product-hero-img">
-        </div>
+
+  <!-- BACK -->
+  <a class="sf26-back" href="/pages/shop">&#8592; Back to Shop</a>
+
+  <!-- 1. HERO — full bleed side profile shot -->
+  <section class="sf26-hero">
+    <img class="sf26-hero-img" src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled39.png" alt="SF-26 Hero">
+    <div class="sf26-hero-overlay"></div>
+    <div class="sf26-hero-content">
+      <div class="sf26-eyebrow">// 2026 Season &nbsp;·&nbsp; Ferrari Scuderia</div>
+      <h1 class="sf26-hero-title">SF-26<br><span>Model</span></h1>
+      <p class="sf26-hero-desc">High-fidelity hard surface model of the 2026 Ferrari SF-26. Two liveries. Three resolutions. Ready to render.</p>
+      <div class="sf26-tags">
+        <span class="sf26-tag">FBX</span>
+        <span class="sf26-tag">Hamilton #44</span>
+        <span class="sf26-tag">Leclerc #16</span>
+        <span class="sf26-tag">1K / 2K / 4K Textures</span>
       </div>
     </div>
+    <div class="sf26-scroll-hint">Scroll</div>
+  </section>
 
-    <div class="product-features-grid">
-      <div class="product-feature"><div class="pf-icon">&#9672;</div><div class="pf-title">2026 Ferrari SF-26</div><div class="pf-desc">High-fidelity hard surface model of Ferrari's 2026 Formula 1 chassis, built for production use.</div></div>
-      <div class="product-feature"><div class="pf-icon">&#9678;</div><div class="pf-title">Hamilton Livery</div><div class="pf-desc">Full #44 Lewis Hamilton texture set in 1K, 2K, and 4K resolutions. Ready to drop into your pipeline.</div></div>
-      <div class="product-feature"><div class="pf-icon">&#9635;</div><div class="pf-title">Leclerc Livery</div><div class="pf-desc">Full #16 Charles Leclerc texture set in 1K, 2K, and 4K resolutions. Same quality, different driver.</div></div>
-      <div class="product-feature"><div class="pf-icon">&#11041;</div><div class="pf-title">Maya 2022+ Ready</div><div class="pf-desc">Delivered as a clean Maya file with properly assigned shaders. Drop it into your scene and go.</div></div>
-      <div class="product-feature"><div class="pf-icon">&#9650;</div><div class="pf-title">Production Ready</div><div class="pf-desc">Drop the textures straight into your shader network. No extra setup — just assign and render.</div></div>
+  <!-- 2. FULL BLEED — dead-on front -->
+  <div class="sf26-fullbleed reveal">
+    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled41.png" alt="SF-26 Front">
+  </div>
+
+  <!-- 3. OVERLAY LEFT — 3/4 top down with text -->
+  <section class="sf26-overlay-section reveal">
+    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled45.png" alt="SF-26 Top Down">
+    <div class="sf26-overlay-grad"></div>
+    <div class="sf26-overlay-text">
+      <div class="sf26-overlay-label">// Livery</div>
+      <h2 class="sf26-overlay-title">Hamilton<br>#44</h2>
+      <p class="sf26-overlay-body">The full 2026 Hamilton livery, textured across 1K, 2K, and 4K maps. BaseColor, Roughness, Metalness, and Normal included. Assign and render.</p>
     </div>
+  </section>
 
-    <div class="product-gallery-section">
-      <div class="eyebrow">Preview</div>
-      <div class="section-h" style="margin-bottom:32px;">Gallery</div>
-      <div class="product-gallery-wrap">
-        <div class="product-gallery-thumbs">
-          <div class="product-thumb active" onclick="setGalleryImg(this,'https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Rendered.png')">
-            <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Rendered.png" alt="SF-26 Rendered">
-          </div>
-          <div class="product-thumb" onclick="setGalleryImg(this,'https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Hamilton.png')">
-            <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Hamilton.png" alt="Hamilton Livery">
-          </div>
-          <div class="product-thumb" onclick="setGalleryImg(this,'https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Leclerc.png')">
-            <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Leclerc.png" alt="Leclerc Livery">
-          </div>
-          <div class="product-thumb" onclick="setGalleryImg(this,'https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Textures.png')">
-            <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Textures.png" alt="Texture Sheets">
-          </div>
-          <div class="product-thumb" onclick="setGalleryImg(this,'https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_UVs.png')">
-            <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_UVs.png" alt="UV Layout">
-          </div>
-        </div>
-        <div class="product-gallery">
-          <div id="gallery-main-img" class="product-gallery-main-img">
-            <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Rendered.png" alt="F1 SF-26 Rendered" style="width:100%;height:100%;object-fit:cover;display:block;">
-          </div>
-          <div class="product-gallery-label" id="gallery-label">F1 SF-26 · Texture Pack · Image</div>
-        </div>
-      </div>
+  <!-- 4. PAIR — cockpit + rear wing detail -->
+  <div class="sf26-pair reveal">
+    <div class="sf26-pair-item">
+      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled46.png" alt="Cockpit">
+      <div class="sf26-pair-label">// Cockpit Detail</div>
     </div>
-
-    <div class="product-includes-section">
-      <div class="eyebrow">What You Get</div>
-      <div class="section-h" style="margin-bottom:32px;">Included Files</div>
-      <div class="product-includes-grid">
-        <div class="product-include"><div class="pi-label">// 01</div><div class="pi-title">Maya File</div><div class="pi-desc">Clean SF-26 model with shaders assigned and livery switch attribute configured. Maya 2022+.</div></div>
-        <div class="product-include"><div class="pi-label">// 02</div><div class="pi-title">Hamilton Textures</div><div class="pi-desc">#44 livery texture set in 1K, 2K, and 4K. BaseColor, Roughness, Metalness, Normal maps included.</div></div>
-        <div class="product-include"><div class="pi-label">// 03</div><div class="pi-title">Leclerc Textures</div><div class="pi-desc">#16 livery texture set in 1K, 2K, and 4K. Same map types, same quality, different driver.</div></div>
-        <div class="product-include"><div class="pi-label">// 04</div><div class="pi-title">UV Layout</div><div class="pi-desc">Clean UDIM-compatible UV layout included as reference for custom texture painting.</div></div>
-      </div>
-    </div>
-
-    <div class="product-cta">
-      <div class="product-cta-text">Ready to add this to your toolkit?</div>
-      <div class="product-buy-row" style="justify-content:center;">
-        <span class="product-price">&#8364;TBD</span>
-        <a href="https://payhip.com/b/SF26PLACEHOLDER" class="product-buy-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
-      </div>
-      <div class="product-license">// Personal, educational &amp; portfolio use only. No redistribution or resale.</div>
+    <div class="sf26-pair-item">
+      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled49.png" alt="Rear Wing">
+      <div class="sf26-pair-label">// Rear Wing</div>
     </div>
   </div>
-</div>
+
+  <!-- 5. OVERLAY RIGHT — Leclerc livery -->
+  <section class="sf26-overlay-section right reveal">
+    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled50.png" alt="SF-26 Leclerc">
+    <div class="sf26-overlay-grad"></div>
+    <div class="sf26-overlay-text">
+      <div class="sf26-overlay-label">// Livery</div>
+      <h2 class="sf26-overlay-title">Leclerc<br>#16</h2>
+      <p class="sf26-overlay-body">Same model, same resolution tiers, different driver. The #16 livery is included in the same pack — no separate purchase needed.</p>
+    </div>
+  </section>
+
+  <!-- 6. FULL BLEED — rear 3/4 low -->
+  <div class="sf26-fullbleed reveal">
+    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled51.png" alt="SF-26 Rear">
+  </div>
+
+  <!-- 7. STANDALONE TEXT — what's included -->
+  <section class="sf26-text-block reveal">
+    <div class="sf26-eyebrow">// What You Get</div>
+    <h2 class="sf26-text-block-title">In the Pack</h2>
+    <div class="sf26-includes">
+      <div class="sf26-include">
+        <div class="sf26-include-num">// 01</div>
+        <div class="sf26-include-title">FBX File</div>
+        <div class="sf26-include-desc">Clean SF-26 hard surface model with shaders assigned. Drop it into your scene and go.</div>
+      </div>
+      <div class="sf26-include">
+        <div class="sf26-include-num">// 02</div>
+        <div class="sf26-include-title">Hamilton Textures</div>
+        <div class="sf26-include-desc">#44 livery in 1K, 2K, and 4K. BaseColor, Roughness, Metalness, Normal maps included.</div>
+      </div>
+      <div class="sf26-include">
+        <div class="sf26-include-num">// 03</div>
+        <div class="sf26-include-title">Leclerc Textures</div>
+        <div class="sf26-include-desc">#16 livery in 1K, 2K, and 4K. Same map types, same quality, different driver.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. TRIPLE — detail shots -->
+  <div class="sf26-triple reveal">
+    <div class="sf26-triple-item">
+      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled48.png" alt="Sidepod Detail">
+    </div>
+    <div class="sf26-triple-item">
+      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled47.png" alt="Front Wing">
+    </div>
+    <div class="sf26-triple-item">
+      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled43.png" alt="Wheel Detail">
+    </div>
+  </div>
+
+  <!-- 9. OVERLAY LEFT — halo/cockpit high angle -->
+  <section class="sf26-overlay-section reveal">
+    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled44.png" alt="Halo Detail">
+    <div class="sf26-overlay-grad"></div>
+    <div class="sf26-overlay-text">
+      <div class="sf26-overlay-label">// Detail</div>
+      <h2 class="sf26-overlay-title">Built for<br>Production</h2>
+      <p class="sf26-overlay-body">Every surface modelled with render in mind. Carbon weave, painted bodywork, sponsor lettering — the kind of detail that holds up at any focal length.</p>
+    </div>
+  </section>
+
+  <!-- 10. FULL BLEED — rear dead on -->
+  <div class="sf26-fullbleed reveal">
+    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled38.png" alt="SF-26 Rear Dead-On">
+  </div>
+
+  <!-- 11. CTA -->
+  <section class="sf26-cta reveal" id="sf26-cta">
+    <div class="sf26-eyebrow" style="margin-bottom:16px;">// Available Now</div>
+    <h2 class="sf26-cta-title">Ferrari SF-26 Model</h2>
+    <div class="sf26-cta-sub">Hamilton &amp; Leclerc Liveries &nbsp;·&nbsp; 1K / 2K / 4K &nbsp;·&nbsp; FBX</div>
+    <div class="sf26-cta-price product-price">€TBD</div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;">
+      <a href="https://payhip.com/b/SF26PLACEHOLDER" class="sf26-buy-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy on AviaRigg &#8594;</a>
+      <a href="https://gumroad.com/l/SF26PLACEHOLDER" class="sf26-gumroad-link" target="_blank">Also on Gumroad ↗</a>
+    </div>
+    <div class="sf26-license">// Personal, educational &amp; portfolio use only. No redistribution or resale.</div>
+  </section>
+
+</div><!-- end .page -->
+
 <script>
-
-// ── FETCH LIVE PRICE FROM SUPABASE ──
-(async function() {
-  try {
-    let n = 0;
-    while (typeof _navSb === 'undefined' && n++ < 40) await new Promise(r => setTimeout(r, 50));
-    const sb = _navSb;
-    const { data } = await sb.from('shop_products').select('price, sale_price').eq('id', 'f1-sf26').single();
-    if (!data) return;
-    const { price, sale_price } = data;
-    if (!price) return;
-
-    function parseNum(s) { return parseFloat(String(s||'').replace(/[^0-9.]/g,'')) || 0; }
-    function pct(p, s) { const a = parseNum(p), b = parseNum(s); return (a && b && b < a) ? Math.round((1-b/a)*100) : 0; }
-
-    function buildPriceHtml(price, salePrice) {
-      if (salePrice && salePrice.trim()) {
-        const d = pct(price, salePrice);
-        return `<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-          <div>
-            <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(14px,1.1vw,18px);font-weight:500;color:var(--text-dim);text-decoration:line-through;line-height:1;">${price}</div>
-            <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(26px,2.5vw,36px);font-weight:700;color:#00e87a;line-height:1;">${salePrice}</div>
-          </div>
-          ${d > 0 ? `<span style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:#00e87a;border:1px solid rgba(0,232,122,0.4);background:rgba(0,232,122,0.08);padding:4px 10px;text-transform:uppercase;">-${d}%</span>` : ''}
-        </div>`;
-      }
-      return `<span class="product-price">${price}</span>`;
-    }
-
-    document.querySelectorAll('.product-price').forEach(el => {
-      el.outerHTML = buildPriceHtml(price, sale_price);
-    });
-  } catch(e) { /* fail silently — static price remains */ }
-})();
-
+// ── CHECKOUT ─────────────────────────────────────────────────
 function openCheckout(url) {
   const modal = document.getElementById('checkout-modal');
   document.getElementById('checkout-iframe').src = url;
@@ -259,56 +724,63 @@ function closeCheckout() {
   document.body.style.overflow = '';
 }
 document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('checkout-modal').addEventListener('click', function(e) { if (e.target === this) closeCheckout(); });
+  document.getElementById('checkout-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeCheckout();
+  });
 });
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeCheckout(); });
 
-function setProductGallery(thumb, mainId, labelId, content, labelText) {
-  document.getElementById(mainId).innerHTML = content;
-  document.getElementById(labelId).textContent = labelText;
-  document.querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
-  thumb.classList.add('active');
-}
-function setGallerySketchfab(thumb, modelId) {
-  setProductGallery(thumb, 'gallery-main-img', 'gallery-label',
-    `<iframe src="https://sketchfab.com/models/${modelId}/embed?autostart=1&ui_theme=dark&ui_infos=0&ui_watermark=0" frameborder="0" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>`,
-    'F1 SF-26 · Texture Pack · 3D Viewer');
-}
-function setGalleryVideo(thumb, id) {
-  const vmId = id.replace('vm:', '');
-  const existing = document.getElementById('avia-gthumb-' + vmId);
-  if (existing) {
-    // First click — swap thumb for Vimeo iframe
-    const main = document.getElementById('gallery-main-img');
-    main.innerHTML = `<div style="position:relative;width:100%;height:100%;">
-      <iframe id="avia-gallery-iframe"
-        src="https://player.vimeo.com/video/${vmId}?autoplay=1&loop=0&title=0&byline=0&portrait=0&controls=1&dnt=1"
-        frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen
-        style="width:100%;height:100%;border:none;display:block;"></iframe>
-    </div>`;
-    document.getElementById('gallery-label').textContent = 'F1 SF-26 · Texture Pack · Video';
-    document.querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
-    thumb.classList.add('active');
-  } else {
-    // Switching to a different video — show thumb first
-    setProductGallery(thumb, 'gallery-main-img', 'gallery-label',
-      `<div class="avia-thumb-wrap" id="avia-gthumb-${vmId}" onclick="setGalleryVideo(this,'vm:${vmId}')" style="position:relative;width:100%;height:100%;cursor:pointer;"><img src="https://vumbnail.com/${vmId}.jpg" alt="Video" style="width:100%;height:100%;object-fit:cover;display:block;"><div class="avia-thumb-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>`,
-      'F1 SF-26 · Texture Pack · Video');
-  }
-}
-function setGalleryImg(thumb, src) {
-  setProductGallery(thumb, 'gallery-main-img', 'gallery-label', `<img src="${src}">`, 'F1 SF-26 · Texture Pack · Image');
-}
-function syncGallerySidebars() {
-  document.querySelectorAll('.product-gallery-wrap').forEach(wrap => {
-    const main = wrap.querySelector('.product-gallery-main-img');
-    const thumbs = wrap.querySelector('.product-gallery-thumbs');
-    if (main && thumbs) thumbs.style.maxHeight = main.offsetHeight + 'px';
-  });
-}
-window.addEventListener('resize', syncGallerySidebars);
-window.addEventListener('load', syncGallerySidebars);
-document.addEventListener('DOMContentLoaded', () => setTimeout(syncGallerySidebars, 100));
+// ── STICKY BUY BAR ────────────────────────────────────────────
+(function() {
+  const bar = document.getElementById('sticky-buy');
+  let shown = false;
+  window.addEventListener('scroll', function() {
+    const scrolled = window.scrollY > window.innerHeight * 0.5;
+    if (scrolled && !shown) { bar.classList.add('visible'); shown = true; }
+    else if (!scrolled && shown) { bar.classList.remove('visible'); shown = false; }
+  }, { passive: true });
+})();
+
+// ── SCROLL REVEAL ─────────────────────────────────────────────
+(function() {
+  const els = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  els.forEach(function(el) { observer.observe(el); });
+})();
+
+// ── LIVE PRICE FROM SUPABASE ──────────────────────────────────
+(async function() {
+  try {
+    let n = 0;
+    while (typeof _navSb === 'undefined' && n++ < 40) await new Promise(r => setTimeout(r, 50));
+    const sb = _navSb;
+    const { data } = await sb.from('shop_products').select('price, sale_price').eq('id', 'f1-sf26').single();
+    if (!data || !data.price) return;
+    const { price, sale_price } = data;
+
+    function parseNum(s) { return parseFloat(String(s||'').replace(/[^0-9.]/g,'')) || 0; }
+    function pct(p, s) { const a = parseNum(p), b = parseNum(s); return (a && b && b < a) ? Math.round((1-b/a)*100) : 0; }
+
+    function buildPriceHtml(price, salePrice) {
+      if (salePrice && salePrice.trim()) {
+        const d = pct(price, salePrice);
+        return `<span style="font-family:'Rajdhani',sans-serif;font-size:inherit;font-weight:700;color:#00e87a;">${salePrice}</span>${d > 0 ? ` <span style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:#00e87a;border:1px solid rgba(0,232,122,0.4);background:rgba(0,232,122,0.08);padding:4px 10px;vertical-align:middle;">-${d}%</span>` : ''}`;
+      }
+      return price;
+    }
+
+    document.querySelectorAll('.product-price').forEach(el => {
+      el.innerHTML = buildPriceHtml(price, sale_price);
+    });
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>
