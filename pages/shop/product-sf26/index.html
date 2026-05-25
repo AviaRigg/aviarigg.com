@@ -115,13 +115,21 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
-  padding: 14px 32px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+#sticky-buy-inner {
+  max-width: 1280px;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  transform: translateY(100%);
-  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  padding: 14px 0;
 }
 #sticky-buy.visible { transform: translateY(0); }
 #sticky-buy .sb-left {
@@ -182,10 +190,39 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   text-transform: uppercase;
   color: var(--text-dim);
   text-decoration: none;
-  padding: 24px 40px;
   transition: color 0.2s;
 }
 .sf26-back:hover { color: var(--text); }
+
+/* ── PAGE HEADER ──────────────────────────────────────────── */
+.sf26-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.sf26-page-header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px 40px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sf26-page-header-right {
+  text-align: right;
+}
+.sf26-page-title {
+  font-family: var(--head);
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1px;
+  line-height: 1;
+}
 
 /* ── HERO SECTION ─────────────────────────────────────────── */
 .sf26-hero {
@@ -217,8 +254,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 .sf26-hero-content {
   position: relative;
   z-index: 2;
-  padding: 0 60px 70px;
-  max-width: 900px;
+  padding: 0 40px 70px;
+  max-width: min(900px, 100%);
+  width: 100%;
 }
 .sf26-eyebrow {
   font-family: var(--mono);
@@ -349,6 +387,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   grid-template-columns: 1fr 1fr;
   gap: 2px;
   background: #000;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 .sf26-pair-item {
   position: relative;
@@ -372,8 +412,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 
 /* ── STANDALONE TEXT BLOCK ────────────────────────────────── */
 .sf26-text-block {
-  padding: 100px 60px;
-  max-width: 1200px;
+  padding: 100px 40px;
+  max-width: 1280px;
   margin: 0 auto;
 }
 .sf26-text-block .sf26-eyebrow { margin-bottom: 20px; }
@@ -422,6 +462,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   grid-template-columns: 1fr 1fr 1fr;
   gap: 2px;
   background: #000;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 .sf26-triple-item {
   overflow: hidden;
@@ -540,7 +582,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   .sf26-cta { padding: 80px 24px 120px; }
   .sf26-overlay-section { aspect-ratio: auto; min-height: 520px; }
   #sticky-buy { padding: 12px 20px; }
-  .sf26-back { padding: 20px 24px; }
+  .sf26-page-header-inner { padding: 16px 24px !important; }
+  .sf26-page-title { font-size: 17px; }
+  .sf26-text-block { padding: 64px 24px !important; }
+  #sticky-buy { padding: 0 20px; }
 }
 </style>
 </head>
@@ -565,24 +610,34 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 
 <!-- STICKY BUY BAR -->
 <div id="sticky-buy">
-  <div class="sb-left">
-    <div>
-      <div class="sb-title">Ferrari SF-26 Model</div>
-      <div class="sb-sub">Hamilton &amp; Leclerc Liveries &nbsp;·&nbsp; 1K–4K &nbsp;·&nbsp; FBX</div>
+  <div id="sticky-buy-inner">
+    <div class="sb-left">
+      <div>
+        <div class="sb-title">Ferrari SF-26 Model</div>
+        <div class="sb-sub">Hamilton &amp; Leclerc Liveries &nbsp;·&nbsp; 1K–4K &nbsp;·&nbsp; FBX</div>
+      </div>
+      <div class="sb-price product-price">€TBD</div>
     </div>
-    <div class="sb-price product-price">€TBD</div>
+    <a href="https://payhip.com/b/SF26PLACEHOLDER" class="sticky-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
   </div>
-  <a href="https://payhip.com/b/SF26PLACEHOLDER" class="sticky-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
 </div>
 
 <div class="page active" id="page-product-f1-sf26">
 
-  <!-- BACK -->
-  <a class="sf26-back" href="/pages/shop">&#8592; Back to Shop</a>
+  <!-- PAGE HEADER -->
+  <div class="sf26-page-header">
+    <div class="sf26-page-header-inner">
+      <a class="sf26-back" href="/pages/shop">&#8592; Back to Shop</a>
+      <div class="sf26-page-header-right">
+        <div class="sf26-eyebrow" style="margin-bottom:4px;">// Hard Surface Model</div>
+        <div class="sf26-page-title">Ferrari SF-26</div>
+      </div>
+    </div>
+  </div>
 
   <!-- 1. HERO — full bleed side profile shot -->
   <section class="sf26-hero">
-    <img class="sf26-hero-img" src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled39.png" alt="SF-26 Hero">
+    <img class="sf26-hero-img" src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render6.png" alt="SF-26 Hero">
     <div class="sf26-hero-overlay"></div>
     <div class="sf26-hero-content">
       <div class="sf26-eyebrow">// 2026 Season &nbsp;·&nbsp; Ferrari Scuderia</div>
@@ -600,12 +655,12 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 
   <!-- 2. FULL BLEED — dead-on front -->
   <div class="sf26-fullbleed reveal">
-    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled41.png" alt="SF-26 Front">
+    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render8.png" alt="SF-26 Front">
   </div>
 
   <!-- 3. OVERLAY LEFT — 3/4 top down with text -->
   <section class="sf26-overlay-section reveal">
-    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled45.png" alt="SF-26 Top Down">
+    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render2.png" alt="SF-26 Top Down">
     <div class="sf26-overlay-grad"></div>
     <div class="sf26-overlay-text">
       <div class="sf26-overlay-label">// Livery</div>
@@ -617,18 +672,18 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   <!-- 4. PAIR — cockpit + rear wing detail -->
   <div class="sf26-pair reveal">
     <div class="sf26-pair-item">
-      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled46.png" alt="Cockpit">
+      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render1.png" alt="Cockpit">
       <div class="sf26-pair-label">// Cockpit Detail</div>
     </div>
     <div class="sf26-pair-item">
-      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled49.png" alt="Rear Wing">
+      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render5.png" alt="Rear Wing">
       <div class="sf26-pair-label">// Rear Wing</div>
     </div>
   </div>
 
   <!-- 5. OVERLAY RIGHT — Leclerc livery -->
   <section class="sf26-overlay-section right reveal">
-    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled50.png" alt="SF-26 Leclerc">
+    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render11.png" alt="SF-26 Leclerc">
     <div class="sf26-overlay-grad"></div>
     <div class="sf26-overlay-text">
       <div class="sf26-overlay-label">// Livery</div>
@@ -639,7 +694,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 
   <!-- 6. FULL BLEED — rear 3/4 low -->
   <div class="sf26-fullbleed reveal">
-    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled51.png" alt="SF-26 Rear">
+    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render14.png" alt="SF-26 Rear">
   </div>
 
   <!-- 7. STANDALONE TEXT — what's included -->
@@ -668,19 +723,19 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   <!-- 8. TRIPLE — detail shots -->
   <div class="sf26-triple reveal">
     <div class="sf26-triple-item">
-      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled48.png" alt="Sidepod Detail">
+      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render3.png" alt="Sidepod Detail">
     </div>
     <div class="sf26-triple-item">
-      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled47.png" alt="Front Wing">
+      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render4.png" alt="Front Wing">
     </div>
     <div class="sf26-triple-item">
-      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled43.png" alt="Wheel Detail">
+      <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render13.png" alt="Wheel Detail">
     </div>
   </div>
 
   <!-- 9. OVERLAY LEFT — halo/cockpit high angle -->
   <section class="sf26-overlay-section reveal">
-    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled44.png" alt="Halo Detail">
+    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render9.png" alt="Halo Detail">
     <div class="sf26-overlay-grad"></div>
     <div class="sf26-overlay-text">
       <div class="sf26-overlay-label">// Detail</div>
@@ -691,7 +746,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 
   <!-- 10. FULL BLEED — rear dead on -->
   <div class="sf26-fullbleed reveal">
-    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/Untitled38.png" alt="SF-26 Rear Dead-On">
+    <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render12.png" alt="SF-26 Rear Dead-On">
   </div>
 
   <!-- 11. CTA -->
