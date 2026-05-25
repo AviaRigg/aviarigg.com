@@ -95,7 +95,7 @@
   --bg:        #06060f;
   --bg2:       #0d0d18;
   --border:    rgba(255,255,255,0.07);
-  --accent:    #c8102e;
+  --accent:    #8b4fc8;
   --accent2:   #00e87a;
   --text:      #e8e8f0;
   --text-dim:  #7a7a99;
@@ -155,22 +155,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   font-weight: 700;
   color: var(--text);
 }
-.sticky-btn {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: #fff;
-  background: var(--accent);
-  border: none;
-  padding: 12px 28px;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-  transition: background 0.2s, transform 0.15s;
-  white-space: nowrap;
-}
-.sticky-btn:hover { background: #a50d25; transform: translateY(-1px); }
+
 
 /* ── CHECKOUT MODAL ───────────────────────────────────────── */
 #checkout-modal {
@@ -264,7 +249,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   font-size: 10px;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: var(--accent);
+  color: #00e87a;
   margin-bottom: 16px;
 }
 .sf26-hero-title {
@@ -276,7 +261,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   color: #fff;
   margin-bottom: 24px;
 }
-.sf26-hero-title span { color: var(--accent); }
+.sf26-hero-title span { color: #00e87a; }
 .sf26-hero-desc {
   font-family: var(--head);
   font-size: 17px;
@@ -366,7 +351,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   font-family: var(--mono);
   font-size: 9px; letter-spacing: 3px;
   text-transform: uppercase;
-  color: var(--accent);
+  color: #00e87a;
   margin-bottom: 14px;
 }
 .sf26-overlay-title {
@@ -447,7 +432,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 .sf26-include-num {
   font-family: var(--mono);
   font-size: 9px; letter-spacing: 3px;
-  color: var(--accent);
+  color: #00e87a;
   text-transform: uppercase;
   margin-bottom: 16px;
 }
@@ -505,7 +490,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   font-family: var(--head);
   font-size: clamp(120px, 20vw, 280px);
   font-weight: 700;
-  color: rgba(200,16,46,0.04);
+  color: rgba(139,79,200,0.05);
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
@@ -533,21 +518,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   line-height: 1;
   margin-bottom: 32px;
 }
-.sf26-buy-btn {
-  display: inline-block;
-  font-family: var(--mono);
-  font-size: 11px; letter-spacing: 4px;
-  text-transform: uppercase;
-  color: #fff;
-  background: var(--accent);
-  border: none;
-  padding: 18px 52px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background 0.2s, transform 0.15s;
-}
 
-.sf26-buy-btn:hover { background: #a50d25; transform: translateY(-2px); }
 
 .sf26-license {
   font-family: var(--mono);
@@ -624,7 +595,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
       </div>
       <div class="sb-price product-price">€TBD</div>
     </div>
-    <a href="https://payhip.com/b/SF26PLACEHOLDER" class="sticky-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
+    <a href="https://payhip.com/b/SF26PLACEHOLDER" class="product-buy-btn" style="white-space:nowrap;" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
   </div>
 </div>
 
@@ -757,12 +728,12 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 
   <!-- 11. CTA -->
   <section class="sf26-cta reveal" id="sf26-cta">
-    <div class="sf26-eyebrow" style="margin-bottom:16px;">// Available Now</div>
+    <div class="sf26-eyebrow" style="margin-bottom:16px;color:#00e87a;">// Available Now</div>
     <h2 class="sf26-cta-title">Ferrari SF-26 Model</h2>
     <div class="sf26-cta-sub">Hamilton &amp; Leclerc Liveries &nbsp;·&nbsp; 1K / 2K / 4K &nbsp;·&nbsp; FBX</div>
     <div class="sf26-cta-price product-price">€TBD</div>
     <div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;">
-      <a href="https://payhip.com/b/SF26PLACEHOLDER" class="sf26-buy-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
+      <a href="https://payhip.com/b/SF26PLACEHOLDER" class="product-buy-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
     </div>
     <div class="sf26-license">// Personal, educational &amp; portfolio use only. No redistribution or resale.</div>
   </section>
