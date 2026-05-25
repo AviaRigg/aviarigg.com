@@ -76,6 +76,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   font-size: 22px;
   font-weight: 700;
   color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 
@@ -92,7 +95,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   align-items: center;
   gap: 8px;
   font-family: var(--mono);
-  font-size: clamp(10px, 0.9vw, 13px);
+  font-size: clamp(10px, 1vw, 14px);
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--text);
@@ -112,10 +115,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   background: var(--bg);
 }
 .sf26-page-header-inner {
-  max-width: 1280px;
+  width: 75%;
   margin: 0 auto;
-  padding: 20px 40px;
-  width: 100%;
+  padding: 20px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -125,7 +127,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 }
 .sf26-page-title {
   font-family: var(--head);
-  font-size: clamp(18px, 1.8vw, 28px);
+  font-size: clamp(20px, 2vw, 36px);
   font-weight: 700;
   color: #fff;
   letter-spacing: 1px;
@@ -162,13 +164,13 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 .sf26-hero-content {
   position: relative;
   z-index: 2;
-  padding: 0 40px 70px;
-  max-width: min(900px, 100%);
-  width: 100%;
+  padding: 0 0 80px;
+  width: 75%;
+  margin: 0 auto;
 }
 .sf26-eyebrow {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: clamp(10px, 0.85vw, 13px);
   letter-spacing: 4px;
   text-transform: uppercase;
   color: #8b4fc8;
@@ -176,7 +178,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 }
 .sf26-hero-title {
   font-family: var(--head);
-  font-size: clamp(52px, 8vw, 110px);
+  font-size: clamp(64px, 9vw, 140px);
   font-weight: 700;
   line-height: 0.9;
   letter-spacing: -1px;
@@ -186,10 +188,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 .sf26-hero-title span { color: #8b4fc8; }
 .sf26-hero-desc {
   font-family: var(--head);
-  font-size: 17px;
+  font-size: clamp(15px, 1.4vw, 22px);
   font-weight: 400;
   color: var(--text-dim);
-  max-width: 520px;
+  max-width: 640px;
   line-height: 1.6;
   margin-bottom: 36px;
 }
@@ -198,12 +200,12 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 }
 .sf26-tag {
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: clamp(9px, 0.75vw, 12px);
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--text-dim);
   border: 1px solid var(--border);
-  padding: 5px 12px;
+  padding: 6px 14px;
 }
 .sf26-scroll-hint {
   position: absolute;
@@ -231,6 +233,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   aspect-ratio: 16/9;
   overflow: hidden;
   position: relative;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 32px 80px rgba(0,0,0,0.6);
 }
 .sf26-fullbleed img {
   width: 100%; height: 100%;
@@ -248,6 +251,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   overflow: hidden;
   display: flex;
   align-items: flex-end;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 32px 80px rgba(0,0,0,0.6);
 }
 .sf26-overlay-section img {
   position: absolute; inset: 0;
@@ -294,19 +298,17 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 /* ── EDITORIAL PAIR (asymmetric featured layout) ──────────── */
 .sf26-pair {
   display: grid;
-  grid-template-columns: 3fr 2fr;
+  grid-template-columns: 1fr 1fr;
   gap: 3px;
   background: var(--bg);
   width: 75%;
   margin: 0 auto;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 32px 80px rgba(0,0,0,0.6);
 }
 .sf26-pair-item {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 16/10;
-}
-.sf26-pair-item:first-child {
-  aspect-ratio: 16/10;
+  aspect-ratio: 1/1;
 }
 .sf26-pair-item img {
   width: 100%; height: 100%;
@@ -334,7 +336,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 .sf26-text-block .sf26-eyebrow { margin-bottom: 20px; }
 .sf26-text-block-title {
   font-family: var(--head);
-  font-size: clamp(36px, 5vw, 72px);
+  font-size: clamp(40px, 5.5vw, 88px);
   font-weight: 700;
   color: #fff;
   line-height: 1;
@@ -349,24 +351,24 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 }
 .sf26-include {
   background: var(--bg2);
-  padding: 36px 32px;
+  padding: clamp(28px,3vw,48px) clamp(24px,2.5vw,40px);
 }
 .sf26-include-num {
   font-family: var(--mono);
-  font-size: 9px; letter-spacing: 3px;
+  font-size: clamp(9px,0.75vw,12px); letter-spacing: 3px;
   color: #8b4fc8;
   text-transform: uppercase;
   margin-bottom: 16px;
 }
 .sf26-include-title {
   font-family: var(--head);
-  font-size: 20px; font-weight: 600;
+  font-size: clamp(18px,1.8vw,28px); font-weight: 600;
   color: #fff;
   margin-bottom: 10px;
 }
 .sf26-include-desc {
   font-family: var(--head);
-  font-size: 14px; font-weight: 400;
+  font-size: clamp(13px,1.1vw,17px); font-weight: 400;
   color: var(--text-dim);
   line-height: 1.6;
 }
@@ -374,13 +376,14 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 /* ── TRIPLE IMAGE ROW ─────────────────────────────────────── */
 .sf26-triple {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 3px;
   background: var(--bg);
   width: 75%;
   margin: 0 auto;
-  aspect-ratio: 16/7;
+  aspect-ratio: 16/9;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 32px 80px rgba(0,0,0,0.6);
 }
 .sf26-triple-item {
   overflow: hidden;
@@ -388,6 +391,14 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 }
 .sf26-triple-item:first-child {
   grid-row: 1 / 3;
+}
+.sf26-triple-item:nth-child(2) {
+  grid-column: 2;
+  grid-row: 1;
+}
+.sf26-triple-item:nth-child(3) {
+  grid-column: 2;
+  grid-row: 2;
 }
 .sf26-triple-item img {
   width: 100%; height: 100%;
@@ -439,6 +450,11 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   color: var(--text);
   line-height: 1;
   margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 
@@ -488,11 +504,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
 }
 </style>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>F1 SF-25 Rig — AviaRigg Shop</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css">
 <script>
   document.addEventListener('touchmove', function(e) {
     if (e.touches.length > 1) e.preventDefault();
@@ -619,7 +630,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
     <div class="sf26-page-header-inner">
       <a class="sf26-back" href="/pages/shop">&#8592; Back to Shop</a>
       <div class="sf26-page-header-right">
-        <div class="sf26-eyebrow" style="margin-bottom:4px;">// Hard Surface Model</div>
+        <div class="sf26-eyebrow" style="margin-bottom:4px;font-size:clamp(9px,0.85vw,12px);">// Hard Surface Model</div>
         <div class="sf26-page-title">Ferrari SF-26</div>
       </div>
     </div>
@@ -643,13 +654,16 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
     <div class="sf26-scroll-hint">Scroll</div>
   </section>
 
+  <!-- DIVIDER between hero and images -->
+  <div style="height:48px;background:var(--bg);"></div>
+
   <!-- 2. FULL BLEED — dead-on front -->
-  <div class="sf26-fullbleed reveal">
+  <div class="sf26-fullbleed reveal" style="margin-bottom:48px;">
     <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render8.png" alt="SF-26 Front">
   </div>
 
   <!-- 3. OVERLAY LEFT — 3/4 top down with text -->
-  <section class="sf26-overlay-section reveal">
+  <section class="sf26-overlay-section reveal" style="margin-bottom:48px;">
     <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render2.png" alt="SF-26 Top Down">
     <div class="sf26-overlay-grad"></div>
     <div class="sf26-overlay-text">
@@ -660,19 +674,17 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   </section>
 
   <!-- 4. PAIR — cockpit + rear wing detail -->
-  <div class="sf26-pair reveal">
+  <div class="sf26-pair reveal" style="margin-bottom:48px;">
     <div class="sf26-pair-item">
       <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render1.png" alt="Cockpit">
-      <div class="sf26-pair-label">// Cockpit Detail</div>
     </div>
     <div class="sf26-pair-item">
       <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render5.png" alt="Rear Wing">
-      <div class="sf26-pair-label">// Rear Wing</div>
     </div>
   </div>
 
   <!-- 5. OVERLAY RIGHT — Leclerc livery -->
-  <section class="sf26-overlay-section right reveal">
+  <section class="sf26-overlay-section right reveal" style="margin-bottom:48px;">
     <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render11.png" alt="SF-26 Leclerc">
     <div class="sf26-overlay-grad"></div>
     <div class="sf26-overlay-text">
@@ -683,7 +695,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   </section>
 
   <!-- 6. FULL BLEED — rear 3/4 low -->
-  <div class="sf26-fullbleed reveal">
+  <div class="sf26-fullbleed reveal" style="margin-bottom:48px;">
     <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render14.png" alt="SF-26 Rear">
   </div>
 
@@ -711,7 +723,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   </section>
 
   <!-- 8. TRIPLE — detail shots -->
-  <div class="sf26-triple reveal">
+  <div class="sf26-triple reveal" style="margin-bottom:48px;">
     <div class="sf26-triple-item">
       <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render3.png" alt="Sidepod Detail">
     </div>
@@ -724,7 +736,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   </div>
 
   <!-- 9. OVERLAY LEFT — halo/cockpit high angle -->
-  <section class="sf26-overlay-section reveal">
+  <section class="sf26-overlay-section reveal" style="margin-bottom:48px;">
     <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render9.png" alt="Halo Detail">
     <div class="sf26-overlay-grad"></div>
     <div class="sf26-overlay-text">
@@ -735,7 +747,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--head); over
   </section>
 
   <!-- 10. FULL BLEED — rear dead on -->
-  <div class="sf26-fullbleed reveal">
+  <div class="sf26-fullbleed reveal" style="margin-bottom:48px;">
     <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/sf26/Render12.png" alt="SF-26 Rear Dead-On">
   </div>
 
@@ -818,9 +830,9 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close
         return `<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(14px,1.1vw,18px);font-weight:500;color:var(--text-dim);text-decoration:line-through;line-height:1;">${price}</div>
-            <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(26px,2.5vw,36px);font-weight:700;color:var(--text);line-height:1;">${salePrice}</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(26px,2.5vw,36px);font-weight:700;color:#00e87a;line-height:1;">${salePrice}</div>
           </div>
-          ${d > 0 ? `<span style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text);border:1px solid var(--border);background:rgba(255,255,255,0.04);padding:4px 10px;text-transform:uppercase;">-${d}%</span>` : ''}
+          ${d > 0 ? `<span style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:#00e87a;border:1px solid rgba(0,232,122,0.4);background:rgba(0,232,122,0.08);padding:4px 10px;text-transform:uppercase;">-${d}%</span>` : ''}
         </div>`;
       }
       return `<span class="product-price">${price}</span>`;
