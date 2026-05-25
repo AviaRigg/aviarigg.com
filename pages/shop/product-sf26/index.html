@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 SF-26 Model — AviaRigg Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<script>
+  document.addEventListener('touchmove', function(e) {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+  let lastTap = 0;
+  document.addEventListener('touchend', function(e) {
+    const tag = e.target.tagName;
+    if (['INPUT', 'SELECT', 'TEXTAREA'].includes(tag)) return;
+    const now = Date.now();
+    if (now - lastTap < 300) e.preventDefault();
+    lastTap = now;
+  }, { passive: false });
+</script>
+<style>
+  .page { display: block !important; }
+  .nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
+  .avia-thumb-play {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(6,6,15,0.45);
+    transition: background 0.2s;
+    pointer-events: none;
+  }
+  .avia-thumb-wrap:hover .avia-thumb-play { background: rgba(6,6,15,0.3); }
+  .avia-thumb-play svg {
+    width: 56px; height: 56px; fill: white;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+    margin-left: 5px;
+  }
+</style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RYTKYEPJG2');
+  </script>
+  <link rel="icon" type="image/png" href="/assets/icons/SiteIcon.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <script src="/assets/js/status.js"></script>
+  <script src="/assets/js/nav.js"></script>
+  <!-- Supabase + product availability check -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/product-check.js"></script>
+  <!-- Nav auth styles -->
+<!-- Nav auth script -->
+  <script>
+    const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
+    const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let currentUser = null, currentProfile = null, isAdmin = false;
+
+    async function initAuth() {
+      const { data: { session } } = await _sb.auth.getSession();
+      if (session) await handleSession(session.user);
+      _sb.auth.onAuthStateChange(async (_e, session) => {
+        if (session) await handleSession(session.user);
+        else { currentUser = null; currentProfile = null; isAdmin = false; updateNavAuth(); }
+      });
+    }
+    async function handleSession(user) {
+      currentUser = user;
+      const { data: profile } = await _sb.from('profiles').select('role, username').eq('id', user.id).single();
+      currentProfile = profile; isAdmin = profile?.role === 'admin';
+      updateNavAuth();
+    }
+    function updateNavAuth() {
+      const c = document.getElementById('nav-auth-container');
+      if (!c) return;
+      if (currentUser) {
+        const name = currentProfile?.username || currentUser.email.split('@')[0];
+        c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="toggleUserMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${currentUser.email}</div><a class="nav-dropdown-item" href="#">My Profile</a><button class="nav-dropdown-item" onclick="handleLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="handleDeleteAccount()">Delete Account</button></div></div>`;
+      } else {
+        c.innerHTML = '<a class="nav-auth-link" href="/pages/login">Log In</a>';
+      }
+    }
+    function toggleUserMenu(e) {
+      e.stopPropagation();
+      const dd = document.getElementById('nav-user-dropdown');
+      if (dd) dd.classList.toggle('open');
+    }
+    document.addEventListener('click', () => { const dd = document.getElementById('nav-user-dropdown'); if (dd) dd.classList.remove('open'); });
+    async function handleLogout() { await _sb.auth.signOut(); window.location.href = '/'; }
+    async function handleDeleteAccount() {
+      if (!confirm('Delete your account? This cannot be undone.')) return;
+      await _sb.from('profiles').delete().eq('id', currentUser.id);
+      await _sb.auth.signOut(); window.location.href = '/';
+    }
+    document.addEventListener('DOMContentLoaded', initAuth);
+  </script>
+  </script>
+  <script>
+    </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/nav-auth.js"></script>
+  <script src="/assets/js/banner.js"></script>
+</head>
+<body data-product-id="f1-sf26">
+
+<div id="nav-root"></div>
+
+<!-- CHECKOUT MODAL -->
+<div id="checkout-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+  <div style="position:relative;width:min(680px,95vw);height:min(820px,92vh);background:#0d0d12;border:1px solid rgba(255,255,255,0.1);box-shadow:0 0 60px rgba(139,79,200,0.2);display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.07);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:#666680;text-transform:uppercase;">
+      <span>// Checkout &#8212; AviaRigg</span>
+      <button onclick="closeCheckout()" style="background:none;border:none;color:#666680;font-size:20px;cursor:pointer;line-height:1;padding:0 4px;transition:color 0.2s;">&#10005;</button>
+    </div>
+    <iframe id="checkout-iframe" src="" style="flex:1;border:none;width:100%;"></iframe>
+    <div style="padding:12px 18px;border-top:1px solid rgba(255,255,255,0.07);background:#0d0d12;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <span style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:#555570;text-transform:uppercase;">If Payhip does not load, open directly ↓</span>
+      <a id="checkout-fallback-btn" href="#" target="_blank" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#00e87a;border:1px solid rgba(0,232,122,0.4);padding:7px 16px;text-decoration:none;white-space:nowrap;" onmouseover="this.style.background='rgba(0,232,122,0.1)'" onmouseout="this.style.background='transparent'">Open in Browser ↗</a>
+    </div>
+  </div>
+</div>
+
+<div class="page active" id="page-product-f1-sf26">
+  <div class="product-wrap">
+    <a class="product-back" href="/pages/shop" style="text-decoration:none;">&#8592; Back to Shop</a>
+    <div class="product-hero">
+      <div class="product-hero-left">
+        <div class="eyebrow">Hard Surface Model</div>
+        <div class="section-h">Formula 1<br><span class="accent">SF-26 Model</span></div>
+        <p class="product-tagline">The 2026 Ferrari SF-26, modelled and textured for Maya. Hamilton or Leclerc livery — choose your side carefully.</p>
+        <div class="product-tags">
+          <span class="ptag">Maya 2022+</span><span class="ptag">Hard Surface</span><span class="ptag">1K – 4K Textures</span><span class="ptag">Two Liveries</span>
+        </div>
+        <div class="product-buy-row">
+          <span class="product-price">&#8364;TBD</span>
+          <a href="https://payhip.com/b/SF26PLACEHOLDER" class="product-buy-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
+        </div>
+        <div class="product-license">// Personal, educational &amp; portfolio use only</div>
+      </div>
+      <div class="product-hero-right">
+        <div class="product-img-wrap">
+          <div class="shop-card-scan"></div>
+          <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Rendered.png" alt="F1 SF-26 Rendered" class="product-hero-img">
+        </div>
+      </div>
+    </div>
+
+    <div class="product-features-grid">
+      <div class="product-feature"><div class="pf-icon">&#9672;</div><div class="pf-title">2026 Ferrari SF-26</div><div class="pf-desc">High-fidelity hard surface model of Ferrari's 2026 Formula 1 chassis, built for production use.</div></div>
+      <div class="product-feature"><div class="pf-icon">&#9678;</div><div class="pf-title">Hamilton Livery</div><div class="pf-desc">Full #44 Lewis Hamilton texture set in 1K, 2K, and 4K resolutions. Ready to drop into your pipeline.</div></div>
+      <div class="product-feature"><div class="pf-icon">&#9635;</div><div class="pf-title">Leclerc Livery</div><div class="pf-desc">Full #16 Charles Leclerc texture set in 1K, 2K, and 4K resolutions. Same quality, different driver.</div></div>
+      <div class="product-feature"><div class="pf-icon">&#11041;</div><div class="pf-title">1K – 4K Textures</div><div class="pf-desc">Three resolution tiers per livery. Use 1K for fast previews, 4K for final renders.</div></div>
+      <div class="product-feature"><div class="pf-icon">&#10022;</div><div class="pf-title">Maya 2022+ Ready</div><div class="pf-desc">Delivered as a clean Maya file with properly assigned shaders and UDIM-compatible UV layout.</div></div>
+      <div class="product-feature"><div class="pf-icon">&#9650;</div><div class="pf-title">Livery Switch</div><div class="pf-desc">Toggle between Hamilton and Leclerc textures via a single attribute — no manual shader swaps needed.</div></div>
+    </div>
+
+    <div class="product-gallery-section">
+      <div class="eyebrow">Preview</div>
+      <div class="section-h" style="margin-bottom:32px;">Gallery</div>
+      <div class="product-gallery-wrap">
+        <div class="product-gallery-thumbs">
+          <div class="product-thumb active" onclick="setGalleryImg(this,'https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Rendered.png')">
+            <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Rendered.png" alt="SF-26 Rendered">
+          </div>
+          <div class="product-thumb" onclick="setGalleryImg(this,'https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Hamilton.png')">
+            <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Hamilton.png" alt="Hamilton Livery">
+          </div>
+          <div class="product-thumb" onclick="setGalleryImg(this,'https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Leclerc.png')">
+            <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Leclerc.png" alt="Leclerc Livery">
+          </div>
+          <div class="product-thumb" onclick="setGalleryImg(this,'https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Textures.png')">
+            <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Textures.png" alt="Texture Sheets">
+          </div>
+          <div class="product-thumb" onclick="setGalleryImg(this,'https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_UVs.png')">
+            <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_UVs.png" alt="UV Layout">
+          </div>
+        </div>
+        <div class="product-gallery">
+          <div id="gallery-main-img" class="product-gallery-main-img">
+            <img src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf26/SF26_Rendered.png" alt="F1 SF-26 Rendered" style="width:100%;height:100%;object-fit:cover;display:block;">
+          </div>
+          <div class="product-gallery-label" id="gallery-label">F1 SF-26 · Texture Pack · Image</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-includes-section">
+      <div class="eyebrow">What You Get</div>
+      <div class="section-h" style="margin-bottom:32px;">Included Files</div>
+      <div class="product-includes-grid">
+        <div class="product-include"><div class="pi-label">// 01</div><div class="pi-title">Maya File</div><div class="pi-desc">Clean SF-26 model with shaders assigned and livery switch attribute configured. Maya 2022+.</div></div>
+        <div class="product-include"><div class="pi-label">// 02</div><div class="pi-title">Hamilton Textures</div><div class="pi-desc">#44 livery texture set in 1K, 2K, and 4K. BaseColor, Roughness, Metalness, Normal maps included.</div></div>
+        <div class="product-include"><div class="pi-label">// 03</div><div class="pi-title">Leclerc Textures</div><div class="pi-desc">#16 livery texture set in 1K, 2K, and 4K. Same map types, same quality, different driver.</div></div>
+        <div class="product-include"><div class="pi-label">// 04</div><div class="pi-title">UV Layout</div><div class="pi-desc">Clean UDIM-compatible UV layout included as reference for custom texture painting.</div></div>
+      </div>
+    </div>
+
+    <div class="product-cta">
+      <div class="product-cta-text">Ready to add this to your toolkit?</div>
+      <div class="product-buy-row" style="justify-content:center;">
+        <span class="product-price">&#8364;TBD</span>
+        <a href="https://payhip.com/b/SF26PLACEHOLDER" class="product-buy-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
+      </div>
+      <div class="product-license">// Personal, educational &amp; portfolio use only. No redistribution or resale.</div>
+    </div>
+  </div>
+</div>
+<script>
+
+// ── FETCH LIVE PRICE FROM SUPABASE ──
+(async function() {
+  try {
+    let n = 0;
+    while (typeof _navSb === 'undefined' && n++ < 40) await new Promise(r => setTimeout(r, 50));
+    const sb = _navSb;
+    const { data } = await sb.from('shop_products').select('price, sale_price').eq('id', 'f1-sf26').single();
+    if (!data) return;
+    const { price, sale_price } = data;
+    if (!price) return;
+
+    function parseNum(s) { return parseFloat(String(s||'').replace(/[^0-9.]/g,'')) || 0; }
+    function pct(p, s) { const a = parseNum(p), b = parseNum(s); return (a && b && b < a) ? Math.round((1-b/a)*100) : 0; }
+
+    function buildPriceHtml(price, salePrice) {
+      if (salePrice && salePrice.trim()) {
+        const d = pct(price, salePrice);
+        return `<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(14px,1.1vw,18px);font-weight:500;color:var(--text-dim);text-decoration:line-through;line-height:1;">${price}</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:clamp(26px,2.5vw,36px);font-weight:700;color:#00e87a;line-height:1;">${salePrice}</div>
+          </div>
+          ${d > 0 ? `<span style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:#00e87a;border:1px solid rgba(0,232,122,0.4);background:rgba(0,232,122,0.08);padding:4px 10px;text-transform:uppercase;">-${d}%</span>` : ''}
+        </div>`;
+      }
+      return `<span class="product-price">${price}</span>`;
+    }
+
+    document.querySelectorAll('.product-price').forEach(el => {
+      el.outerHTML = buildPriceHtml(price, sale_price);
+    });
+  } catch(e) { /* fail silently — static price remains */ }
+})();
+
+function openCheckout(url) {
+  const modal = document.getElementById('checkout-modal');
+  document.getElementById('checkout-iframe').src = url;
+  document.getElementById('checkout-fallback-btn').href = url;
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeCheckout() {
+  document.getElementById('checkout-modal').style.display = 'none';
+  document.getElementById('checkout-iframe').src = '';
+  document.body.style.overflow = '';
+}
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('checkout-modal').addEventListener('click', function(e) { if (e.target === this) closeCheckout(); });
+});
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeCheckout(); });
+
+function setProductGallery(thumb, mainId, labelId, content, labelText) {
+  document.getElementById(mainId).innerHTML = content;
+  document.getElementById(labelId).textContent = labelText;
+  document.querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
+  thumb.classList.add('active');
+}
+function setGallerySketchfab(thumb, modelId) {
+  setProductGallery(thumb, 'gallery-main-img', 'gallery-label',
+    `<iframe src="https://sketchfab.com/models/${modelId}/embed?autostart=1&ui_theme=dark&ui_infos=0&ui_watermark=0" frameborder="0" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>`,
+    'F1 SF-26 · Texture Pack · 3D Viewer');
+}
+function setGalleryVideo(thumb, id) {
+  const vmId = id.replace('vm:', '');
+  const existing = document.getElementById('avia-gthumb-' + vmId);
+  if (existing) {
+    // First click — swap thumb for Vimeo iframe
+    const main = document.getElementById('gallery-main-img');
+    main.innerHTML = `<div style="position:relative;width:100%;height:100%;">
+      <iframe id="avia-gallery-iframe"
+        src="https://player.vimeo.com/video/${vmId}?autoplay=1&loop=0&title=0&byline=0&portrait=0&controls=1&dnt=1"
+        frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen
+        style="width:100%;height:100%;border:none;display:block;"></iframe>
+    </div>`;
+    document.getElementById('gallery-label').textContent = 'F1 SF-26 · Texture Pack · Video';
+    document.querySelectorAll('.product-thumb').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+  } else {
+    // Switching to a different video — show thumb first
+    setProductGallery(thumb, 'gallery-main-img', 'gallery-label',
+      `<div class="avia-thumb-wrap" id="avia-gthumb-${vmId}" onclick="setGalleryVideo(this,'vm:${vmId}')" style="position:relative;width:100%;height:100%;cursor:pointer;"><img src="https://vumbnail.com/${vmId}.jpg" alt="Video" style="width:100%;height:100%;object-fit:cover;display:block;"><div class="avia-thumb-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>`,
+      'F1 SF-26 · Texture Pack · Video');
+  }
+}
+function setGalleryImg(thumb, src) {
+  setProductGallery(thumb, 'gallery-main-img', 'gallery-label', `<img src="${src}">`, 'F1 SF-26 · Texture Pack · Image');
+}
+function syncGallerySidebars() {
+  document.querySelectorAll('.product-gallery-wrap').forEach(wrap => {
+    const main = wrap.querySelector('.product-gallery-main-img');
+    const thumbs = wrap.querySelector('.product-gallery-thumbs');
+    if (main && thumbs) thumbs.style.maxHeight = main.offsetHeight + 'px';
+  });
+}
+window.addEventListener('resize', syncGallerySidebars);
+window.addEventListener('load', syncGallerySidebars);
+document.addEventListener('DOMContentLoaded', () => setTimeout(syncGallerySidebars, 100));
+</script>
+</body>
+</html>
