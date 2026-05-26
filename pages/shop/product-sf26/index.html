@@ -483,6 +483,9 @@ body { color: var(--text); font-family: var(--head); overflow-x: hidden; }
   inset: 0;
 }
 
+/* ── BUY BUTTON GATE — hidden until access confirmed ─────── */
+.sf26-buy-action { visibility: hidden; }
+
 /* ── SCROLL REVEAL ────────────────────────────────────────── */
 .reveal {
   opacity: 0;
@@ -935,7 +938,13 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close
 
     // Fetch product status
     const { data: product } = await sb.from('shop_products').select('status').eq('id', 'sf26-model').single();
-    if (!product || product.status === 'live') return;
+    if (!product) return;
+
+    if (product.status === 'live') {
+      // Reveal buttons — they start hidden via CSS
+      document.querySelectorAll('.sf26-buy-action').forEach(el => el.style.visibility = 'visible');
+      return;
+    }
     if (product.status !== 'early') return;
 
     // Check access via navAuthReady state (already resolved by nav-auth.js)
@@ -963,7 +972,10 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close
 
     function removeLock() {
       document.querySelectorAll('.sf26-redeem-btn').forEach(el => el.remove());
-      document.querySelectorAll('.sf26-buy-action').forEach(el => el.style.display = '');
+      document.querySelectorAll('.sf26-buy-action').forEach(el => {
+        el.style.display = '';
+        el.style.visibility = 'visible';
+      });
     }
 
     // Apply on load
