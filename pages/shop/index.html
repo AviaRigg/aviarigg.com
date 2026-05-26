@@ -23,6 +23,51 @@
   .page { display: block !important; }
   .nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
 
+  /* ── SHOP PAGE LOAD ANIMATIONS ───────────────────────────── */
+  @keyframes shop-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes shop-rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Page header: eyebrow + title */
+  .port-header {
+    animation: shop-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.1s both;
+  }
+
+  /* Tab switcher */
+  .shop-tabs-wrap {
+    animation: shop-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.22s both;
+  }
+
+  /* Featured hero card */
+  .hero-card {
+    animation: shop-rise 1s cubic-bezier(0.25,0.1,0.25,1) 0.35s both;
+  }
+
+  /* Filter row */
+  .filter-row {
+    animation: shop-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.5s both;
+  }
+
+  /* Product grid — fade in as a whole, cards stagger via JS */
+  #product-grid {
+    animation: shop-fade 0.6s cubic-bezier(0.25,0.1,0.25,1) 0.65s both;
+  }
+
+  /* Shop notice */
+  .shop-notice {
+    animation: shop-fade 0.6s cubic-bezier(0.25,0.1,0.25,1) 0.8s both;
+  }
+
+  /* Individual product cards — stagger applied by JS after Supabase loads them */
+  .product-card.shop-card-enter {
+    animation: shop-rise 0.7s cubic-bezier(0.25,0.1,0.25,1) both;
+  }
+
   /* Override default text colour to full white */
   :root { --text: #ffffff; }
 
@@ -1699,5 +1744,32 @@
 
 <script src="/assets/js/shop-products.js"></script>
 <script src="/assets/js/shop-admin.js"></script>
+
+<script>
+// ── SHOP CARD STAGGER ANIMATION ───────────────────────────────
+// Watches for cards being inserted into the grid and staggers them in
+(function() {
+  const grid = document.getElementById('product-grid');
+  if (!grid) return;
+
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      mutation.addedNodes.forEach(function(node, i) {
+        if (node.nodeType !== 1) return;
+        const cards = node.classList?.contains('product-card')
+          ? [node]
+          : Array.from(node.querySelectorAll?.('.product-card') || []);
+
+        cards.forEach(function(card, idx) {
+          card.classList.add('shop-card-enter');
+          card.style.animationDelay = (0.65 + idx * 0.08) + 's';
+        });
+      });
+    });
+  });
+
+  observer.observe(grid, { childList: true, subtree: true });
+})();
+</script>
 </body>
 </html>
