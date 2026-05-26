@@ -22,6 +22,52 @@
 <script src="/assets/js/banner.js"></script>
 <script src="/assets/js/lib-engine.js"></script>
 
+<style>
+@keyframes lib-fade { from { opacity:0; } to { opacity:1; } }
+@keyframes lib-rise { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+@keyframes lib-left { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:translateX(0); } }
+
+/* Sidebar slides in from left */
+.lib-sidebar {
+  animation: lib-left 0.9s cubic-bezier(0.25,0.1,0.25,1) 0.1s both;
+}
+
+/* Breadcrumb */
+.lib-breadcrumb {
+  animation: lib-fade 0.6s cubic-bezier(0.25,0.1,0.25,1) 0.3s both;
+}
+
+/* Hero title */
+.lib-hero-title {
+  animation: lib-rise 1s cubic-bezier(0.25,0.1,0.25,1) 0.4s both;
+}
+
+/* Sub line */
+.lib-hero-sub {
+  animation: lib-fade 0.7s cubic-bezier(0.25,0.1,0.25,1) 0.6s both;
+}
+
+/* Stats — stagger */
+.lib-stat:nth-child(1) { animation: lib-rise 0.7s cubic-bezier(0.25,0.1,0.25,1) 0.65s both; }
+.lib-stat:nth-child(2) { animation: lib-rise 0.7s cubic-bezier(0.25,0.1,0.25,1) 0.78s both; }
+.lib-stat:nth-child(3) { animation: lib-rise 0.7s cubic-bezier(0.25,0.1,0.25,1) 0.91s both; }
+
+/* Controls row */
+.lib-controls {
+  animation: lib-rise 0.7s cubic-bezier(0.25,0.1,0.25,1) 0.95s both;
+}
+
+/* Index header */
+.lib-index-header {
+  animation: lib-fade 0.6s cubic-bezier(0.25,0.1,0.25,1) 1.05s both;
+}
+
+/* Script index — fades in after everything else is settled */
+#lib-index {
+  animation: lib-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 1.15s both;
+}
+</style>
+
 <!-- LOGIN GATE — reuses _navSb from nav-auth.js -->
 <script>
 document.addEventListener('DOMContentLoaded', async function() {
