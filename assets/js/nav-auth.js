@@ -210,6 +210,12 @@ function _injectRedeemModal() {
 }
 
 function _openRedeemModal() {
+  // Not logged in — redirect to login with return URL
+  if (!_navUser) {
+    window.location.href = '/pages/login?redirect=' + encodeURIComponent(window.location.pathname);
+    return;
+  }
+
   // Close nav dropdown first
   const dd = document.getElementById('nav-user-dropdown');
   if (dd) dd.classList.remove('open');
