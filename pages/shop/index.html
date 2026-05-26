@@ -121,8 +121,17 @@
   .shop-notice {
     animation: shop-fade 0.6s cubic-bezier(0.25,0.1,0.25,1) 1.6s both;
   }
-  /* Product cards stagger — set by JS */
-  .product-card.shop-card-enter {
+  /* Cards hidden by default — JS drives the reveal */
+  #product-grid .product-card {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  /* Once ready class added to grid, animate each card */
+  #product-grid.cards-ready .product-card {
+    animation: shop-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) both;
+  }
+  /* Filter re-stagger — same but instant start */
+  #product-grid .product-card.shop-card-enter {
     animation: shop-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) both;
   }
 
