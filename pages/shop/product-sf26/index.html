@@ -601,7 +601,7 @@ body { color: var(--text); font-family: var(--head); overflow-x: hidden; }
   <script src="/assets/js/banner.js"></script>
 
 </head>
-<body data-product-id="f1-sf26">
+<body data-product-id="sf26-model">
 
 <div id="nav-root"></div>
 
@@ -630,7 +630,9 @@ body { color: var(--text); font-family: var(--head); overflow-x: hidden; }
       </div>
       <div class="sb-price product-price">€TBD</div>
     </div>
-    <a href="https://payhip.com/b/SF26PLACEHOLDER" class="product-buy-btn" style="white-space:nowrap;" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
+    <div id="sf26-sticky-btn-wrap" data-product-id="sf26-model" data-payhip="SF26PLACEHOLDER" style="position:relative;">
+      <a href="https://payhip.com/b/SF26PLACEHOLDER" class="product-buy-btn sf26-buy-action" style="white-space:nowrap;" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
+    </div>
   </div>
 </div>
 
@@ -821,7 +823,9 @@ body { color: var(--text); font-family: var(--head); overflow-x: hidden; }
       <div class="sf26-cta-price product-price" style="text-align:center;">€TBD</div>
     </div>
     <div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;">
-      <a href="https://payhip.com/b/SF26PLACEHOLDER" class="product-buy-btn" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
+      <div id="sf26-cta-btn-wrap" data-product-id="sf26-model" data-payhip="SF26PLACEHOLDER" style="position:relative;display:inline-block;">
+        <a href="https://payhip.com/b/SF26PLACEHOLDER" class="product-buy-btn sf26-buy-action" onclick="event.preventDefault();openCheckout('https://payhip.com/b/SF26PLACEHOLDER')">Buy Now &#8594;</a>
+      </div>
     </div>
     <div class="sf26-license">// Personal, educational &amp; portfolio use only. No redistribution or resale.</div>
   </section>
@@ -918,6 +922,75 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close
       el.outerHTML = buildPriceHtml(price, sale_price);
     });
   } catch(e) {}
+})();
+</script>
+
+<script>
+// ── SF26 EARLY ACCESS GATE ──────────────────────────────────
+(async function() {
+  try {
+    let n = 0;
+    while (typeof _navSb === 'undefined' && n++ < 40) await new Promise(r => setTimeout(r, 50));
+    const sb = _navSb;
+
+    // Fetch product status
+    const { data: product } = await sb.from('shop_products').select('status').eq('id', 'sf26-model').single();
+    if (!product) return;
+    const status = product.status;
+
+    // If live — nothing to do, buttons stay as-is
+    if (status === 'live') return;
+
+    // If early — check if user has a license key
+    let hasAccess = false;
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const { data: key } = await sb.from('license_keys')
+        .select('id').eq('product_id', 'sf26-model').eq('user_id', session.user.id).maybeSingle();
+      if (key) hasAccess = true;
+      // Also check buyer role
+      const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+      if (profile?.role === 'buyer' || profile?.role === 'admin') hasAccess = true;
+    }
+
+    if (hasAccess) return;
+
+    // Apply early lock overlay to both button wrappers
+    const earlyHTML = `
+      <div class="sf26-early-lock" style="
+        display:inline-flex;align-items:center;gap:8px;
+        font-family:'Share Tech Mono',monospace;font-size:10px;
+        letter-spacing:3px;text-transform:uppercase;
+        color:#b06ef5;border:1px solid rgba(176,110,245,0.4);
+        background:rgba(176,110,245,0.08);padding:10px 20px;
+        cursor:default;white-space:nowrap;">
+        &#128274;&nbsp; Early Access Only
+      </div>`;
+
+    ['sf26-sticky-btn-wrap','sf26-cta-btn-wrap'].forEach(id => {
+      const wrap = document.getElementById(id);
+      if (!wrap) return;
+      const btn = wrap.querySelector('.sf26-buy-action');
+      if (btn) { btn.style.display = 'none'; }
+      if (!wrap.querySelector('.sf26-early-lock')) {
+        wrap.insertAdjacentHTML('beforeend', earlyHTML);
+      }
+    });
+
+    // Re-check if user logs in while page is open
+    sb.auth.onAuthStateChange(async (_e, session) => {
+      if (!session) return;
+      const { data: key } = await sb.from('license_keys')
+        .select('id').eq('product_id', 'sf26-model').eq('user_id', session.user.id).maybeSingle();
+      const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+      const unlocked = key || profile?.role === 'buyer' || profile?.role === 'admin';
+      if (unlocked) {
+        document.querySelectorAll('.sf26-early-lock').forEach(el => el.remove());
+        document.querySelectorAll('.sf26-buy-action').forEach(el => el.style.display = '');
+      }
+    });
+
+  } catch(e) { console.warn('SF26 gate:', e); }
 })();
 </script>
 </body>
