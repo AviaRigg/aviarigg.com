@@ -133,6 +133,49 @@ body { color: var(--text); font-family: var(--head); overflow-x: hidden; }
   line-height: 1;
 }
 
+
+/* ── HERO LOAD ANIMATION ──────────────────────────────────── */
+@keyframes sf26-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes sf26-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Image: slow fade over 1.8s */
+.sf26-hero-img {
+  animation: sf26-fade-in 1.8s cubic-bezier(0.25,0.1,0.25,1) both;
+}
+
+/* Overlay: fade in slightly after image starts */
+.sf26-hero-overlay {
+  animation: sf26-fade-in 2.2s cubic-bezier(0.25,0.1,0.25,1) both;
+}
+
+/* Text elements: stagger in after image is mostly loaded */
+.sf26-hero .sf26-eyebrow {
+  animation: sf26-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) 0.8s both;
+}
+.sf26-hero-title {
+  animation: sf26-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) 1.05s both;
+}
+.sf26-hero-desc {
+  animation: sf26-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) 1.25s both;
+}
+.sf26-hero .sf26-tags {
+  animation: sf26-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) 1.4s both;
+}
+.sf26-scroll-hint {
+  animation: sf26-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) 1.6s both;
+}
+
+/* Page header: fade in with page */
+.sf26-page-header {
+  animation: sf26-fade-in 0.6s cubic-bezier(0.25,0.1,0.25,1) 0.1s both;
+}
+
 /* ── HERO SECTION ─────────────────────────────────────────── */
 .sf26-hero {
   position: relative;
