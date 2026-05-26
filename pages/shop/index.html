@@ -1807,10 +1807,10 @@
       // Set stagger delays then reveal
       const cards = grid.querySelectorAll('.product-card');
       cards.forEach(function(card, idx) {
-        card.style.animationDelay = (idx * 0.12) + 's';
+        card.style.animationDelay = (2.35 + idx * 0.12) + 's';
       });
       grid.classList.add('cards-ready');
-    }, 2000);
+    }, 50);
   });
 
   loadObserver.observe(grid, { childList: true, subtree: true });
