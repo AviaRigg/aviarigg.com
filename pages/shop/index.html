@@ -23,51 +23,6 @@
   .page { display: block !important; }
   .nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
 
-  /* ── SHOP PAGE LOAD ANIMATIONS ───────────────────────────── */
-  @keyframes shop-fade {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-  @keyframes shop-rise {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Page header: eyebrow + title */
-  .port-header {
-    animation: shop-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.1s both;
-  }
-
-  /* Tab switcher */
-  .shop-tabs-wrap {
-    animation: shop-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.22s both;
-  }
-
-  /* Featured hero card */
-  .hero-card {
-    animation: shop-rise 1s cubic-bezier(0.25,0.1,0.25,1) 0.35s both;
-  }
-
-  /* Filter row */
-  .filter-row {
-    animation: shop-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.5s both;
-  }
-
-  /* Product grid — fade in as a whole, cards stagger via JS */
-  #product-grid {
-    animation: shop-fade 0.6s cubic-bezier(0.25,0.1,0.25,1) 0.65s both;
-  }
-
-  /* Shop notice */
-  .shop-notice {
-    animation: shop-fade 0.6s cubic-bezier(0.25,0.1,0.25,1) 0.8s both;
-  }
-
-  /* Individual product cards — stagger applied by JS after Supabase loads them */
-  .product-card.shop-card-enter {
-    animation: shop-rise 0.7s cubic-bezier(0.25,0.1,0.25,1) both;
-  }
-
   /* Override default text colour to full white */
   :root { --text: #ffffff; }
 
@@ -1113,8 +1068,15 @@
       color: rgba(255,255,255,0.15); letter-spacing: 1px;
     }
     .hero-card.no-featured {
-      cursor: default; pointer-events: none; opacity: 0.5;
+      cursor: default; pointer-events: none;
+      display: none; /* hidden from everyone by default */
     }
+    /* Admin sees the empty state, non-admins see nothing */
+    body.is-admin .hero-card.no-featured {
+      display: grid;
+      opacity: 0.5;
+    }
+    body.is-admin .hero-card.no-featured .hero-empty { display: flex; }
     .hero-card.no-featured:hover { background: var(--surface); }
     .hero-card.no-featured:hover .hero-img { transform: none; }
     /* Featured placeholder text color */
@@ -1249,7 +1211,13 @@
       });
 
       // Re-evaluate early cards when nav-auth fires (buyer role upgrade via redeem modal)
-      document.addEventListener('navAuthReady', async () => {
+      document.addEventListener('navAuthReady', async (e) => {
+        // Apply admin body class for featured empty state visibility
+        if (e.detail?.isAdmin) {
+          document.body.classList.add('is-admin');
+        } else {
+          document.body.classList.remove('is-admin');
+        }
         // Re-apply early status cards based on new role
         document.querySelectorAll('[data-product-id][data-status="early"]').forEach(card => {
           applyStatusToCard(card.dataset.productId, 'early', card, false);
@@ -1375,24 +1343,27 @@
     <div class="shop-tab-panel active" id="tab-products">
       <div class="shop-inner">
 
-      <!-- Hero featured card -->
-      <div class="hero-card" onclick="window.location.href='/pages/shop/product-f1'">
+      <!-- Hero featured card — populated dynamically by JS, empty until Supabase sets featured -->
+      <div class="hero-card no-featured" id="hero-featured-card" onclick="">
         <div class="hero-card-img">
-          <img class="hero-img" src="https://bbyiezjvonacajigqoik.supabase.co/storage/v1/object/public/images/f1-sf25/F1_Rendered.png" alt="F1 SF-25 Rig">
+          <img class="hero-img" src="" alt="" style="display:none;">
           <div class="hero-img-overlay"></div>
-          <div class="hero-card-tag">// Hard Surface · Featured</div>
+          <div class="hero-card-tag" style="display:none;"></div>
+          <div class="hero-empty admin-placeholder" style="display:none;">
+            <div class="hero-empty-label">// Admin Only</div>
+            <div class="hero-empty-text">No featured product selected</div>
+          </div>
         </div>
         <div class="hero-card-body">
-          <div class="hero-featured-label">Featured Product</div>
-          <div class="hero-cat">Maya Rig</div>
-          <div class="hero-title">Formula 1 SF-25 Livery</div>
-          <div class="hero-desc">A fully rigged F1 car for Maya. Hamilton or Leclerc livery included — choose your side very carefully.</div>
-          <div class="hero-footer">
+          <div class="hero-featured-label" style="display:none;"></div>
+          <div class="hero-cat" style="display:none;"></div>
+          <div class="hero-title" style="display:none;"></div>
+          <div class="hero-desc" style="display:none;"></div>
+          <div class="hero-footer" style="display:none;">
             <div>
-              <div class="hero-price">&#8364;19.99</div>
-              <div class="hero-price-sub">EUR · Pay what you want</div>
+              <div class="hero-price"></div>
+              <div class="hero-price-sub"></div>
             </div>
-            <a href="https://payhip.com/b/4akCM" class="shop-buy-btn" onclick="event.preventDefault();event.stopPropagation();openCheckout('https://payhip.com/b/4akCM')">Buy Now &#8594;</a>
           </div>
         </div>
       </div>
@@ -1744,32 +1715,5 @@
 
 <script src="/assets/js/shop-products.js"></script>
 <script src="/assets/js/shop-admin.js"></script>
-
-<script>
-// ── SHOP CARD STAGGER ANIMATION ───────────────────────────────
-// Watches for cards being inserted into the grid and staggers them in
-(function() {
-  const grid = document.getElementById('product-grid');
-  if (!grid) return;
-
-  const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-      mutation.addedNodes.forEach(function(node, i) {
-        if (node.nodeType !== 1) return;
-        const cards = node.classList?.contains('product-card')
-          ? [node]
-          : Array.from(node.querySelectorAll?.('.product-card') || []);
-
-        cards.forEach(function(card, idx) {
-          card.classList.add('shop-card-enter');
-          card.style.animationDelay = (0.65 + idx * 0.08) + 's';
-        });
-      });
-    });
-  });
-
-  observer.observe(grid, { childList: true, subtree: true });
-})();
-</script>
 </body>
 </html>
