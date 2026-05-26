@@ -1781,29 +1781,56 @@
 
 <script>
 // ── SHOP CARD STAGGER ─────────────────────────────────────────
+function staggerVisibleCards() {
+  const cards = document.querySelectorAll('.product-card:not([style*="display: none"]):not([style*="display:none"])');
+  cards.forEach(function(card, idx) {
+    card.style.animation = 'none';
+    card.offsetHeight; // force reflow
+    card.style.animation = '';
+    card.classList.remove('shop-card-enter');
+    void card.offsetWidth;
+    card.classList.add('shop-card-enter');
+    card.style.animationDelay = (idx * 0.07) + 's';
+  });
+}
+
+// Stagger on initial grid population via MutationObserver
 (function() {
   const grid = document.getElementById('product-grid');
   if (!grid) return;
   const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-      mutation.addedNodes.forEach(function(node) {
-        if (node.nodeType !== 1) return;
-        const cards = node.classList?.contains('product-card')
-          ? [node]
-          : Array.from(node.querySelectorAll?.('.product-card') || []);
-        cards.forEach(function(card, idx) {
-          card.classList.add('shop-card-enter');
-          card.style.animationDelay = (0.65 + idx * 0.08) + 's';
-        });
-      });
-    });
+    let added = false;
+    mutations.forEach(function(m) { if (m.addedNodes.length) added = true; });
+    if (added) staggerVisibleCards();
   });
   observer.observe(grid, { childList: true, subtree: true });
 })();
 
+// Wrap filterProducts to re-stagger after each filter
+(function() {
+  const _orig = window.filterProducts;
+  if (typeof _orig !== 'function') {
+    // filterProducts not yet defined — wait for it
+    Object.defineProperty(window, 'filterProducts', {
+      configurable: true,
+      set: function(fn) {
+        Object.defineProperty(window, 'filterProducts', { value: wrap(fn), writable: true, configurable: true });
+      }
+    });
+  } else {
+    window.filterProducts = wrap(_orig);
+  }
+
+  function wrap(fn) {
+    return function() {
+      fn.apply(this, arguments);
+      // Small delay so DOM visibility changes settle before we stagger
+      setTimeout(staggerVisibleCards, 20);
+    };
+  }
+})();
+
 // ── COMMISSIONS TAB ANIMATION ─────────────────────────────────
-// Watches for .active being added to #tab-commissions
-// Only triggers once — re-entering the tab doesn't replay
 (function() {
   const commTab = document.getElementById('tab-commissions');
   if (!commTab) return;
@@ -1812,10 +1839,7 @@
     if (!fired && commTab.classList.contains('active')) {
       fired = true;
       const wrap = commTab.querySelector('.comm-wrap');
-      if (wrap) {
-        // Small delay so the panel is fully visible before animating
-        setTimeout(() => wrap.classList.add('comm-animate'), 30);
-      }
+      if (wrap) setTimeout(() => wrap.classList.add('comm-animate'), 30);
       observer.disconnect();
     }
   });
