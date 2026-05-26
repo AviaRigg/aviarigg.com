@@ -134,6 +134,56 @@
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
+/* ── HOMEPAGE LOAD ANIMATIONS ─────────────────────────────── */
+@keyframes home-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes home-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Kicker line */
+.pf-kicker {
+  animation: home-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.1s both;
+}
+
+/* Big tagline — the hero, slightly slower */
+.pf-tagline {
+  animation: home-rise 1s cubic-bezier(0.25,0.1,0.25,1) 0.22s both;
+}
+
+/* Right side: name, bio, actions — stagger after tagline */
+.pf-name-sig {
+  animation: home-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.38s both;
+}
+.pf-bio-short {
+  animation: home-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.5s both;
+}
+.pf-actions {
+  animation: home-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.6s both;
+}
+
+/* Work cards — stagger each one */
+.pf-works .work-card:nth-child(1) {
+  animation: home-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.55s both;
+}
+.pf-works .work-card:nth-child(2) {
+  animation: home-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.68s both;
+}
+.pf-works .work-card:nth-child(3) {
+  animation: home-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.81s both;
+}
+.pf-works .work-card:nth-child(4) {
+  animation: home-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.94s both;
+}
+
+/* Hero bar — fades in last, subtly */
+.hero-bar {
+  animation: home-fade 0.9s cubic-bezier(0.25,0.1,0.25,1) 1.0s both;
+}
+
 </style>
   <script>
     document.addEventListener('touchmove', function(e) {
