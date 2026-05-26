@@ -950,12 +950,16 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close
     const { data: product } = await sb.from('shop_products').select('status').eq('id', 'sf26-model').single();
     if (!product) return;
 
-    if (product.status === 'live') {
+    if (product.status === 'live' || product.status === 'featured') {
       // Reveal buttons — they start hidden via CSS
       document.querySelectorAll('.sf26-buy-action').forEach(el => el.style.visibility = 'visible');
       return;
     }
-    if (product.status !== 'early') return;
+    if (product.status !== 'early') {
+      // Any other status (draft, hidden) — just reveal buttons, no gate
+      document.querySelectorAll('.sf26-buy-action').forEach(el => el.style.visibility = 'visible');
+      return;
+    }
 
     // Check access via navAuthReady state (already resolved by nav-auth.js)
     function hasAccess() {
