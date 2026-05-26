@@ -134,6 +134,14 @@
   document.head.appendChild(style);
 })();
 
+function dismissBanner() {
+  const banner = document.getElementById('site-banner');
+  const textEl = document.getElementById('site-banner-text');
+  if (textEl?.textContent) sessionStorage.setItem('banner_dismissed', textEl.textContent);
+  if (banner) banner.classList.remove('banner-visible');
+  document.body.classList.remove('has-banner');
+}
+
 document.addEventListener('DOMContentLoaded', async function initBanner() {
 
   if (!document.getElementById('site-banner')) {
@@ -152,6 +160,11 @@ document.addEventListener('DOMContentLoaded', async function initBanner() {
 
     document.getElementById('site-banner-close').addEventListener('click', dismissBanner);
   }
+
+  // Fallback delegation in case the above missed (race condition)
+  document.addEventListener('click', function(e) {
+    if (e.target && e.target.id === 'site-banner-close') dismissBanner();
+  });
 
   async function getSb() {
     let n = 0;
@@ -191,11 +204,3 @@ document.addEventListener('DOMContentLoaded', async function initBanner() {
     console.warn('Banner init failed:', e);
   }
 });
-
-function dismissBanner() {
-  const banner = document.getElementById('site-banner');
-  const textEl = document.getElementById('site-banner-text');
-  if (textEl?.textContent) sessionStorage.setItem('banner_dismissed', textEl.textContent);
-  if (banner) banner.classList.remove('banner-visible');
-  document.body.classList.remove('has-banner');
-}
