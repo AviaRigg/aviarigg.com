@@ -1783,7 +1783,7 @@
 // ── SHOP CARD STAGGER ─────────────────────────────────────────
 function staggerVisibleCards(isFilter) {
   const cards = document.querySelectorAll('.product-card:not([style*="display: none"]):not([style*="display:none"])');
-  const baseDelay = isFilter ? 0 : 1.1;
+  const baseDelay = isFilter ? 0 : 1.6;
   cards.forEach(function(card, idx) {
     card.style.animation = 'none';
     card.offsetHeight;
