@@ -121,16 +121,12 @@
   .shop-notice {
     animation: shop-fade 0.6s cubic-bezier(0.25,0.1,0.25,1) 1.6s both;
   }
-  /* Cards hidden by default — JS drives the reveal */
-  #product-grid .product-card {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  /* Once ready class added to grid, animate each card */
+  /* Grid hidden until JS triggers reveal */
+  #product-grid { visibility: hidden; }
+  #product-grid.cards-ready { visibility: visible; }
   #product-grid.cards-ready .product-card {
     animation: shop-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) both;
   }
-  /* Filter re-stagger — same but instant start */
   #product-grid .product-card.shop-card-enter {
     animation: shop-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) both;
   }
@@ -1784,59 +1780,70 @@
   <button id="edit-mode-btn" onclick="toggleEditMode()">✎ Edit Mode</button>
 </div>
 
-
 <script src="/assets/js/shop-products.js"></script>
 <script src="/assets/js/shop-admin.js"></script>
 
 <script>
-// ── SHOP CARD STAGGER ─────────────────────────────────────────
-function staggerVisibleCards(isFilter) {
-  const cards = document.querySelectorAll('.product-card:not([style*="display: none"]):not([style*="display:none"])');
-  const baseDelay = isFilter ? 0 : 1.6;
-  cards.forEach(function(card, idx) {
-    card.style.animation = 'none';
-    card.offsetHeight;
-    card.style.animation = '';
-    card.classList.remove('shop-card-enter');
-    void card.offsetWidth;
-    card.classList.add('shop-card-enter');
-    card.style.animationDelay = (baseDelay + idx * 0.12) + 's';
-  });
-}
-
-// Stagger on initial grid population via MutationObserver
 (function() {
   const grid = document.getElementById('product-grid');
   if (!grid) return;
-  const observer = new MutationObserver(function(mutations) {
+
+  // ── INITIAL LOAD ──────────────────────────────────────────────
+  // Grid starts visibility:hidden via CSS.
+  // Watch for cards added by shop-products.js, debounce,
+  // then after 2s delay reveal grid with staggered cards.
+  let debounce = null;
+  let initialDone = false;
+
+  const loadObserver = new MutationObserver(function(mutations) {
+    if (initialDone) return;
     let added = false;
     mutations.forEach(function(m) { if (m.addedNodes.length) added = true; });
-    if (added) staggerVisibleCards(false);
+    if (!added) return;
+    clearTimeout(debounce);
+    debounce = setTimeout(function() {
+      initialDone = true;
+      loadObserver.disconnect();
+      // Set stagger delays then reveal
+      const cards = grid.querySelectorAll('.product-card');
+      cards.forEach(function(card, idx) {
+        card.style.animationDelay = (idx * 0.12) + 's';
+      });
+      grid.classList.add('cards-ready');
+    }, 2000);
   });
-  observer.observe(grid, { childList: true, subtree: true });
-})();
 
-// Wrap filterProducts to re-stagger after each filter
-(function() {
-  const _orig = window.filterProducts;
-  if (typeof _orig !== 'function') {
-    // filterProducts not yet defined — wait for it
+  loadObserver.observe(grid, { childList: true, subtree: true });
+
+  // ── FILTER RE-STAGGER ─────────────────────────────────────────
+  function staggerFilter() {
+    const cards = Array.from(grid.querySelectorAll('.product-card')).filter(function(c) {
+      return getComputedStyle(c).display !== 'none';
+    });
+    cards.forEach(function(card, idx) {
+      card.classList.remove('shop-card-enter');
+      void card.offsetWidth;
+      card.style.animationDelay = (idx * 0.12) + 's';
+      card.classList.add('shop-card-enter');
+    });
+  }
+
+  function wrapFilter(fn) {
+    return function() {
+      fn.apply(this, arguments);
+      setTimeout(staggerFilter, 20);
+    };
+  }
+
+  if (typeof window.filterProducts === 'function') {
+    window.filterProducts = wrapFilter(window.filterProducts);
+  } else {
     Object.defineProperty(window, 'filterProducts', {
       configurable: true,
       set: function(fn) {
-        Object.defineProperty(window, 'filterProducts', { value: wrap(fn), writable: true, configurable: true });
+        Object.defineProperty(window, 'filterProducts', { value: wrapFilter(fn), writable: true, configurable: true });
       }
     });
-  } else {
-    window.filterProducts = wrap(_orig);
-  }
-
-  function wrap(fn) {
-    return function() {
-      fn.apply(this, arguments);
-      // Small delay so DOM visibility changes settle before we stagger
-      setTimeout(() => staggerVisibleCards(true), 20);
-    };
   }
 })();
 
