@@ -85,7 +85,70 @@
   }
 
   .shop-tab-panel { display: none; }
-  .shop-tab-panel.active { display: block; animation: pgIn 0.25s ease; padding-top: 40px; }
+  .shop-tab-panel.active { display: block; padding-top: 40px; }
+
+  /* ── SHOP PAGE LOAD ANIMATIONS ───────────────────────────── */
+  @keyframes shop-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes shop-rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Page header */
+  .port-header {
+    animation: shop-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.1s both;
+  }
+  /* Tab switcher */
+  .shop-tabs-wrap {
+    animation: shop-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.22s both;
+  }
+  /* Featured hero card */
+  .hero-card {
+    animation: shop-rise 1s cubic-bezier(0.25,0.1,0.25,1) 0.35s both;
+  }
+  /* Filter row */
+  .filter-row {
+    animation: shop-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.5s both;
+  }
+  /* Product grid */
+  #product-grid {
+    animation: shop-fade 0.6s cubic-bezier(0.25,0.1,0.25,1) 0.65s both;
+  }
+  /* Shop notice */
+  .shop-notice {
+    animation: shop-fade 0.6s cubic-bezier(0.25,0.1,0.25,1) 0.8s both;
+  }
+  /* Product cards stagger — set by JS */
+  .product-card.shop-card-enter {
+    animation: shop-rise 0.7s cubic-bezier(0.25,0.1,0.25,1) both;
+  }
+
+  /* ── TAB SWITCH — products tab ── */
+  #tab-products.active {
+    animation: shop-rise 0.5s cubic-bezier(0.25,0.1,0.25,1) both;
+  }
+
+  /* ── COMMISSIONS TAB — only fires when tab becomes active ── */
+  /* Elements start hidden, JS adds .comm-animate to trigger stagger */
+  .comm-wrap .comm-step,
+  .comm-wrap .comm-tiers-grid,
+  .comm-wrap .comm-talk-banner,
+  .comm-wrap .comm-faq-block,
+  .comm-wrap .comm-avail-row {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: none;
+  }
+  .comm-wrap.comm-animate .comm-step:nth-child(1) { animation: shop-rise 0.7s cubic-bezier(0.25,0.1,0.25,1) 0.05s both; }
+  .comm-wrap.comm-animate .comm-step:nth-child(2) { animation: shop-rise 0.7s cubic-bezier(0.25,0.1,0.25,1) 0.15s both; }
+  .comm-wrap.comm-animate .comm-step:nth-child(3) { animation: shop-rise 0.7s cubic-bezier(0.25,0.1,0.25,1) 0.25s both; }
+  .comm-wrap.comm-animate .comm-tiers-grid        { animation: shop-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.3s both; }
+  .comm-wrap.comm-animate .comm-talk-banner       { animation: shop-rise 0.7s cubic-bezier(0.25,0.1,0.25,1) 0.45s both; }
+  .comm-wrap.comm-animate .comm-faq-block         { animation: shop-rise 0.7s cubic-bezier(0.25,0.1,0.25,1) 0.55s both; }
+  .comm-wrap.comm-animate .comm-avail-row         { animation: shop-rise 0.7s cubic-bezier(0.25,0.1,0.25,1) 0.0s both; }
   /* ══════════════════════════════════════════
      OPTION A — PRODUCTS TAB
   ══════════════════════════════════════════ */
@@ -1715,5 +1778,49 @@
 
 <script src="/assets/js/shop-products.js"></script>
 <script src="/assets/js/shop-admin.js"></script>
+
+<script>
+// ── SHOP CARD STAGGER ─────────────────────────────────────────
+(function() {
+  const grid = document.getElementById('product-grid');
+  if (!grid) return;
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      mutation.addedNodes.forEach(function(node) {
+        if (node.nodeType !== 1) return;
+        const cards = node.classList?.contains('product-card')
+          ? [node]
+          : Array.from(node.querySelectorAll?.('.product-card') || []);
+        cards.forEach(function(card, idx) {
+          card.classList.add('shop-card-enter');
+          card.style.animationDelay = (0.65 + idx * 0.08) + 's';
+        });
+      });
+    });
+  });
+  observer.observe(grid, { childList: true, subtree: true });
+})();
+
+// ── COMMISSIONS TAB ANIMATION ─────────────────────────────────
+// Watches for .active being added to #tab-commissions
+// Only triggers once — re-entering the tab doesn't replay
+(function() {
+  const commTab = document.getElementById('tab-commissions');
+  if (!commTab) return;
+  let fired = false;
+  const observer = new MutationObserver(function() {
+    if (!fired && commTab.classList.contains('active')) {
+      fired = true;
+      const wrap = commTab.querySelector('.comm-wrap');
+      if (wrap) {
+        // Small delay so the panel is fully visible before animating
+        setTimeout(() => wrap.classList.add('comm-animate'), 30);
+      }
+      observer.disconnect();
+    }
+  });
+  observer.observe(commTab, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
 </body>
 </html>
