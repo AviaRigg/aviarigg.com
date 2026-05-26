@@ -23,6 +23,248 @@
 <style>
   .page { display: block !important; }
   .nav-logo, .nav-link, .nav-badge, .nav-drawer a { text-decoration: none; }
+
+  /* ── LOAD ANIMATIONS ─────────────────────────────────────── */
+  @keyframes ab-fade { from { opacity:0; } to { opacity:1; } }
+  @keyframes ab-rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+  .eyebrow       { animation: ab-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.1s both; }
+  .section-h     { animation: ab-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.2s both; }
+  .about-photo-col { animation: ab-rise 1s cubic-bezier(0.25,0.1,0.25,1) 0.3s both; }
+  .about-content > div:nth-child(1) { animation: ab-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.4s both; }
+  .about-content > div:nth-child(2) { animation: ab-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.52s both; }
+  .about-content > div:nth-child(3) { animation: ab-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.64s both; }
+  .about-content > div:nth-child(4) { animation: ab-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.76s both; }
+  .about-content > div:nth-child(5) { animation: ab-rise 0.8s cubic-bezier(0.25,0.1,0.25,1) 0.88s both; }
+
+  /* ── LAYOUT ──────────────────────────────────────────────── */
+  .about-wrap {
+    padding: clamp(48px,6vw,100px) clamp(32px,7vw,120px);
+    max-width: 100%;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: clamp(48px,6vw,120px);
+    margin-top: 40px;
+    align-items: start;
+  }
+
+  /* Sticky sidebar */
+  .about-photo-col {
+    position: sticky;
+    top: calc(var(--nav-h) + 32px);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  /* ── PHOTO ───────────────────────────────────────────────── */
+  .about-photo {
+    width: 100%;
+    max-width: 280px;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    object-position: center top;
+    border: 1px solid rgba(139,79,200,0.4);
+    filter: grayscale(15%);
+    display: block;
+  }
+
+  /* ── NAME / HANDLE ───────────────────────────────────────── */
+  .about-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(20px, 1.8vw, 28px);
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 1px;
+    margin-bottom: 0;
+  }
+  .about-handle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(9px, 0.7vw, 12px);
+    color: var(--accent2);
+    letter-spacing: 3px;
+    margin-top: -8px;
+  }
+
+  /* ── SOCIAL LINKS ────────────────────────────────────────── */
+  .about-links { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+
+  .alink {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 2px solid transparent;
+    text-decoration: none;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(9px, 0.7vw, 11px);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .alink:hover {
+    border-left-color: var(--accent2);
+    color: var(--text-bright);
+    background: var(--surface2);
+    padding-left: 18px;
+  }
+  .alink-icon { color: var(--accent2); font-size: 12px; flex-shrink: 0; }
+
+  /* ── CONTENT SECTIONS ────────────────────────────────────── */
+  .about-content { display: flex; flex-direction: column; gap: 56px; }
+
+  .about-section-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(9px, 0.7vw, 11px);
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .about-section-title::before { content: '//'; color: var(--accent); font-size: inherit; }
+
+  .about-text {
+    font-size: clamp(14px, 1.05vw, 16px);
+    line-height: 2;
+    color: rgba(255,255,255,0.75);
+    font-weight: 300;
+    margin-bottom: 14px;
+  }
+  .about-text:last-of-type { margin-bottom: 0; }
+
+  /* ── SKILL CHIPS ─────────────────────────────────────────── */
+  .skill-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .chip {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(8px, 0.65vw, 10px);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    border: 1px solid rgba(176,110,245,0.25);
+    background: rgba(176,110,245,0.06);
+    padding: 5px 14px;
+    transition: all 0.2s;
+  }
+  .chip:hover { background: rgba(176,110,245,0.12); border-color: rgba(176,110,245,0.5); }
+
+  /* ── LANGUAGE ROWS ───────────────────────────────────────── */
+  .lang-list { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); }
+  .lang-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(12px,1.2vw,18px) clamp(16px,1.6vw,24px);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+  .lang-row:last-child { border-bottom: none; }
+  .lang-row:hover { background: var(--surface2); }
+  .lang-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(15px, 1.3vw, 19px);
+    font-weight: 600;
+    color: var(--text-bright);
+    letter-spacing: 0.5px;
+  }
+  .lang-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(8px, 0.65vw, 10px);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border: 1px solid;
+  }
+  .lb-native  { color: #c084fc; border-color: rgba(192,132,252,0.4); background: rgba(192,132,252,0.06); }
+  .lb-fluent  { color: #a78bfa; border-color: rgba(167,139,250,0.4); background: rgba(167,139,250,0.06); }
+  .lb-reading { color: #9988bb; border-color: rgba(153,136,187,0.4); background: rgba(153,136,187,0.06); }
+
+  /* ── TIMELINE ────────────────────────────────────────────── */
+  .timeline { display: flex; flex-direction: column; }
+
+  .tl-item {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 24px;
+    padding: clamp(20px,2vw,32px) 0;
+    border-bottom: 1px solid rgba(139,79,200,0.1);
+    position: relative;
+  }
+  .tl-item:first-child { border-top: 1px solid rgba(139,79,200,0.1); }
+  .tl-item:last-child { border-bottom: none; }
+
+  /* Accent dot on timeline */
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: 72px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  .tl-year {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(9px, 0.75vw, 11px);
+    letter-spacing: 2px;
+    color: var(--accent);
+    padding-top: 3px;
+    text-align: right;
+    flex-shrink: 0;
+    opacity: 0.8;
+  }
+
+  .tl-body { display: flex; flex-direction: column; gap: 5px; padding-left: 16px; }
+
+  .tl-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(16px, 1.4vw, 22px);
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 0.5px;
+  }
+
+  .tl-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(9px, 0.75vw, 11px);
+    letter-spacing: 2px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .tl-desc {
+    font-size: clamp(12px, 0.95vw, 14px);
+    color: rgba(255,255,255,0.55);
+    line-height: 1.75;
+    margin-top: 8px;
+    font-weight: 300;
+  }
+
+  /* ── MOBILE ──────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .about-grid { grid-template-columns: 1fr; gap: 40px; margin-top: 24px; }
+    .about-photo-col { position: static; flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: 20px; }
+    .about-photo { max-width: 120px; aspect-ratio: 1; }
+    .about-wrap { padding: 32px 20px; }
+    .about-content { gap: 40px; }
+    .tl-item::before { display: none; }
+  }
 </style>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
