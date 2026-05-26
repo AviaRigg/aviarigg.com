@@ -37,6 +37,7 @@
       );
       animation: banner-scan 4s ease-in-out infinite;
       pointer-events: none;
+      z-index: 0;
     }
     @keyframes banner-scan {
       0%   { left: -60%; }
@@ -121,6 +122,8 @@
       line-height: 1.4;
       flex-shrink: 0;
       transition: color 0.15s, border-color 0.15s;
+      pointer-events: auto;
+      z-index: 10;
     }
     #site-banner-close:hover {
       color: rgba(255,255,255,0.75);
