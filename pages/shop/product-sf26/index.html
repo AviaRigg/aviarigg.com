@@ -900,9 +900,10 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close
     let n = 0;
     while (typeof _navSb === 'undefined' && n++ < 40) await new Promise(r => setTimeout(r, 50));
     const sb = _navSb;
-    const { data } = await sb.from('shop_products').select('price, sale_price, payhip_url').eq('id', 'sf26-model').single();
-    if (!data || !data.price) return;
-    const { price, sale_price } = data;
+    const { data } = await sb.from('shop_products').select('price, sale_price, buy_url').eq('id', 'sf26-model').single();
+    if (!data || (!data.price && !data.sale_price)) return;
+    const price = data.price || null;
+    const sale_price = data.sale_price || null;
 
     function parseNum(s) { return parseFloat(String(s||'').replace(/[^0-9.]/g,'')) || 0; }
     function pct(p, s) { const a = parseNum(p), b = parseNum(s); return (a && b && b < a) ? Math.round((1-b/a)*100) : 0; }
@@ -926,8 +927,8 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close
     });
 
     // Update Payhip URLs from Supabase
-    if (data.payhip_url) {
-      const url = data.payhip_url;
+    if (data.buy_url) {
+      const url = data.buy_url;
       document.querySelectorAll('.sf26-buy-action').forEach(btn => {
         btn.href = url;
         btn.setAttribute('onclick', `event.preventDefault();openCheckout('${url}')`);
