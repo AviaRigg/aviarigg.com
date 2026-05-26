@@ -68,10 +68,25 @@
       z-index: 1;
     }
 
+    #site-banner-text {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(9px, 0.75vw, 14px);
+      letter-spacing: clamp(1px, 0.2vw, 4px);
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: 60%;
+      text-align: center;
+    }
+
     #site-banner-tag {
       font-family: 'Share Tech Mono', monospace;
       font-size: clamp(8px, 0.6vw, 12px);
-      letter-spacing: clamp(2px, 0.25vw, 4px);
+      letter-spacing: clamp(1px, 0.25vw, 4px);
       text-transform: uppercase;
       color: var(--accent2, #b06ef5);
       background: rgba(139,79,200,0.2);
@@ -91,19 +106,13 @@
       animation: blink 2s ease-in-out infinite;
     }
 
-    #site-banner-text {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: clamp(9px, 0.75vw, 14px);
-      letter-spacing: clamp(2px, 0.2vw, 4px);
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.85);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      /* Don't let it stretch — keep text centered in the row */
-      flex: 0 1 auto;
-      max-width: 70%;
-      text-align: center;
+    @media (max-width: 768px) {
+      #site-banner { overflow: hidden; }
+      #site-banner-inner { padding: 0 44px 0 12px; gap: 6px; justify-content: flex-start; }
+      #site-banner-tag { display: none; }
+      #site-banner-dot { display: none; }
+      #site-banner-text { max-width: calc(100% - 20px); font-size: 9px; letter-spacing: 1.5px; text-align: left; flex: 1 1 0; min-width: 0; }
+      #site-banner-close { right: 10px; }
     }
 
     #site-banner-close {
