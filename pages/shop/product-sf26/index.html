@@ -935,58 +935,46 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close
 
     // Fetch product status
     const { data: product } = await sb.from('shop_products').select('status').eq('id', 'sf26-model').single();
-    if (!product) return;
-    const status = product.status;
+    if (!product || product.status === 'live') return;
+    if (product.status !== 'early') return;
 
-    // If live — nothing to do, buttons stay as-is
-    if (status === 'live') return;
-
-    // If early — check if user has a license key
-    let hasAccess = false;
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      const { data: key } = await sb.from('license_keys')
-        .select('id').eq('product_id', 'sf26-model').eq('user_id', session.user.id).maybeSingle();
-      if (key) hasAccess = true;
-      // Also check buyer role
-      const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
-      if (profile?.role === 'buyer' || profile?.role === 'admin') hasAccess = true;
+    // Check access via navAuthReady state (already resolved by nav-auth.js)
+    function hasAccess() {
+      return window._navIsBuyer || window._navIsAdmin;
     }
 
-    if (hasAccess) return;
+    function applyLock() {
+      if (hasAccess()) return;
+      ['sf26-sticky-btn-wrap', 'sf26-cta-btn-wrap'].forEach(id => {
+        const wrap = document.getElementById(id);
+        if (!wrap) return;
+        const buyBtn = wrap.querySelector('.sf26-buy-action');
+        if (buyBtn) buyBtn.style.display = 'none';
+        if (!wrap.querySelector('.sf26-redeem-btn')) {
+          const btn = document.createElement('button');
+          btn.className = 'product-buy-btn sf26-redeem-btn';
+          btn.innerHTML = '&#128274;&nbsp; Redeem Key';
+          btn.style.cssText = 'cursor:pointer;white-space:nowrap;background:rgba(139,79,200,0.12);border:1px solid rgba(139,79,200,0.5);';
+          btn.addEventListener('click', function() { _openRedeemModal(); });
+          wrap.appendChild(btn);
+        }
+      });
+    }
 
-    // Apply early lock overlay to both button wrappers
-    const earlyHTML = `
-      <div class="sf26-early-lock" style="
-        display:inline-flex;align-items:center;gap:8px;
-        font-family:'Share Tech Mono',monospace;font-size:10px;
-        letter-spacing:3px;text-transform:uppercase;
-        color:#b06ef5;border:1px solid rgba(176,110,245,0.4);
-        background:rgba(176,110,245,0.08);padding:10px 20px;
-        cursor:default;white-space:nowrap;">
-        &#128274;&nbsp; Early Access Only
-      </div>`;
+    function removeLock() {
+      document.querySelectorAll('.sf26-redeem-btn').forEach(el => el.remove());
+      document.querySelectorAll('.sf26-buy-action').forEach(el => el.style.display = '');
+    }
 
-    ['sf26-sticky-btn-wrap','sf26-cta-btn-wrap'].forEach(id => {
-      const wrap = document.getElementById(id);
-      if (!wrap) return;
-      const btn = wrap.querySelector('.sf26-buy-action');
-      if (btn) { btn.style.display = 'none'; }
-      if (!wrap.querySelector('.sf26-early-lock')) {
-        wrap.insertAdjacentHTML('beforeend', earlyHTML);
-      }
-    });
+    // Apply on load
+    applyLock();
 
-    // Re-check if user logs in while page is open
-    sb.auth.onAuthStateChange(async (_e, session) => {
-      if (!session) return;
-      const { data: key } = await sb.from('license_keys')
-        .select('id').eq('product_id', 'sf26-model').eq('user_id', session.user.id).maybeSingle();
-      const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
-      const unlocked = key || profile?.role === 'buyer' || profile?.role === 'admin';
-      if (unlocked) {
-        document.querySelectorAll('.sf26-early-lock').forEach(el => el.remove());
-        document.querySelectorAll('.sf26-buy-action').forEach(el => el.style.display = '');
+    // React to navAuthReady — fires on login, redeem success, logout
+    document.addEventListener('navAuthReady', function(e) {
+      if (e.detail.isBuyer || e.detail.isAdmin) {
+        removeLock();
+      } else {
+        applyLock();
       }
     });
 
