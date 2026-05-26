@@ -5,7 +5,14 @@
 
 const _NAV_SB_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
 const _NAV_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJieWllemp2b25hY2FqaWdxb2lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMTI0MTcsImV4cCI6MjA5NDY4ODQxN30.TbSdKC1qXcGTpyEmILfPlZi_z1RrTR1-SPCFjE-1mLs';
-const _navSb = supabase.createClient(_NAV_SB_URL, _NAV_SB_KEY);
+const _navSb = supabase.createClient(_NAV_SB_URL, _NAV_SB_KEY, {
+  auth: {
+    storageKey: 'aviarigg-auth',
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+  }
+});
 let _navUser = null, _navProfile = null;
 
 async function _initNavAuth() {
@@ -210,12 +217,6 @@ function _injectRedeemModal() {
 }
 
 function _openRedeemModal() {
-  // Not logged in — redirect to login with return URL
-  if (!_navUser) {
-    window.location.href = '/pages/login?redirect=' + encodeURIComponent(window.location.pathname);
-    return;
-  }
-
   // Close nav dropdown first
   const dd = document.getElementById('nav-user-dropdown');
   if (dd) dd.classList.remove('open');

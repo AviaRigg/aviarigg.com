@@ -547,59 +547,8 @@ body { color: var(--text); font-family: var(--head); overflow-x: hidden; }
   <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
   <script src="/assets/js/status.js"></script>
   <script src="/assets/js/nav.js"></script>
-  <!-- Supabase + product availability check -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/assets/js/product-check.js"></script>
-  <!-- Nav auth styles -->
-<!-- Nav auth script -->
-  <script>
-    const SUPABASE_URL = 'https://bbyiezjvonacajigqoik.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_cINDYla6QRiEpRWunZVFqQ_E5q2LqHb';
-    const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    let currentUser = null, currentProfile = null, isAdmin = false;
-
-    async function initAuth() {
-      const { data: { session } } = await _sb.auth.getSession();
-      if (session) await handleSession(session.user);
-      _sb.auth.onAuthStateChange(async (_e, session) => {
-        if (session) await handleSession(session.user);
-        else { currentUser = null; currentProfile = null; isAdmin = false; updateNavAuth(); }
-      });
-    }
-    async function handleSession(user) {
-      currentUser = user;
-      const { data: profile } = await _sb.from('profiles').select('role, username').eq('id', user.id).single();
-      currentProfile = profile; isAdmin = profile?.role === 'admin';
-      updateNavAuth();
-    }
-    function updateNavAuth() {
-      const c = document.getElementById('nav-auth-container');
-      if (!c) return;
-      if (currentUser) {
-        const name = currentProfile?.username || currentUser.email.split('@')[0];
-        c.innerHTML = `<div class="nav-user-wrap"><button class="nav-user-btn" onclick="toggleUserMenu(event)"><span class="nav-user-dot"></span>${name}<span class="nav-user-caret">&#9660;</span></button><div class="nav-user-dropdown" id="nav-user-dropdown"><div class="nav-user-email">${currentUser.email}</div><a class="nav-dropdown-item" href="#">My Profile</a><button class="nav-dropdown-item" onclick="handleLogout()">Log Out</button><button class="nav-dropdown-item nav-dropdown-danger" onclick="handleDeleteAccount()">Delete Account</button></div></div>`;
-      } else {
-        c.innerHTML = '<a class="nav-auth-link" href="/pages/login">Log In</a>';
-      }
-    }
-    function toggleUserMenu(e) {
-      e.stopPropagation();
-      const dd = document.getElementById('nav-user-dropdown');
-      if (dd) dd.classList.toggle('open');
-    }
-    document.addEventListener('click', () => { const dd = document.getElementById('nav-user-dropdown'); if (dd) dd.classList.remove('open'); });
-    async function handleLogout() { await _sb.auth.signOut(); window.location.href = '/'; }
-    async function handleDeleteAccount() {
-      if (!confirm('Delete your account? This cannot be undone.')) return;
-      await _sb.from('profiles').delete().eq('id', currentUser.id);
-      await _sb.auth.signOut(); window.location.href = '/';
-    }
-    document.addEventListener('DOMContentLoaded', initAuth);
-  </script>
-  </script>
-  <script>
-    </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/assets/js/nav-auth.js"></script>
   <script src="/assets/js/banner.js"></script>
 
