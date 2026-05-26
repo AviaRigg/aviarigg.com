@@ -121,9 +121,7 @@
   .shop-notice {
     animation: shop-fade 0.6s cubic-bezier(0.25,0.1,0.25,1) 1.6s both;
   }
-  /* Product cards — hidden until grid is ready */
-  .product-card { opacity: 0; }
-  /* Once JS adds shop-card-enter, the animation takes over */
+  /* Product cards stagger — set by JS */
   .product-card.shop-card-enter {
     animation: shop-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) both;
   }
@@ -1804,7 +1802,7 @@ function staggerVisibleCards(isFilter) {
   const observer = new MutationObserver(function(mutations) {
     let added = false;
     mutations.forEach(function(m) { if (m.addedNodes.length) added = true; });
-    if (added) setTimeout(() => staggerVisibleCards(false), 1050);
+    if (added) staggerVisibleCards(false);
   });
   observer.observe(grid, { childList: true, subtree: true });
 })();
