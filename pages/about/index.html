@@ -76,7 +76,7 @@
   /* ── NAME / HANDLE ───────────────────────────────────────── */
   .about-name {
     font-family: 'Rajdhani', sans-serif;
-    font-size: clamp(20px, 1.8vw, 28px);
+    font-size: clamp(20px, 1.8vw, 38px);
     font-weight: 700;
     color: var(--text-bright);
     letter-spacing: 1px;
@@ -84,7 +84,7 @@
   }
   .about-handle {
     font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(9px, 0.7vw, 12px);
+    font-size: clamp(9px, 0.7vw, 16px);
     color: var(--accent2);
     letter-spacing: 3px;
     margin-top: -8px;
@@ -104,7 +104,7 @@
     text-decoration: none;
     color: var(--text-dim);
     font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(9px, 0.7vw, 11px);
+    font-size: clamp(9px, 0.7vw, 15px);
     letter-spacing: 2px;
     text-transform: uppercase;
     transition: all 0.2s;
@@ -122,7 +122,7 @@
 
   .about-section-title {
     font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(9px, 0.7vw, 11px);
+    font-size: clamp(9px, 0.7vw, 15px);
     letter-spacing: 4px;
     color: var(--accent);
     text-transform: uppercase;
@@ -136,7 +136,7 @@
   .about-section-title::before { content: '//'; color: var(--accent); font-size: inherit; }
 
   .about-text {
-    font-size: clamp(14px, 1.05vw, 16px);
+    font-size: clamp(14px, 1.05vw, 22px);
     line-height: 2;
     color: rgba(255,255,255,0.75);
     font-weight: 300;
@@ -148,7 +148,7 @@
   .skill-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
   .chip {
     font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(8px, 0.65vw, 10px);
+    font-size: clamp(8px, 0.65vw, 14px);
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--accent2);
@@ -173,17 +173,17 @@
   .lang-row:hover { background: var(--surface2); }
   .lang-name {
     font-family: 'Rajdhani', sans-serif;
-    font-size: clamp(15px, 1.3vw, 19px);
+    font-size: clamp(15px, 1.3vw, 26px);
     font-weight: 600;
     color: var(--text-bright);
     letter-spacing: 0.5px;
   }
   .lang-badge {
     font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(8px, 0.65vw, 10px);
+    font-size: clamp(8px, 0.65vw, 13px);
     letter-spacing: 2px;
     text-transform: uppercase;
-    padding: 4px 12px;
+    padding: clamp(4px,0.4vw,8px) clamp(12px,1vw,20px);
     border: 1px solid;
   }
   .lb-native  { color: #c084fc; border-color: rgba(192,132,252,0.4); background: rgba(192,132,252,0.06); }
@@ -220,7 +220,7 @@
 
   .tl-year {
     font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(9px, 0.75vw, 11px);
+    font-size: clamp(9px, 0.75vw, 14px);
     letter-spacing: 2px;
     color: var(--accent);
     padding-top: 3px;
@@ -233,7 +233,7 @@
 
   .tl-title {
     font-family: 'Rajdhani', sans-serif;
-    font-size: clamp(16px, 1.4vw, 22px);
+    font-size: clamp(16px, 1.4vw, 30px);
     font-weight: 700;
     color: var(--text-bright);
     letter-spacing: 0.5px;
@@ -241,7 +241,7 @@
 
   .tl-sub {
     font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(9px, 0.75vw, 11px);
+    font-size: clamp(9px, 0.75vw, 14px);
     letter-spacing: 2px;
     color: var(--accent2);
     text-transform: uppercase;
@@ -249,7 +249,7 @@
   }
 
   .tl-desc {
-    font-size: clamp(12px, 0.95vw, 14px);
+    font-size: clamp(12px, 0.95vw, 18px);
     color: rgba(255,255,255,0.55);
     line-height: 1.75;
     margin-top: 8px;
