@@ -3130,7 +3130,7 @@ body::before {
   .pf-works {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: 1fr 1fr;
     width: 100%;
     min-width: unset;
     overflow: visible;
@@ -3351,7 +3351,7 @@ body::before {
   .pf-works {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: 1fr 1fr;
     overflow: visible;
     width: 100%;
     margin: 0;
@@ -3365,7 +3365,7 @@ body::before {
     flex: unset;
     min-width: unset;
     width: 100%;
-    min-height: 200px;
+    height: 220px;
     scroll-snap-align: unset;
     border-right: none;
   }
