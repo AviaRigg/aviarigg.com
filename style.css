@@ -3121,6 +3121,25 @@ body::before {
 
   /* Hero bar items wrap */
   .hero-bar { flex-wrap: wrap; }
+
+  /* Home cards — 2x2 grid instead of horizontal scroll */
+  .pf-works-wrap {
+    overflow: visible;
+    padding: 0 12px;
+  }
+  .pf-works {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    width: 100%;
+    min-width: unset;
+    overflow: visible;
+  }
+  .work-card {
+    min-width: unset;
+    width: 100%;
+    min-height: 180px;
+  }
 }
 
 /* ══════════════════════════════════════════
