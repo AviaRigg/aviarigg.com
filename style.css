@@ -3347,28 +3347,27 @@ body::before {
   .pf-actions .btn-primary,
   .pf-actions .btn-ghost { width: 100%; justify-content: center; }
 
-  /* Cards: horizontal scroll, 2 visible at once */
+  /* Cards: 2x2 grid */
   .pf-works {
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    overflow: visible;
     width: 100%;
     margin: 0;
-    gap: 0;
+    gap: 1px;
     background: var(--border);
     scrollbar-width: none;
   }
   .pf-works::-webkit-scrollbar { display: none; }
 
   .work-card {
-    flex: 0 0 75vw;
-    min-width: 75vw;
-    min-height: 240px;
-    scroll-snap-align: start;
-    border-right: 1px solid var(--border);
+    flex: unset;
+    min-width: unset;
+    width: 100%;
+    min-height: 200px;
+    scroll-snap-align: unset;
+    border-right: none;
   }
   .work-card:last-child { border-right: none; }
 
@@ -3378,21 +3377,11 @@ body::before {
   .wcg-contact { width: 70px; height: 70px; }
   .wcg-rig { width: 40px; height: 70px; }
 
-  /* Scroll hint indicator */
+  /* Remove swipe hint */
   .pf-works-wrap { position: relative; }
-  .pf-works-wrap::after {
-    content: '← swipe →';
-    display: block;
-    text-align: center;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    padding: 8px 0;
-    border-top: 1px solid var(--border);
-    background: var(--bg);
-  }
+  .pf-works-wrap::after { display: none; }
+
+
 
   .hero-pf .hero-bar {
     flex-direction: column;
@@ -3406,7 +3395,7 @@ body::before {
 }
 
 @media (max-width: 480px) {
-  .work-card { flex: 0 0 85vw; min-width: 85vw; }
+  .work-card { flex: unset; min-width: unset; }
 }
 
 /* ══════════════════════════════════════════
