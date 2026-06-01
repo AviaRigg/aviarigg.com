@@ -241,6 +241,44 @@
   .success-footer a:hover {
     text-decoration: underline;
   }
+
+  .success-license {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--green);
+    padding: 22px 24px;
+    margin-bottom: 36px;
+    text-align: left;
+  }
+
+  .license-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 12px;
+  }
+
+  .license-format {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--green);
+    margin-bottom: 14px;
+    word-break: break-all;
+  }
+
+  .license-note {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* 4K readability — container cap only */
+  @media (min-width: 2560px) {
+    .success-wrap { max-width: 720px; }
+  }
 </style>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RYTKYEPJG2"></script>
@@ -272,10 +310,16 @@
       Thanks for your purchase — your download link and receipt have been sent to your email. Check your spam folder if you don't see it within a few minutes.
     </p>
 
+    <div class="success-license">
+      <div class="license-label">// Your License Key</div>
+      <div class="license-format">AVIA-XXXX-XXXX-XXXX</div>
+      <p class="license-note">A license key in this format was included in your confirmation email. Keep it somewhere safe — it verifies your purchase and is what you'll use to redeem access at aviarigg.com.</p>
+    </div>
+
     <div class="success-steps">
       <div class="success-step">
         <span class="step-num">01</span>
-        <span class="step-text"><strong>Check your email</strong> — your download link was sent immediately after payment.</span>
+        <span class="step-text"><strong>Check your email</strong> — your download link and license key were sent immediately after payment.</span>
       </div>
       <div class="success-step">
         <span class="step-num">02</span>
