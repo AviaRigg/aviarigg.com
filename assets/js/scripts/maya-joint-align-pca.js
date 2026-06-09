@@ -1,5 +1,5 @@
 window.LIB_SCRIPT_DATA = window.LIB_SCRIPT_DATA || {};
-window.LIB_SCRIPT_DATA['maya-wheel-joint-align'] = {
+window.LIB_SCRIPT_DATA['maya-joint-align-pca'] = {
   name: 'Joint Align to Mesh (PCA)',
   category: 'Maya',
   tags: ['maya', 'rigging', 'joint', 'pca', 'freeze transform', 'orient', 'disc', 'rotation', 'python'],
