@@ -687,6 +687,9 @@
 .cat-shape     { background:rgba(0,200,255,0.08);  color:#00c8ff; border-color:rgba(0,200,255,0.2); }
 .cat-uvs       { background:rgba(0,180,255,0.08);  color:#00b4ff; border-color:rgba(0,180,255,0.2); }
 .cat-reference { background:rgba(255,255,255,0.04);color:#888899; border-color:rgba(255,255,255,0.12); }
+.cat-blender   { background:rgba(234,124,40,0.08);  color:#ea7c28; border-color:rgba(234,124,40,0.25); }
+.cat-rigging   { background:rgba(255,80,120,0.08);  color:#ff5078; border-color:rgba(255,80,120,0.25); }
+
 /* ══════════════════════════════════════════
    4K SCALING — zoom on html element
    Makes 4K render at 1080p proportions
@@ -695,5 +698,4 @@
   html {
     zoom: 1;
   }
-  .cat-blender { background: rgba(234,124,40,0.15); color: #ea7c28; border-color: rgba(234,124,40,0.3); }
 }
