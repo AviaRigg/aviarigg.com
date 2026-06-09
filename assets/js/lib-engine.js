@@ -17,6 +17,7 @@ const CAT_CLASS = {
   'UVs':               'cat-uvs',
   'Reference':         'cat-reference',
   'Blender':           'cat-blender',
+  'Rigging':           'cat-rigging',
 };
 
 const CAT_SHORT = {
@@ -28,6 +29,7 @@ const CAT_SHORT = {
   'UVs':               'UVS',
   'Reference':         'REFERENCE',
   'Blender':           'BLENDER',
+  'Rigging':           'RIGGING',
 };
 
 // State
