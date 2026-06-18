@@ -25,7 +25,7 @@ window.LIB_SCRIPT_DATA['naming-conventions'] = {
     { title: 'Deformers',              rows: [['Skin Cluster','sc'],['Blendshape','bs'],['Cluster','cls'],['Lattice','lat'],['Wrap','wrap'],['Delta Mush','dm'],['Squash','squash'],['Bend','bend'],['NonLinear','nonLin']] },
     { title: 'Utility Nodes',          rows: [['Multiply Divide (always tag purpose)','md'],['Plus Minus Average','pma'],['Condition (always tag purpose)','cond'],['Clamp','clamp'],['Remap Value','rmv'],['Blend Colors','bc'],['Blend Two Attr','bta'],['Reverse','rev'],['Set Range','sr'],['Distance Between (always tag purpose)','db']] },
     { title: 'Math / Matrix',          rows: [['Sum','sum'],['Decompose Matrix (tag purpose if >1 per setup)','dcm'],['Compose Matrix','cm'],['Inverse Matrix','invMat'],['Mult Matrix','mmx'],['Blend Matrix (always tag purpose)','bm']] },
-    { title: 'Constraints',            rows: [['Parent Constraint','pc'],['Point Constraint','pointCon'],['Orient Constraint','oc'],['Scale Constraint','sc'],['Aim Constraint','ac'],['Matrix Constraint','matCon'],['Proximity Pin','pin']] },
+    { title: 'Constraints',            rows: [['Parent Constraint','pc'],['Point Constraint','pointCon'],['Orient Constraint','oc'],['Scale Constraint','scaleCon'],['Aim Constraint','ac'],['Matrix Constraint','matCon'],['Proximity Pin','pin']] },
     { title: 'IK',                     rows: [['IK Handle','ikh'],['IK Effector','ike'],['Spline IK','splineIK']] },
     { title: 'Spaces & Locators',      rows: [['Local Space Locator','local_loc'],['World Space Locator','world_loc'],['Space Switch','space_sw']] },
     { title: 'Rigging Misc',           rows: [['Follicle','fol'],['Curve Info','crv_info'],['Motion Path','mpath']] },
