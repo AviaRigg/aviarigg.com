@@ -4,15 +4,14 @@ window.LIB_SCRIPT_DATA['naming-conventions'] = {
   category: 'Reference',
   tags: ['naming','suffix','convention','node','shader','texture'],
   isReference: true,
-  desc: `Standard suffix conventions for all node types used in AviaRigg rigs.
-    Consistent naming keeps rigs readable, maintainable, and scriptable.
+  desc: `Standard suffix conventions for all node types used in AviaRigg rigs. Consistent naming keeps rigs readable, maintainable, and scriptable.
 
-    * = always tag purpose before the suffix: {side}_{corner}_{index}_{purpose}_{suffix}
-    e.g. l_f_outer_01_ikFollow_cond, l_f_outer_01_compress_bm,
-    l_f_outer_01_squash_md, l_f_outer_01_compress_db.
+    * Always tag purpose before the suffix:
+    {side}_{corner}_{index}_{purpose}_{suffix}
+    e.g. l_f_outer_01_ikFollow_cond, l_f_outer_01_compress_bm
 
-    ** = tag purpose only if more than one exists per setup
-    e.g. l_f_outer_01_trans_dcm, l_f_outer_01_rot_dcm.`,
+    ** Tag purpose only if more than one exists per setup:
+    e.g. l_f_outer_01_trans_dcm, l_f_outer_01_rot_dcm`,
   conventions: [
     { title: 'Transforms & Hierarchy', rows: [['Transform','transform'],['Group','grp'],['Offset','off'],['Locator','loc'],['Connection Offset','con']] },
     { title: 'Controllers',            rows: [['Control','ctl'],['Control Offset','ctl_off'],['Gimbal Control','gimbal_ctl'],['Set Driven Key','sdk']] },
