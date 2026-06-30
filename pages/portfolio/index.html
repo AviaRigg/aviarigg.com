@@ -723,5 +723,168 @@
 
 <button id="port-edit-btn" onclick="togglePortEditMode()">✎ Edit Mode</button>
 
+<!-- ── WIP NOTICE OVERLAY ── -->
+<style>
+  #wip-overlay {
+    position: fixed; inset: 0; z-index: 99999;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(8,7,12,0.82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 24px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+  #wip-overlay.is-visible { opacity: 1; pointer-events: auto; }
+
+  #wip-card {
+    position: relative;
+    width: 100%; max-width: 540px;
+    background: var(--surface, #13121a);
+    border: 1px solid rgba(139,79,200,0.35);
+    box-shadow: 0 0 80px rgba(139,79,200,0.18), 0 20px 60px rgba(0,0,0,0.5);
+    padding: 40px 36px 32px;
+    transform: translateY(12px) scale(0.98);
+    transition: transform 0.35s ease;
+  }
+  #wip-overlay.is-visible #wip-card { transform: translateY(0) scale(1); }
+
+  #wip-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent, #8b4fc8), transparent);
+  }
+
+  .wip-eyebrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+    color: var(--accent, #8b4fc8);
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 18px;
+  }
+  .wip-eyebrow::before {
+    content: ''; width: 7px; height: 7px; border-radius: 50%;
+    background: #f5a623;
+    box-shadow: 0 0 8px rgba(245,166,35,0.8);
+    animation: wip-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes wip-pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.35; }
+  }
+
+  .wip-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: clamp(26px, 3.2vw, 34px);
+    letter-spacing: 1px;
+    color: #f4f2f8;
+    margin-bottom: 14px;
+  }
+
+  .wip-body {
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px; line-height: 1.7;
+    color: rgba(244,242,248,0.68);
+    margin-bottom: 28px;
+  }
+  .wip-body strong { color: rgba(244,242,248,0.92); font-weight: 600; }
+
+  .wip-actions {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 22px;
+  }
+
+  .wip-social {
+    display: flex; gap: 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  }
+  .wip-social a {
+    color: rgba(244,242,248,0.55);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .wip-social a:hover { color: var(--accent, #8b4fc8); border-color: var(--accent, #8b4fc8); }
+
+  #wip-dismiss {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: #f4f2f8;
+    background: rgba(139,79,200,0.15);
+    border: 1px solid rgba(139,79,200,0.5);
+    padding: 11px 22px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    white-space: nowrap;
+  }
+  #wip-dismiss:hover {
+    background: rgba(139,79,200,0.28);
+    border-color: rgba(139,79,200,0.8);
+  }
+
+  @media (max-width: 480px) {
+    #wip-card { padding: 32px 24px 26px; }
+    .wip-actions { flex-direction: column; align-items: stretch; }
+    #wip-dismiss { width: 100%; text-align: center; }
+  }
+</style>
+
+<div id="wip-overlay">
+  <div id="wip-card">
+    <div class="wip-eyebrow">Work In Progress</div>
+    <div class="wip-title">This portfolio is still being built.</div>
+    <div class="wip-body">
+      Thanks for stopping by. <strong>AviaRigg</strong> is actively under construction — some projects are still
+      placeholders, and pages may change or break while things get finished. Featured work like the
+      <strong>F1 SF-25</strong> rig is live and ready to view; everything else is on the way.
+    </div>
+    <div class="wip-actions">
+      <div class="wip-social">
+        <a href="https://instagram.com/AviaRigg" target="_blank" rel="noopener">Instagram</a>
+        <a href="mailto:paulchedozeau@gmail.com">Contact</a>
+      </div>
+      <button id="wip-dismiss" type="button">Continue to site</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var STORAGE_KEY = 'aviarigg_wip_dismissed_v1';
+    var overlay = document.getElementById('wip-overlay');
+    var dismissBtn = document.getElementById('wip-dismiss');
+
+    function show() {
+      overlay.style.display = 'flex';
+      requestAnimationFrame(function () { overlay.classList.add('is-visible'); });
+    }
+    function hide() {
+      overlay.classList.remove('is-visible');
+      setTimeout(function () { overlay.style.display = 'none'; }, 350);
+      try { sessionStorage.setItem(STORAGE_KEY, '1'); } catch (e) {}
+    }
+
+    var alreadySeen = false;
+    try { alreadySeen = sessionStorage.getItem(STORAGE_KEY) === '1'; } catch (e) {}
+
+    if (!alreadySeen) {
+      show();
+    } else {
+      overlay.style.display = 'none';
+    }
+
+    dismissBtn.addEventListener('click', hide);
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) hide();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && overlay.classList.contains('is-visible')) hide();
+    });
+  })();
+</script>
+
 </body>
 </html>
