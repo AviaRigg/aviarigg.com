@@ -119,7 +119,10 @@
 
     const { data: { session } } = await sb.auth.getSession();
     if (!session || !session.user) {
-      if (locked) locked.style.display = 'block';
+      if (locked) {
+        locked.textContent = '// Log in and purchase a product to leave a review';
+        locked.style.display = 'block';
+      }
       return;
     }
     currentUserId = session.user.id;
@@ -132,7 +135,10 @@
     if (keyErr) { console.warn('license_keys check error:', keyErr); }
     const isBuyer = keys && keys.length > 0;
     if (!isBuyer) {
-      if (locked) locked.style.display = 'block';
+      if (locked) {
+        locked.textContent = '// Make sure to redeem your key after purchase to unlock reviews';
+        locked.style.display = 'block';
+      }
       return;
     }
 
