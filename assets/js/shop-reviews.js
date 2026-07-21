@@ -237,6 +237,77 @@
     });
   }
 
+  async function loadPendingReviews() {
+    const sb = await getSb();
+    if (!sb) return;
+    const list = document.getElementById('rev-admin-list');
+    const empty = document.getElementById('rev-admin-empty');
+    if (!list) return;
+
+    const { data, error } = await sb
+      .from('customer_reviews')
+      .select('id, rating, review_text, created_at, product_id, profiles(username), shop_products(name)')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: true });
+
+    if (error) { console.warn('loadPendingReviews error:', error); return; }
+
+    list.innerHTML = '';
+
+    if (!data || data.length === 0) {
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    data.forEach(r => {
+      const name = (r.profiles && r.profiles.username) || 'Unknown buyer';
+      const productName = r.product_id && r.shop_products ? r.shop_products.name : null;
+      const item = document.createElement('div');
+      item.className = 'rev-admin-item';
+      item.innerHTML = `
+        <div class="rev-admin-item-top">
+          <div class="rev-admin-who">
+            <div class="rev-admin-name">${escapeHtml(name)}</div>
+            <div class="rev-admin-stars">${starsHtml(r.rating)}</div>
+          </div>
+        </div>
+        ${productName ? `<div class="rev-admin-product">Re: ${escapeHtml(productName)}</div>` : ''}
+        ${r.review_text ? `<div class="rev-admin-text">${escapeHtml(r.review_text)}</div>` : ''}
+        <div class="rev-admin-actions">
+          <button class="rev-admin-approve" data-id="${r.id}">Approve</button>
+          <button class="rev-admin-reject" data-id="${r.id}">Reject</button>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+
+    list.querySelectorAll('.rev-admin-approve').forEach(btn => {
+      btn.addEventListener('click', () => moderateReview(btn.dataset.id, 'approved'));
+    });
+    list.querySelectorAll('.rev-admin-reject').forEach(btn => {
+      btn.addEventListener('click', () => moderateReview(btn.dataset.id, 'rejected'));
+    });
+  }
+
+  async function moderateReview(id, status) {
+    const sb = await getSb();
+    if (!sb) return;
+    const { error } = await sb
+      .from('customer_reviews')
+      .update({ status, reviewed_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) {
+      console.error('moderateReview error:', error);
+      alert('Could not update that review. Please try again.');
+      return;
+    }
+    await loadPendingReviews();
+    await loadApprovedReviews(sb);
+  }
+
+  window.loadPendingReviews = loadPendingReviews;
+
   async function init() {
     const sb = await getSb();
     if (!sb) { console.warn('shop-reviews.js: Supabase client unavailable'); return; }
