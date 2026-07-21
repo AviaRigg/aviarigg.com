@@ -59,7 +59,7 @@
 
     const { data, error } = await sb
       .from('customer_reviews')
-      .select('id, rating, review_text, created_at, product_id, profiles(display_name), shop_products(name)')
+      .select('id, rating, review_text, created_at, product_id, profiles(username), shop_products(name)')
       .eq('status', 'approved')
       .order('created_at', { ascending: false });
 
@@ -83,7 +83,7 @@
     }
 
     data.forEach(r => {
-      const name = (r.profiles && r.profiles.display_name) || 'Verified buyer';
+      const name = (r.profiles && r.profiles.username) || 'Verified buyer';
       const productName = r.product_id && r.shop_products ? r.shop_products.name : null;
       const item = document.createElement('div');
       item.className = 'rev-item';
@@ -126,7 +126,7 @@
 
     const { data: keys, error: keyErr } = await sb
       .from('license_keys')
-      .select('id')
+      .select('key')
       .eq('redeemed_by', currentUserId)
       .limit(1);
     if (keyErr) { console.warn('license_keys check error:', keyErr); }
