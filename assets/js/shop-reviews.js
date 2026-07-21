@@ -220,7 +220,7 @@
       });
 
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Submit for review';
+      submitBtn.textContent = 'Submit review';
 
       if (error) {
         console.error('Review submit error:', error);
