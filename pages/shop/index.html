@@ -6,7 +6,6 @@
 <title>Shop — AviaRigg</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
-<script type="text/javascript" src="https://payhip.com/payhip.js"></script>
 <script>
   document.addEventListener('touchmove', function(e) {
     if (e.touches.length > 1) e.preventDefault();
@@ -2116,20 +2115,6 @@
   });
   observer.observe(commTab, { attributes: true, attributeFilter: ['class'] });
 })();
-</script>
-
-<!-- PAYHIP CHECKOUT FIX — overrides the old raw-iframe openCheckout/closeCheckout -->
-<!-- from shop-products.js. Payhip sends X-Frame-Options: sameorigin on the checkout -->
-<!-- page, so it can never be loaded in a plain <iframe> on aviarigg.com. Payhip.Checkout.open() -->
-<!-- is Payhip's own script-driven overlay and isn't subject to that block. -->
-<script>
-  window.openCheckout = function(url) {
-    const match = url.match(/payhip\.com\/b\/([^/?]+)/);
-    const key = match ? match[1] : null;
-    if (!key) { window.open(url, '_blank'); return; }
-    Payhip.Checkout.open({ product: key });
-  };
-  window.closeCheckout = function() {}; // Payhip's overlay manages its own close now
 </script>
 </body>
 </html>
